@@ -95,12 +95,16 @@
 			message_admins("[character] ([character.ckey]) has spawned with their gender as plural or neuter. Please notify coders.")
 			gender = MALE
 
+	round_number = universe.round_number
+
 /datum/character/proc/saveCharacter( var/prompt = 0 )
 	if( istype( char_mob ))
+		char_mob.fully_replace_character_name( char_mob.real_name, name )
 		copy_to( char_mob )
 		char_mob.update_hair()
 		char_mob.update_body()
 		char_mob.check_dna( char_mob )
+
 
 	if( temporary ) // If we're just a temporary character, dont save to database
 		return 1
@@ -226,6 +230,7 @@
 	variables["employment_status"] = html_encode( sql_sanitize_text( employment_status ))
 	variables["felon"] = sanitize_integer( felon, 0, BITFLAGS_MAX, 0 )
 	variables["prison_date"] = html_encode( list2params( prison_date ))
+	variables["round_number"] = sanitize_integer( round_number, 0, 1.8446744e+19, 0 )
 
 	var/list/names = list()
 	var/list/values = list()
