@@ -283,7 +283,7 @@
 
 	return 1
 
-/proc/checkCharacter( var/character_name, var/ckey )
+/proc/checkCharacter( var/character_ident, var/ckey )
 	establish_db_connection()
 	if( !dbcon.IsConnected() )
 		return 0
@@ -291,13 +291,13 @@
 	if( !ckey )
 		return 0
 
-	if( !character_name )
+	if( !character_ident )
 		return 0
 
 	var/sql_ckey = ckey( ckey )
-	var/sql_character_name = html_encode( character_name )
+	var/sql_character_ident = html_encode( character_ident )
 
-	var/DBQuery/query = dbcon.NewQuery("SELECT id FROM characters WHERE ckey = '[sql_ckey]' AND name = '[sql_character_name]'")
+	var/DBQuery/query = dbcon.NewQuery("SELECT id FROM characters WHERE ckey = '[sql_ckey]' AND unique_identifier = '[sql_character_ident]'")
 	if( !query.Execute() )
 		return 0
 
@@ -317,14 +317,14 @@
 
 	return sql_id
 
-/datum/character/proc/loadCharacter( var/character_name )
+/datum/character/proc/loadCharacter( var/character_ident, var/is_temporary = 0 )
 	if( !ckey )
 		return 0
 
-	if( !character_name )
+	if( !character_ident )
 		return 0
 
-	if( !checkCharacter( character_name, ckey ))
+	if( !checkCharacter( character_ident, ckey ))
 		return 0
 
 	establish_db_connection()
@@ -415,13 +415,12 @@
 	variables["prison_date"] = "prison_date"
 
 	var/query_names = list2text( variables, "," )
-	var/sql_ckey = ckey( ckey )
-	var/sql_character_name = html_encode( sql_sanitize_text( character_name ))
+	var/sql_ident = html_encode( sql_sanitize_text( character_ident ))
 
 	new_character = 0 // If we're loading from the database, we're obviously a pre-existing character
-	temporary = 0
+	temporary = is_temporary
 
-	var/DBQuery/query = dbcon.NewQuery("SELECT [query_names] FROM characters WHERE ckey = '[sql_ckey]' AND name = '[sql_character_name]'")
+	var/DBQuery/query = dbcon.NewQuery("SELECT [query_names] FROM characters WHERE unique_identifier = '[sql_ident]'")
 	if( !query.Execute() )
 		return 0
 

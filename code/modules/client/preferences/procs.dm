@@ -76,17 +76,17 @@
 	var/sql_toggles = sanitize_integer( toggles, 0, TOGGLES_DEFAULT, TOGGLES_DEFAULT )
 
 	// Saved characters
-	var/sql_select_char = "None"
+	var/sql_select_ident = "None"
 	if( selected_character )
-		sql_select_char = html_encode( sql_sanitize_text( selected_character.name ))
+		sql_select_ident = html_encode( sql_sanitize_text( selected_character.unique_identifier ))
 
 	if(sql_id)
 		//Player already identified previously, we need to just update the 'lastseen', 'ip' and 'computer_id' variables
-		var/DBQuery/query_update = dbcon.NewQuery("UPDATE preferences SET OOC_color = '[sql_OOC_color]', UI_style = '[sql_UI_style]', UI_style_color = '[sql_UI_color]', UI_style_alpha = '[sql_UI_alpha]', toggles = '[sql_toggles]', last_character = '[sql_select_char]' WHERE id = [sql_id]")
+		var/DBQuery/query_update = dbcon.NewQuery("UPDATE preferences SET OOC_color = '[sql_OOC_color]', UI_style = '[sql_UI_style]', UI_style_color = '[sql_UI_color]', UI_style_alpha = '[sql_UI_alpha]', toggles = '[sql_toggles]', last_character = '[sql_select_ident]' WHERE id = [sql_id]")
 		query_update.Execute()
 	else
 		//New player!! Need to insert all the stuff
-		var/DBQuery/query_insert = dbcon.NewQuery("INSERT INTO preferences (id, ckey, joined_date, OOC_color, UI_style, UI_style_color, UI_style_alpha, toggles, last_character) VALUES (null, '[sql_ckey]', '[sql_join_date]', '[sql_OOC_color]', '[sql_UI_style]', '[sql_UI_color]', '[sql_UI_alpha]', '[sql_toggles]', '[sql_select_char]')")
+		var/DBQuery/query_insert = dbcon.NewQuery("INSERT INTO preferences (id, ckey, joined_date, OOC_color, UI_style, UI_style_color, UI_style_alpha, toggles, last_character) VALUES (null, '[sql_ckey]', '[sql_join_date]', '[sql_OOC_color]', '[sql_UI_style]', '[sql_UI_color]', '[sql_UI_alpha]', '[sql_toggles]', '[sql_select_ident]')")
 
 		query_insert.Execute()
 

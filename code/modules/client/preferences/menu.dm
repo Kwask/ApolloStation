@@ -222,7 +222,7 @@
 
 	establish_db_connection()
 	if( dbcon.IsConnected() )
-		var/DBQuery/query = dbcon.NewQuery("SELECT employment_status, prison_date, name, gender, department FROM characters WHERE ckey = '[sql_ckey]' ORDER BY name")
+		var/DBQuery/query = dbcon.NewQuery("SELECT employment_status, prison_date, name, unique_identifier, gender, department FROM characters WHERE ckey = '[sql_ckey]' ORDER BY name")
 		query.Execute()
 
 		. += "<tr>"
@@ -247,18 +247,19 @@
 
 			. += "<tr>"
 			var/name = query.item[3]
+			var/ident = query.item[4]
 			if( selected_character && selected_character.name == name )
 				. += "<td><b>[name]</b> - Selected</td>"
 			else
 				if( employment != "Active" )
 					. += "<td>[name] - Locked</td>"
 				else
-					. += "<td><a href='byond://?src=\ref[user];preference=[menu_name];task=choose;name=[name]'>[name]</a></td>"
+					. += "<td><a href='byond://?src=\ref[user];preference=[menu_name];task=choose;ident=[ident]'>[name]</a></td>"
 
-			. += "<td>[capitalize( query.item[4] )]</td>"
+			. += "<td>[capitalize( query.item[5] )]</td>"
 			. += "<td style='text-align:left'>[employment]</td>"
 
-			var/datum/department/D = job_master.GetDepartment( text2num( query.item[5] ))
+			var/datum/department/D = job_master.GetDepartment( text2num( query.item[6] ))
 			if( D )
 				. += "<td>[D.name]</td>"
 			else
@@ -276,9 +277,9 @@
 /datum/preferences/proc/SelectCharacterMenuProcess( mob/user, list/href_list )
 	switch( href_list["task"] )
 		if( "choose" )
-			var/chosen_name = href_list["name"]
+			var/chosen_ident = href_list["ident"]
 			for( var/datum/character/C in characters)
-				if( C.name == chosen_name )
+				if( C.unique_identifier == chosen_ident )
 					selected_character = C
 					SelectCharacterMenu( user )
 					winshow( user, "select_character_menu", 0)
@@ -287,7 +288,7 @@
 
 			selected_character = new( client.ckey )
 			characters.Add( selected_character )
-			if( !selected_character.loadCharacter( chosen_name ))
+			if( !selected_character.loadCharacter( chosen_ident ))
 				qdel( selected_character )
 
 			savePreferences()
