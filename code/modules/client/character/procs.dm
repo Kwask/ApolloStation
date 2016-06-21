@@ -518,6 +518,8 @@
 
 		vars[variables[i]] = value
 
+	update_preview_icon()
+
 	return 1
 
 /datum/character/proc/randomize_appearance( var/random_age = 0 )

@@ -61,8 +61,6 @@
 
 		var/id = add_zero(num2hex(rand(1, 1.6777215E7)), 6)	//this was the best they could come up with? A large random number? *sigh*
 
-		var/icon/front = new(get_id_photo(H), dir = SOUTH)
-		var/icon/side = new(get_id_photo(H), dir = WEST)
 		//General Record
 		var/datum/data/record/G = new()
 		G.fields["id"]			= id
@@ -79,8 +77,8 @@
 		G.fields["citizenship"]	= H.character.citizenship
 		G.fields["faction"]		= H.character.faction
 		G.fields["religion"]	= H.character.religion
-		G.fields["photo_front"]	= front
-		G.fields["photo_side"]	= side
+		G.fields["photo_front"]	= H.character.preview_icon_front
+		G.fields["photo_side"]	= H.character.preview_icon_side
 		G.fields["character"]	= H.character
 		if(H.character.gen_record && !jobban_isbanned(H, "Records"))
 			G.fields["notes"] = H.character.gen_record
@@ -154,7 +152,7 @@
 
 	return
 
-
+/*
 proc/get_id_photo(var/mob/living/carbon/human/H)
 	var/icon/preview_icon = null
 
@@ -317,3 +315,4 @@ proc/get_id_photo(var/mob/living/carbon/human/H)
 	qdel(clothes_s)
 
 	return preview_icon
+*/
