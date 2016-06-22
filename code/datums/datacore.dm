@@ -252,9 +252,15 @@ var/global/ManifestJSON
 	query.Execute()
 
 	while( query.NextRow() )
-		var/datum/character/C = new()
-		C.loadCharacter( html_decode( query.item[1] ), 1 )
+		var/datum/character/C = PoolOrNew( /datum/character )
+		var/ident = html_decode( sanitize_text( query.item[1], "ERROR" ))
 
+		if( !ident || ident == "ERROR" )
+			log_debug( "Failed to load character" )
+			qdel( C )
+			continue
+
+		C.loadCharacter( ident )
 		employee_pool += C
 
 /obj/effect/datacore/proc/manifest(var/nosleep = 0)

@@ -95,7 +95,7 @@
 			message_admins("[character] ([character.ckey]) has spawned with their gender as plural or neuter. Please notify coders.")
 			gender = MALE
 
-	round_number = universe.round_number
+	enterMob()
 
 /datum/character/proc/saveCharacter( var/prompt = 0 )
 	if( istype( char_mob ))
@@ -322,18 +322,18 @@
 
 	return sql_id
 
-/datum/character/proc/loadCharacter( var/character_ident, var/is_temporary = 0 )
-	if( !ckey )
-		return 0
-
+/datum/character/proc/loadCharacter( var/character_ident )
 	if( !character_ident )
+		log_debug( "No character identity!" )
 		return 0
 
-	if( !checkCharacter( character_ident, ckey ))
+	if( ckey && !checkCharacter( character_ident, ckey ))
+		log_debug( "Character does not belong to the given ckey!" )
 		return 0
 
 	establish_db_connection()
 	if( !dbcon.IsConnected() )
+		log_debug( "Database is not connected!" )
 		return 0
 
 	var/list/variables = list()
@@ -423,13 +423,15 @@
 	var/sql_ident = html_encode( sql_sanitize_text( character_ident ))
 
 	new_character = 0 // If we're loading from the database, we're obviously a pre-existing character
-	temporary = is_temporary
+	temporary = 1 // All characters are temporary until they enter the game
 
 	var/DBQuery/query = dbcon.NewQuery("SELECT [query_names] FROM characters WHERE unique_identifier = '[sql_ident]'")
 	if( !query.Execute() )
+		log_debug( "Could not execute query!" )
 		return 0
 
 	if( !query.NextRow() )
+		log_debug( "Query has no data!" )
 		return 0
 
 	for( var/i = 1; i <= variables.len; i++ )
@@ -928,3 +930,7 @@
 		return 0
 
 	return 1
+
+/datum/character/proc/enterMob()
+	temporary = new_character // If we're a new character, then we're also temporary
+	round_number = universe.round_number

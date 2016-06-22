@@ -140,4 +140,4 @@ var/list/all_characters = list() // A list of all loaded characters
 	var/species_preview   // Used for the species selection window.
 
 	var/new_character = 1 // Is this a new character?
-	var/temporary = 1 // Is this character only for this round?
+	var/temporary = 1 // Should we avoid saving this datum on round end?
