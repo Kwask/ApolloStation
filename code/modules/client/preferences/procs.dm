@@ -119,7 +119,7 @@
 
 		if( checkCharacter( selected_char_name, client.ckey ))
 			selected_character = new( client.ckey, 0, 0 )
-			characters.Add( selected_character )
+			data_core.employee_pool.Add( selected_character )
 			selected_character.loadCharacter( selected_char_name )
 
 	return 1

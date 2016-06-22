@@ -9,8 +9,14 @@
 	var/global/list/medical = list()
 	var/global/list/general = list()
 	var/global/list/security = list()
+
 	//This list tracks characters spawned in the world and cannot be modified in-game. Currently referenced by respawn_character().
 	var/global/list/locked = list()
+
+	var/max_employee_inactivity = 60 // If they've not been on-station within this many rounds, then they're not loaded
+
+	var/global/list/employee_pool = list() // A list of all employees who have participated within at least one of the last max_employee_inactivity rounds
+	var/global/list/crewmembers = list() // A list of all employees currently on-station
 
 /obj/effect/datacore/proc/get_manifest(monochrome, OOC)
 	var/list/heads = new()
@@ -227,11 +233,39 @@ var/global/ManifestJSON
 	ManifestJSON = list2json(PDA_Manifest)
 	return
 
+/obj/effect/datacore/proc/getCharacter( var/ident )
+	if( !ident )
+		return null
+
+	for( var/datum/character/C in employee_pool )
+		if( C.unique_identifier == employee_pool )
+			return C
+
+/obj/effect/datacore/proc/loadFromDB()
+	establish_db_connection()
+	if( !dbcon.IsConnected() )
+		return
+
+	var/min_round_number = universe.round_number-max_employee_inactivity
+
+	var/DBQuery/query = dbcon.NewQuery("SELECT unique_identifier FROM characters WHERE round_number > [min_round_number] ORDER BY name")
+	query.Execute()
+
+	while( query.NextRow() )
+		var/datum/character/C = new()
+		C.loadCharacter( html_decode( query.item[1] ), 1 )
+
+		employee_pool += C
+
 /obj/effect/datacore/proc/manifest(var/nosleep = 0)
 	spawn()
 		if(!nosleep)
 			sleep(40)
+
+		loadFromDB()
+
 		for(var/mob/living/carbon/human/H in player_list)
+			crewmembers += H.character
 			manifest_inject(H)
 		return
 

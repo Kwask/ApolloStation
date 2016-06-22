@@ -59,7 +59,7 @@
 		if( "edit_character" )
 			if( !selected_character )
 				selected_character = new( client.ckey, 1, 0 )
-				characters.Add( selected_character )
+				data_core.employee_pool.Add( selected_character )
 			ClientMenuDisable( user )
 			selected_character.EditCharacterMenu( user )
 		if( "delete_character" )
@@ -68,8 +68,6 @@
 
 			if( deleteCharacter( client.ckey, selected_character.name ))
 				client << "[selected_character.name] deleted from your account."
-
-				characters.Remove( selected_character )
 
 				qdel( selected_character )
 				selected_character = null
@@ -80,7 +78,7 @@
 			ClientMenu( user )
 		if( "new_character" )
 			selected_character = new( client.ckey, 1, 0 )
-			characters.Add( selected_character )
+			data_core.employee_pool.Add( selected_character )
 			savePreferences()
 
 			ClientMenuDisable( user )
@@ -278,16 +276,18 @@
 	switch( href_list["task"] )
 		if( "choose" )
 			var/chosen_ident = href_list["ident"]
-			for( var/datum/character/C in characters)
-				if( C.unique_identifier == chosen_ident )
-					selected_character = C
-					SelectCharacterMenu( user )
-					winshow( user, "select_character_menu", 0)
-					ClientMenu( user )
-					return
+
+			var/datum/character/C = data_core.getCharacter( chosen_ident )
+
+			if( C )
+				selected_character = C
+				SelectCharacterMenu( user )
+				winshow( user, "select_character_menu", 0)
+				ClientMenu( user )
+				return
 
 			selected_character = new( client.ckey )
-			characters.Add( selected_character )
+			data_core.employee_pool.Add( selected_character )
 			if( !selected_character.loadCharacter( chosen_ident ))
 				qdel( selected_character )
 

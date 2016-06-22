@@ -28,7 +28,6 @@ var/list/preferences_datums = list()
 	var/toggles = TOGGLES_DEFAULT
 
 	// Saved characters
-	var/list/characters = list()
 	var/datum/character/selected_character
 
 	// Items tied to the account
