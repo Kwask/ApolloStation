@@ -63,11 +63,11 @@ var/global/datum/global_init/init = new ()
 	master_controller = new /datum/controller/game_controller()
 
 	spawn(1)
+		universe.load_date()
+
 		processScheduler.deferSetupFor(/datum/controller/process/ticker)
 		processScheduler.setup()
 		master_controller.setup()
-
-		universe.load_date()
 
 		sleep_offline = 1 // go to sleep after the controllers are all set up
 

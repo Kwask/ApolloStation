@@ -1,11 +1,4 @@
-/hook/startup/proc/createDatacore()
-	data_core = new /obj/effect/datacore()
-	return 1
-
-
-/obj/effect/datacore
-	name = "station database"
-	desc = "Holds a local copy of all of the crewmember records."
+/datum/controller/process/datacore
 	var/global/list/medical = list()
 	var/global/list/general = list()
 	var/global/list/security = list()
@@ -18,7 +11,20 @@
 	var/global/list/employee_pool = list() // A list of all employees who have participated within at least one of the last max_employee_inactivity rounds
 	var/global/list/crewmembers = list() // A list of all employees currently on-station
 
-/obj/effect/datacore/proc/get_manifest(monochrome, OOC)
+/datum/controller/process/datacore/New()
+	..()
+
+	data_core = src
+	active_controllers += src
+
+/datum/controller/process/datacore/setup()
+	name = "station database"
+	schedule_interval = 50
+
+	data_core.loadFromDB()
+	data_core.queue_manifest()
+
+/datum/controller/process/datacore/proc/get_manifest(monochrome, OOC)
 	var/list/heads = new()
 	var/list/sec = new()
 	var/list/eng = new()
@@ -143,13 +149,13 @@
 We can't just insert in HTML into the nanoUI so we need the raw data to play with.
 Instead of creating this list over and over when someone leaves their PDA open to the page
 we'll only update it when it changes.  The PDA_Manifest global list is zeroed out upon any change
-using /obj/effect/datacore/proc/manifest_inject( ), or manifest_insert( )
+using /datum/controller/process/datacore/proc/manifest_inject( ), or manifest_insert( )
 */
 
 var/global/list/PDA_Manifest = list()
 var/global/ManifestJSON
 
-/obj/effect/datacore/proc/get_manifest_json()
+/datum/controller/process/datacore/proc/get_manifest_json()
 	if(PDA_Manifest.len)
 		return
 	var/heads[0]
@@ -233,7 +239,7 @@ var/global/ManifestJSON
 	ManifestJSON = list2json(PDA_Manifest)
 	return
 
-/obj/effect/datacore/proc/getCharacter( var/ident )
+/datum/controller/process/datacore/proc/getCharacter( var/ident )
 	if( !ident )
 		return null
 
@@ -241,7 +247,7 @@ var/global/ManifestJSON
 		if( C.unique_identifier == employee_pool )
 			return C
 
-/obj/effect/datacore/proc/loadFromDB()
+/datum/controller/process/datacore/proc/loadFromDB()
 	establish_db_connection()
 	if( !dbcon.IsConnected() )
 		return
@@ -263,26 +269,28 @@ var/global/ManifestJSON
 		C.loadCharacter( ident )
 		employee_pool += C
 
-/obj/effect/datacore/proc/manifest(var/nosleep = 0)
-	spawn()
-		if(!nosleep)
-			sleep(40)
-
-		loadFromDB()
-
-		for(var/mob/living/carbon/human/H in player_list)
-			crewmembers += H.character
-			manifest_inject(H)
+/datum/controller/process/datacore/proc/queue_manifest(var/nosleep = 0)
+	if(!nosleep)
+		manifest()
 		return
 
-/obj/effect/datacore/proc/manifest_sort()
+	spawn(40)
+		manifest()
+
+/datum/controller/process/datacore/proc/manifest()
+	for(var/mob/living/carbon/human/H in player_list)
+		crewmembers += H.character
+		manifest_inject(H)
+	return
+
+/datum/controller/process/datacore/proc/manifest_sort()
 	// Keep 'em boys in neat rows
 	general = sortRecord(general, "name", 1)
 	medical = sortRecord(medical, "name", 1)
 	security = sortRecord(security, "name", 1)
 	locked = sortRecord(locked, "name", 1)
 
-/obj/effect/datacore/proc/manifest_modify(var/name, var/assignment)
+/datum/controller/process/datacore/proc/manifest_modify(var/name, var/assignment)
 	if(PDA_Manifest.len)
 		PDA_Manifest.Cut()
 	var/datum/data/record/foundrecord
@@ -309,7 +317,7 @@ var/global/ManifestJSON
 
 	manifest_sort()
 
-/obj/effect/datacore/proc/manifest_inject(var/mob/living/carbon/human/H)
+/datum/controller/process/datacore/proc/manifest_inject(var/mob/living/carbon/human/H)
 	if(PDA_Manifest.len)
 		PDA_Manifest.Cut()
 

@@ -127,7 +127,6 @@ var/global/datum/controller/gameticker/ticker
 	create_characters() //Create player characters and transfer them
 	collect_minds()
 	equip_characters()
-	data_core.manifest()
 
 	setup_economy()
 	current_state = GAME_STATE_PLAYING

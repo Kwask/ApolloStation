@@ -2,7 +2,7 @@
 //This file was auto-corrected by findeclaration.exe on 25.5.2012 20:42:31
 
 //items that ask to be called every cycle
-var/global/obj/effect/datacore/data_core = null
+var/global/datum/controller/process/datacore/data_core = null
 var/global/list/all_areas = list()
 var/global/list/machines = list()
 var/global/list/processing_objects = list()
