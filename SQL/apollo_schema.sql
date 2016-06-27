@@ -207,7 +207,7 @@ CREATE TABLE IF NOT EXISTS `accounts` (
   `ckey` varchar(32) NOT NULL,
   `owner_hash` varchar(32) NOT NULL,
   `domain_name` varchar(100) NOT NULL DEFAULT "apollo.nt", -- The domain that this account belongs to
-  `username` varchar(100) NOT NULL, -- The username to log into this character's account, is also for their email acc
+  `username` varchar(100) NOT NULL DEFAULT "username", -- The username to log into this character's account, is also for their email acc
   `password` varchar(100) NOT NULL DEFAULT "password", -- The password to log into this character's account
   `pin` varchar(4) NOT NULL DEFAULT "0000",
   `security_level` tinyint NOT NULL DEFAULT '1', -- What kind of authorization is needed to log into this acc?

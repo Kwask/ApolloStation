@@ -17,10 +17,12 @@
 
 	change_age( 30 )
 
-	account = new( key )
+	account = new( key, src )
 
 	if( !account.department )
 		account.LoadDepartment( CIVILIAN )
+
+	account.generateUsername()
 
 	menu = new( null, "creator", "Character Creator", 710, 610 )
 	menu.window_options = "focus=0;can_close=0;"

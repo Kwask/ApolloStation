@@ -220,7 +220,7 @@
 
 	establish_db_connection()
 	if( dbcon.IsConnected() )
-		var/DBQuery/query = dbcon.NewQuery("SELECT employment_status, prison_date, name, hash, gender, department FROM characters WHERE ckey = '[sql_ckey]' ORDER BY name")
+		var/DBQuery/query = dbcon.NewQuery("SELECT employment_status, prison_date, name, owner_hash, gender, department FROM accounts WHERE ckey = '[sql_ckey]' ORDER BY name")
 		query.Execute()
 
 		. += "<tr>"

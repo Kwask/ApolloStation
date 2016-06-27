@@ -22,7 +22,7 @@
 	return 0
 
 /datum/account/New( var/key, var/datum/character/char )
-	if( !istype( char ))
+	if( istype( char ))
 		owner = char
 		copyFrom( char )
 
@@ -62,10 +62,13 @@
 	return add_zero( num2text( rand( 0, 9999 )), 4 )
 
 /datum/account/proc/generatePassword()
-	return add_zero( num2text( rand( 0, 999999 )), 6 )
+	return ckey( "[pick( alphabet_phonetic )][rand( 0, 100 )]" )
 
 /datum/account/proc/generateUsername()
 	// Format firlastbd
+	if( owner )
+		name = owner.name
+
 	var/stripped_name = ckey( name )
 	var/usern = ""
 	var/max_size = 9
@@ -81,6 +84,7 @@
 		usern += num2text( rand( 0, 9 ))
 
 		if( !accUsernameExists( usern ) && usern != "username" )
+			username = usern
 			return usern
 
 /datum/account/proc/generateEmail()
