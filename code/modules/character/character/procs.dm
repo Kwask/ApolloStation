@@ -283,7 +283,7 @@
 			testing( "SAVE CHARACTER: Didn't save [name] / ([ckey]) because the SQL insert failed" )
 			return 0
 
-	if( new_character )
+	if( new_character || prompt )
 		account.copyFrom( src )
 
 	account.saveAccount()

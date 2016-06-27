@@ -1,9 +1,35 @@
+/proc/accUsernameExists( var/username )
+	establish_db_connection()
+	if( !dbcon.IsConnected() )
+		return 0
+
+	var/DBQuery/query = dbcon.NewQuery("SELECT id FROM accounts WHERE username = '[username]'")
+	query.Execute()
+
+	var/sql_id = 0
+	while( query.NextRow() )
+		sql_id = query.item[1]
+		break
+
+	//Just the standard check to see if it's actually a number
+	if(sql_id)
+		if(istext(sql_id))
+			sql_id = text2num(sql_id)
+
+	if( sql_id )
+		return 1
+
+	return 0
+
 /datum/account/New( var/key, var/datum/character/char )
 	if( !istype( char ))
 		owner = char
 		copyFrom( char )
 
 	ckey = ckey( key )
+
+	password = generatePassword()
+	pin = generatePin()
 
 	if( !department )
 		LoadDepartment( CIVILIAN )
@@ -25,9 +51,40 @@
 	blood_type = owner.blood_type
 	owner_hash = owner.hash
 
+	if( !username || username == "username" )
+		username = generateUsername()
+
 	temporary = 0 // Data has changed that should be saved now
 
 	return 1
+
+/datum/account/proc/generatePin()
+	return add_zero( num2text( rand( 0, 9999 )), 4 )
+
+/datum/account/proc/generatePassword()
+	return add_zero( num2text( rand( 0, 999999 )), 6 )
+
+/datum/account/proc/generateUsername()
+	// Format firlastbd
+	var/stripped_name = ckey( name )
+	var/usern = ""
+	var/max_size = 9
+
+	for( var/i = 0, i < 50, i++ )
+		var/firstchar = 1
+		var/lastchar = max_size-2
+		if( lentext( name ) < lastchar )
+			lastchar = round( lentext( name )/2 )
+
+		usern += copytext( stripped_name, firstchar, lastchar )
+		usern += add_zero( num2text( birth_date[3] ), 2 )
+		usern += num2text( rand( 0, 9 ))
+
+		if( !accUsernameExists( usern ) && usern != "username" )
+			return usern
+
+/datum/account/proc/generateEmail()
+	return "[username]@[domain_name]"
 
 /datum/account/proc/saveAccount( var/force = 0 )
 	if( temporary && !force ) // If we're just a temporary character and we're not forcing a save, dont save to database
@@ -40,6 +97,9 @@
 	if ( IsGuestKey( ckey ))
 		testing( "SAVE CHARACTER: Didn't save [name]'s account / ([ckey]) because they were a guest character" )
 		return 0
+
+	if( !username || username == "username" )
+		username = generateUsername()
 
 	var/list/variables = list()
 

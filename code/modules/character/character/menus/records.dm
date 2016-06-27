@@ -14,6 +14,46 @@
 	. += "<hr>"
 
 	. += "<table width='100%'>"
+	. += "<tr><td valign='top'>"
+
+	. += "<table class='border'>"
+	. += "<tr>"
+	. += "<th>Username</th>"
+	. += "<td>[account.username]</td>"
+	. += "</tr>"
+
+	. += "<tr>"
+	. += "<th>Password</th>"
+	. += "<td>[account.password]</td>"
+	. += "</tr>"
+
+	. += "<tr>"
+	. += "<th>Pin</th>"
+	. += "<td>[account.pin]</td>"
+	. += "</tr>"
+	. += "</table>"
+
+	. += "</td><td valign='top'>"
+
+	. += "<table class='border'>"
+	. += "<tr>"
+	. += "<th>Clearence</th>"
+	. += "<td>[account.clearence_level]</td>"
+	. += "</tr>"
+
+	. += "<tr>"
+	. += "<th>Account Security</th>"
+	. += "<td>[account.security_level]</td>"
+	. += "</tr>"
+
+	. += "<tr>"
+	. += "<th>Email</th>"
+	. += "<td>[account.generateEmail()]</td>"
+	. += "</tr>"
+
+	. += "</table>"
+
+	. += "</td></tr>"
 	. += "<tr><td colspan='2' valign='top'>"
 
 	. += "<table class='border'>"

@@ -4,10 +4,10 @@
 	var/ckey
 	var/owner_hash
 
-	var/domain_name = "nanotrasen.nt"
+	var/domain_name = "apollo.nt"
 
 	// Login information
-	var/username							// Account username to login with
+	var/username = "username"				// Account username to login with
 	var/password = "password"				// Simple password to login with
 	var/pin = "0000"						// Less secure form of password, number between 0000 and 9999
 
