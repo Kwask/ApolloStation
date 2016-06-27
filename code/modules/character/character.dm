@@ -9,6 +9,8 @@
 	var/gender = MALE					//gender of character (well duh)
 	var/age = AGE_DEFAULT				//age of character
 
+	var/list/birth_date = list()
+
 	var/blood_type = "A+"				//blood type (not-chooseable)
 
 	// Default clothing
@@ -60,8 +62,6 @@
 
 	// Mob preview
 	var/icon/preview_icon = null
-	var/icon/preview_icon_front = null
-	var/icon/preview_icon_side = null
 	var/species_preview   // Used for the species selection window.
 
 	var/new_character = 1 // Is this a new character?

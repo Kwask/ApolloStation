@@ -152,7 +152,7 @@
 	set desc = "Toggles which special roles you would like to be a candidate for, during events."
 	var/role_flag = be_special_flags[role]
 	if(!role_flag)	return
-	prefs.selected_character.job_antag ^= role_flag
+	prefs.job_antag ^= role_flag
 	prefs.savePreferences()
 	src << "You will [(prefs.beSpecial() & role_flag) ? "now" : "no longer"] be considered for [role] events (where possible)."
 	feedback_add_details("admin_verb","TBeSpecial") //If you are copy-pasting this, ensure the 2nd parameter is unique to the new proc!

@@ -9,8 +9,8 @@
 	//width	 - Screen' width. Defaults to 550 to make it look nice.
 	//height 	 - Screen's height. Defaults to 500 to make it look nice.
 
-	if( !department )
-		ResetJobs()
+	if( !account.department )
+		account.ResetJobs()
 
 	. = "<html><body>"
 	. += "<center>"
@@ -28,7 +28,7 @@
 		return
 
 	// This is a list of job datums organized by department, also listed in order of succession
-	var/list/dep_jobs = organizeJobByDepartment( jobNamesToDatums( roles ))
+	var/list/dep_jobs = organizeJobByDepartment( jobNamesToDatums( account.roles ))
 
 	. += "<table>"
 	. += "<tr>"
@@ -36,14 +36,14 @@
 	. += "<td><table>"
 	. += "<tr>"
 	. += "<td><b>Branch:</b></td>"
-	if( !department.department_id )
-		. += "<td><a href='byond://?src=\ref[src];character=[menu_name];task=change_branch'>[department.name]</a></td>"
+	if( !account.department.department_id )
+		. += "<td><a href='byond://?src=\ref[src];character=[menu_name];task=change_branch'>[account.department.name]</a></td>"
 	else
-		. += "<td>[department.name]</td>"
+		. += "<td>[account.department.name]</td>"
 	. += "</tr>"
 	. += "</table></td>"
 
-	if( department.department_id && user.client.character_tokens && user.client.character_tokens["Command"] )
+	if( account.department.department_id && user.client.character_tokens && user.client.character_tokens["Command"] )
 		. += "<td><table>"
 
 		var/num = user.client.character_tokens["Command"]
@@ -89,7 +89,7 @@
 			if( !istype( J ))
 				continue
 
-			if( !( J.title in roles )) // If its not in our roles, dont show it
+			if( !( J.title in account.roles )) // If its not in our roles, dont show it
 				continue
 
 			var/required_playtime = 0
@@ -104,7 +104,7 @@
 				. += "<b>"
 
 			if( J.alt_titles )
-				. += "<a href='byond://?src=\ref[src];character=[menu_name];task=alt_title;job=\ref[J]'>[GetPlayerAltTitle(J)]</a>"
+				. += "<a href='byond://?src=\ref[src];character=[menu_name];task=alt_title;job=\ref[J]'>[account.GetPlayerAltTitle(J)]</a>"
 			else
 				. += "[role]"
 
@@ -119,11 +119,11 @@
 				. += "IN [(required_playtime)] HOURS"
 			else
 				. += "<a href='byond://?src=\ref[src];character=[menu_name];task=input;text=[role]'>"
-				if( GetJobLevel( role ) == "High" )
+				if( account.GetJobLevel( role ) == "High" )
 					. += "<font color=#80ffff>HIGH</font>"
-				else if( GetJobLevel( role ) == "Medium" )
+				else if( account.GetJobLevel( role ) == "Medium" )
 					. += "<font color=#66ff66>MEDIUM</font>"
-				else if( GetJobLevel( role ) == "Low" )
+				else if( account.GetJobLevel( role ) == "Low" )
 					. += "<font color=#ffff66>LOW</font>"
 				else
 					. += "<font color=#ff6666>NEVER</font>"
@@ -138,7 +138,7 @@
 	. += "</tr>"
 	. += "</table>"
 
-	switch(alternate_option)
+	switch(user.client.prefs.alternate_spawn_option)
 		if(GET_RANDOM_JOB)
 			. += "<center><br><u><a href='byond://?src=\ref[src];character=[menu_name];task=random'>Get random job if preferences unavailable</a></u></center><br>"
 		if(BE_ASSISTANT)
@@ -193,28 +193,29 @@
 				return
 
 			if( choice )
-				SetDepartment( choices[choice] )
+				account.SetDepartment( choices[choice] )
 		if("use_token")
 			if(alert("Are you sure you want to use a command token on this character? This will unlock all roles in your selected department, but will consume the token.",,"Yes","No")=="No")
 				return
 
 			useCharacterToken( href_list["type"], user )
 		if("random")
-			if(alternate_option == GET_RANDOM_JOB || alternate_option == BE_ASSISTANT)
-				alternate_option += 1
-			else if(alternate_option == RETURN_TO_LOBBY)
-				alternate_option = 0
+			var/option = user.client.prefs.alternate_spawn_option
+			if(option == GET_RANDOM_JOB || option == BE_ASSISTANT)
+				option += 1
+			else if(option == RETURN_TO_LOBBY)
+				option = 0
 			else
 				return 0
 		if ("alt_title")
 			var/datum/job/job = locate(href_list["job"])
 			if (job)
 				var/choices = list(job.title) + job.alt_titles
-				var/choice = input("Pick a title for [job.title].", "Character Generation", GetPlayerAltTitle(job)) as anything in choices | null
+				var/choice = input("Pick a title for [job.title].", "Character Generation", account.GetPlayerAltTitle(job)) as anything in choices | null
 				if(choice)
-					SetPlayerAltTitle(job, choice)
+					account.SetPlayerAltTitle(job, choice)
 		if("input")
-			SetJob(user, href_list["text"])
+			account.SetJob(user, href_list["text"])
 
 	JobChoicesMenu( user )
 

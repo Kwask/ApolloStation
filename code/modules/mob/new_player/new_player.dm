@@ -135,8 +135,8 @@
 
 					totalPlayersReady++
 
-					var/datum/character/H = C.prefs.selected_character
-					var/datum/job/J = job_master.GetJob( H.GetHighestLevelJob() )
+					var/datum/account/A = C.prefs.selected_character.account
+					var/datum/job/J = job_master.GetJob( A.GetHighestLevelJob() )
 
 					var/datum/department/D = job_master.GetDepartment( J.department_id )
 					var/department = D.name
@@ -174,7 +174,7 @@
 				announce_ghost_joinleave(src)
 				if( client && client.prefs && client.prefs.selected_character )
 					client.prefs.selected_character.update_preview_icon()
-					observer.icon = client.prefs.selected_character.preview_icon
+					observer.icon = client.prefs.selected_character.account.preview_icon
 					observer.real_name = client.prefs.selected_character.name
 					observer.name = observer.real_name
 
@@ -257,7 +257,7 @@
 				src << alert("Your current species, [S], is not available for play on the station.")
 				return 0
 
-			AttemptLateSpawn(href_list["SelectedJob"],client.prefs.selected_character.spawnpoint)
+			AttemptLateSpawn(href_list["SelectedJob"],client.prefs.selected_character.account.spawnpoint)
 			return
 
 		if(!ready && href_list["preference"])
@@ -433,7 +433,7 @@
 					dat += "<font color='red'>The station is currently undergoing crew transfer procedures.</font><br>"
 
 		dat += "Choose from the following open positions:<br>"
-		for(var/role in client.prefs.selected_character.roles)
+		for(var/role in client.prefs.selected_character.account.roles)
 			var/datum/job/job = job_master.GetJob( role )
 
 			if( !istype( job ))

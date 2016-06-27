@@ -44,17 +44,19 @@
 
 	var/datum/character/C = new( antag.current.client.ckey )
 	C.randomize_appearance( 1 )
-	antag.current.client.prefs.selected_character.copy_metadata_to( C )
-	C.temporary = 1
+
 	antag.current.client.prefs.selected_character = C
 
 	if( istype( antag.current, /mob/living/carbon/human ))
 		C.copy_to( antag.current ) // for latespawns
 
+	antag.current.client.prefs.selected_character.account.copy_metadata_to( C.account )
+	C.temporary = 1
+
 	antag.current << "<span class='ooc_notice'>You are a non-persistent antagonist and have received a randomized character!</span>"
 
 /datum/antagonist/proc/setup(var/skip_greet=0)
-	if(faction) 
+	if(faction)
 		faction = faction_controller.join_faction(antag, faction)
 	else
 		faction = faction_controller.get_syndie_faction(antag)
@@ -66,7 +68,7 @@
 		qdel(src)
 		return 0
 
-	notoriety = antag.character.antag_data["notoriety"]
+	notoriety = antag.character.account.antag_data["notoriety"]
 
 	// greet the antagonist and give them any info concerning their task(s)
 	if(!skip_greet)
@@ -126,7 +128,7 @@
 
 	var/obj/item/I = locate(/obj/item/device/pda) in antag.current.contents
 
-	if(antag.character.uplink_location == "Headset" && locate(/obj/item/device/radio) in antag.current.contents)
+	if(antag.character.account.uplink_location == "Headset" && locate(/obj/item/device/radio) in antag.current.contents)
 		I = locate(/obj/item/device/radio) in antag.current.contents
 
 	if(!I)	return

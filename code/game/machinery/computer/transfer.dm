@@ -30,7 +30,7 @@
 			flick( "jobchange_deny", src )
 			return
 
-		var/job = input(usr, "Choose the role you want to change to:", "Department Transfer")  as null|anything in C.mob.character.roles
+		var/job = input(usr, "Choose the role you want to change to:", "Department Transfer")  as null|anything in C.account.roles
 
 		if( !job )
 			return

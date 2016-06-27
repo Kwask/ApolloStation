@@ -44,7 +44,7 @@
 		if(response == "Yes")
 			transfer_personality(C.mob)
 		else if (response == "Never for this round")
-			C.prefs.selected_character.job_antag ^= BE_AI
+			C.prefs.job_antag ^= BE_AI
 
 
 /obj/item/device/mmi/digital/posibrain/transfer_identity(var/mob/living/carbon/H)

@@ -1,9 +1,9 @@
-/datum/character/proc/GetPlayerAltTitle(datum/job/job)
+/datum/account/proc/GetPlayerAltTitle(datum/job/job)
 	return player_alt_titles.Find(job.title) > 0 \
 		? player_alt_titles[job.title] \
 		: job.title
 
-/datum/character/proc/SetPlayerAltTitle(datum/job/job, new_title)
+/datum/account/proc/SetPlayerAltTitle(datum/job/job, new_title)
 	// remove existing entry
 	if(player_alt_titles.Find(job.title))
 		player_alt_titles -= job.title
@@ -11,7 +11,7 @@
 	if(job.title != new_title)
 		player_alt_titles[job.title] = new_title
 
-/datum/character/proc/SelectDepartment( mob/user )
+/datum/account/proc/SelectDepartment( mob/user )
 	var/list/choices = list()
 	for( var/datum/department/D in job_master.departments )
 		choices[D.name] = D
@@ -22,7 +22,7 @@
 
 	SetDepartment( choices[choice] )
 
-/datum/character/proc/SetDepartment( var/datum/department/new_department )
+/datum/account/proc/SetDepartment( var/datum/department/new_department )
 	if( !new_department )
 		return
 
@@ -36,28 +36,28 @@
 	department = new_department
 	roles |= new_department.starting_positions
 
-/datum/character/proc/LoadDepartment( var/id )
+/datum/account/proc/LoadDepartment( var/id )
 	if( !job_master )
 		return
 
 	var/D = job_master.GetDepartment( id )
 	SetDepartment( D )
 
-/datum/character/proc/AddJob( var/job_name )
+/datum/account/proc/AddJob( var/job_name )
 	for( var/role in roles )
 		if( roles[role] == "High" )
 			roles[role] = "Medium"
 
 	roles.["[job_name]"] = "High"
 
-/datum/character/proc/RemoveJob( var/job_name )
+/datum/account/proc/RemoveJob( var/job_name )
 	roles.Remove( "[job_name]" )
 
-/datum/character/proc/SetJob(mob/user, role)
+/datum/account/proc/SetJob(mob/user, role)
 	var/datum/job/job = job_master.GetJob(role)
 	if(!job)
 		user << browse(null, "window=mob_occupation")
-		EditCharacterMenu(user)
+		owner.EditCharacterMenu(user)
 		return
 
 	if(( job.title in roles ) && DepartmentCheck( job ))
@@ -65,17 +65,17 @@
 	else if( DepartmentCheck( job ))
 		roles[job.title] = "None" // Adding the new roles
 
-	JobChoicesMenu(user)
+	owner.JobChoicesMenu(user)
 	return 1
 
 // This checks if the given job is part of our department
-/datum/character/proc/DepartmentCheck( var/datum/job/job )
+/datum/account/proc/DepartmentCheck( var/datum/job/job )
 	if( job.department_id == CIVILIAN )
 		return 1 // If the job isn't in a department, a la civilian roles
 
 	return department.department_id == job.department_id
 
-/datum/character/proc/ChangeJobLevel( var/role )
+/datum/account/proc/ChangeJobLevel( var/role )
 	if( !( role in roles ))
 		return 0
 
@@ -93,13 +93,13 @@
 			roles[role] = "None"
 			return 1
 
-/datum/character/proc/GetJobLevel( var/role )
+/datum/account/proc/GetJobLevel( var/role )
 	if( !( role in roles ))
 		return 0
 
 	return roles[role]
 
-/datum/character/proc/GetJobLevelNum( var/role )
+/datum/account/proc/GetJobLevelNum( var/role )
 	if( !( role in roles ))
 		return 0
 
@@ -113,25 +113,59 @@
 		else
 			return 0
 
-/datum/character/proc/GetHighestLevelJob()
+/datum/account/proc/GetHighestLevelJob()
 	var/list/levels = list( "High", "Medium", "Low", "None" )
 
 	for( var/level in levels )
 		if( level == "None" )
-			switch(alternate_option)
-				if(GET_RANDOM_JOB)
-					return pick( roles )
-				if(BE_ASSISTANT)
-					return "Assistant"
-				if(RETURN_TO_LOBBY)
-					return
+			return "Assistant"
 
 		for( var/role in roles )
 			if( roles[role] == level )
 				return role
 
-/datum/character/proc/ResetJobs()
+/datum/account/proc/ResetJobs()
 	LoadDepartment( CIVILIAN )
 
-/datum/character/proc/SetJobDepartment( var/datum/job/job )
+/datum/account/proc/SetJobDepartment( var/datum/job/job )
 	department = job.department_id
+
+/datum/account/proc/getAllPromotablePositions( var/succession_level )
+	. = list()
+
+	if( department.department_id == CIVILIAN )
+		. |= department.getAllPositionNamesWithPriority()
+	else
+		var/datum/department/D = job_master.GetDepartment( CIVILIAN )
+		. |= D.getAllPositionNamesWithPriority()
+		. |= department.getAllPositionNamesWithPriority()
+
+	for( var/role in . )
+		var/datum/job/J = job_master.GetJob( role )
+		if( !J )
+			continue
+
+		if( J.rank_succesion_level < succession_level )
+			continue
+
+		. -= J
+
+	. -= getAllDemotablePositions()
+
+	return .
+
+/datum/account/proc/getAllDemotablePositions( var/succession_level )
+	. = list()
+
+	for( var/role in roles )
+		var/datum/job/J = job_master.GetJob( role )
+		if( !J )
+			continue
+
+		if( succession_level && ( J.rank_succesion_level >= succession_level ))
+			continue
+
+		. += role
+
+	return .
+

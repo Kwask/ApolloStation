@@ -32,4 +32,4 @@
 
 // This is the proc used to file the record
 /datum/virtual_paperwork/proc/filePaperwork( var/user )
-	return addToPaperworkRecord( user, recipient.unique_identifier,  paper.info, "[record_title]", "Unclassified", "[record_type]" )
+	return addToPaperworkRecord( user, recipient.hash,  paper.info, "[record_title]", "Unclassified", "[record_type]" )

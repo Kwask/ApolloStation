@@ -218,16 +218,16 @@
 	if( !criminal )
 		return
 
-	addToPaperworkRecord( user, criminal.character.unique_identifier,  generateReport(), "Criminal Sentence", "Classified", "Security Records" )
+	addToPaperworkRecord( user, criminal.character.hash,  generateReport(), "Criminal Sentence", "Classified", "Security Records" )
 
 	if( prison_sentence )
 		if( prison_sentence >= PERMAPRISON_SENTENCE )
-			criminal.character.employment_status = "Serving a life sentence"
+			criminal.character.account.employment_status = "Serving a life sentence"
 		else
-			criminal.character.prison_date = progessDate( universe.date, prison_sentence+1 )
+			criminal.character.account.prison_date = progessDate( universe.date, prison_sentence+1 )
 
 	if( getMaxSeverity() >= FELONY_LEVEL )
-		criminal.character.felon = 1
+		criminal.character.account.felon = 1
 
 	if( !criminal.character.new_character ) // If they already exist in the database
 		criminal.character.saveCharacter()

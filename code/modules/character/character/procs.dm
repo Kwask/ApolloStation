@@ -10,17 +10,17 @@
 
 	DNA = md5( "DNA[name][blood_type][gender][eye_color][time2text(world.timeofday,"hh:mm")]" )
 	fingerprints = md5( DNA )
-	unique_identifier = md5( fingerprints )
+	hash = md5( fingerprints )
 
 	new_character = new_char
 	temporary = temp
 
 	change_age( 30 )
 
-	if( !department )
-		LoadDepartment( CIVILIAN )
+	if( !account.department )
+		account.LoadDepartment( CIVILIAN )
 
-	nt_account = new( key )
+	account = new( key )
 
 	menu = new( null, "creator", "Character Creator", 710, 610 )
 	menu.window_options = "focus=0;can_close=0;"
@@ -35,11 +35,11 @@
 	..()
 
 // Primarily for copying role data to antags
-/datum/character/proc/copy_metadata_to( var/datum/character/C )
-	C.roles = src.roles
-	C.department = src.department
-	C.antag_data = src.antag_data.Copy()
-	C.uplink_location = src.uplink_location
+/datum/account/proc/copy_metadata_to( var/datum/account/A )
+	A.roles = src.roles
+	A.department = src.department
+	A.antag_data = src.antag_data.Copy()
+	A.uplink_location = src.uplink_location
 
 /datum/character/proc/copy_to( mob/living/carbon/human/character )
 	if( !istype( character ))
@@ -230,7 +230,7 @@
 	variables["DNA"] = html_encode( sql_sanitize_text( DNA ))
 	variables["fingerprints"] = html_encode( sql_sanitize_text( fingerprints ))
 	variables["blood_type"] = html_encode( sql_sanitize_text( blood_type ))
-	variables["hash"] = html_encode( sql_sanitize_text( unique_identifier ))
+	variables["hash"] = html_encode( sql_sanitize_text( hash ))
 
 	var/list/names = list()
 	var/list/values = list()
@@ -400,58 +400,9 @@
 
 				calculate_age()
 				continue
-			if( "department" )
-				LoadDepartment( text2num( value ))
-				continue // Dont need to set the variable on this one
-			if( "antag_data" )
-				var/list/L = params2list( html_decode( value ))
-				if( !L || !L.len )
-					L = list( "notoriety" =  0, "persistant" = 0, "faction" = "Gorlex Marauders", "career_length" = 0 )
-				for(var/V in L)
-					if( V != "faction" ) // hardcode but pls go away
-						L[V] = text2num( L[V] )
-				value = L
-			if( "prison_date" )
-				prison_date = list()
-
-				for( var/num in params2list( html_decode( value )))
-					if( istext( num ))
-						num = text2num( num )
-						if( num )
-							prison_date.Add( num )
-
-				value = prison_date
-			if( "roles" )
-				var/list/L = params2list( html_decode( value ))
-
-				if( !L )
-					L = list()
-
-				for( var/role in L )
-					switch( role )
-						if( "Chemist" )
-							L.Remove( "Chemist" )
-							L["Scientist"] = "High"
-						if( "Roboticist" )
-							L.Remove( "Roboticist" )
-							L["Scientist"] = "High"
-						if( "Xenobiologist" )
-							L.Remove( "Xenobiologist" )
-							L["Senior Scientist"] = "High"
-						if( "Atmospheric Technician" )
-							L.Remove( "Atmospheric Technician" )
-							L["Senior Engineer"] = "High"
-						if( "Virologist" )
-							L.Remove( "Virologist" )
-							L["Senior Medical Doctor"] = "High"
-						if( "Psychiatrist" )
-							L.Remove( "Psychiatrist" )
-							L["Medical Doctor"] = "High"
-				value = L
 
 		vars[variables[i]] = value
 
-	account.loadCharacter( hash )
 	update_preview_icon()
 
 	return 1
@@ -671,9 +622,10 @@
 	skin_color = rgb( red, green, blue )
 
 /datum/character/proc/update_preview_icon()		//seriously. This is horrendous.
-	qdel(preview_icon_front)
-	qdel(preview_icon_side)
-	qdel(preview_icon)
+	qdel(account.preview_icon_front)
+	qdel(account.preview_icon_side)
+
+	var/icon/preview_icon = null
 
 	var/g = "m"
 	if(gender == FEMALE)	g = "f"
@@ -740,10 +692,10 @@
 		undershirt_s = new/icon("icon" = 'icons/mob/human.dmi', "icon_state" = "undershirt[undershirt]_s")
 
 	var/icon/clothes_s = null
-	var/datum/job/job = job_master.GetJob( GetHighestLevelJob() )
+	var/datum/job/job = job_master.GetJob( account.GetHighestLevelJob() )
 
 	if( job )
-		clothes_s = job.make_preview_icon( backpack, GetPlayerAltTitle(job) , g)
+		clothes_s = job.make_preview_icon( backpack, account.GetPlayerAltTitle(job) , g)
 
 	if(disabilities & NEARSIGHTED)
 		preview_icon.Blend(new /icon('icons/mob/eyes.dmi', "glasses"), ICON_OVERLAY)
@@ -756,8 +708,8 @@
 	if(clothes_s)
 		preview_icon.Blend(clothes_s, ICON_OVERLAY)
 
-	preview_icon_front = new(preview_icon, dir = SOUTH)
-	preview_icon_side = new(preview_icon, dir = WEST)
+	account.preview_icon_front = new(preview_icon, dir = SOUTH)
+	account.preview_icon_side = new(preview_icon, dir = WEST)
 
 	qdel(eyes_s)
 	qdel(underwear_s)
@@ -771,57 +723,18 @@
 
 	switch( type )
 		if( "Command" )
-			if( !department || !istype( department ))
-				LoadDepartment( CIVILIAN )
+			if( !istype( account.department ))
+				account.LoadDepartment( CIVILIAN )
 
-			roles |= getAllPromotablePositions()
+			account.roles |= account.getAllPromotablePositions()
 
 		if( "Antagonist" )
-			antag_data["persistant"] = 1
+			account.antag_data["persistant"] = 1
 
 	num--
 
 	user.client.character_tokens[type] = num
 	user.client.saveTokens()
-
-/datum/character/proc/getAllPromotablePositions( var/succession_level )
-	. = list()
-
-	if( department.department_id == CIVILIAN )
-		. |= department.getAllPositionNamesWithPriority()
-	else
-		var/datum/department/D = job_master.GetDepartment( CIVILIAN )
-		. |= D.getAllPositionNamesWithPriority()
-		. |= department.getAllPositionNamesWithPriority()
-
-	for( var/role in . )
-		var/datum/job/J = job_master.GetJob( role )
-		if( !J )
-			continue
-
-		if( J.rank_succesion_level < succession_level )
-			continue
-
-		. -= J
-
-	. -= getAllDemotablePositions()
-
-	return .
-
-/datum/character/proc/getAllDemotablePositions( var/succession_level )
-	. = list()
-
-	for( var/role in roles )
-		var/datum/job/J = job_master.GetJob( role )
-		if( !J )
-			continue
-
-		if( succession_level && ( J.rank_succesion_level >= succession_level ))
-			continue
-
-		. += role
-
-	return .
 
 /datum/character/proc/setHairColor( var/r, var/g, var/b )
 	hair_color = rgb( r, g, b )
@@ -839,10 +752,10 @@
 	eye_color = rgb( r, g, b )
 
 /datum/character/proc/isPersistantAntag()
-	if( !antag_data )
+	if( !account.antag_data )
 		return 0
 
-	if( !antag_data["persistant"] )
+	if( !account.antag_data["persistant"] )
 		return 0
 
 	return 1
@@ -851,14 +764,14 @@
 	if( !isPersistantAntag() )
 		return 0
 
-	return faction_controller.get_faction(antag_data["faction"])
+	return faction_controller.get_faction( account.antag_data["faction"] )
 
 /datum/character/proc/canJoin()
-	if( employment_status != "Active" )
+	if( account.employment_status != "Active" )
 		return 0
 
-	if( prison_date && prison_date.len )
-		var/days = daysTilDate( universe.date, prison_date )
+	if( account.prison_date && account.prison_date.len )
+		var/days = daysTilDate( universe.date, account.prison_date )
 		if( days > 0 )
 			return 0
 
@@ -866,4 +779,7 @@
 
 /datum/character/proc/enterMob()
 	temporary = new_character // If we're a new character, then we're also temporary
-	round_number = universe.round_number
+	account.last_shift_day = universe.round_number
+
+	if( account.first_shift_day )
+		account.first_shift_day = universe.round_number

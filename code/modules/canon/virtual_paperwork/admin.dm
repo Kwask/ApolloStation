@@ -7,7 +7,7 @@
 
 	var/mob/user = usr
 
-	var/datum/character/C = M.character
+	var/datum/account/A = M.character.account
 
 	var/type = input( user, "What type of role modification?", "Set Department" ) as null|anything in list( "Set Department", "Promotion", "Demotion" )
 
@@ -16,24 +16,24 @@
 
 	switch( type )
 		if( "Promotion" )
-			var/list/promotions = C.getAllPromotablePositions()
+			var/list/promotions = A.getAllPromotablePositions()
 			var/role = input( user, "Choose a role to promote them to:", "Role Promote" ) as null|anything in promotions
 			if( !role )
 				return
 
-			C.AddJob( role )
+			A.AddJob( role )
 			message_admins( "Admin [key_name_admin(usr)] has added role [role] from [key_name_admin(M)]", "CANON:" )
 		if( "Demotion" )
-			var/role = input( user, "Choose a role to demote them from:", "Role Demotion" ) as null|anything in C.getAllDemotablePositions()
+			var/role = input( user, "Choose a role to demote them from:", "Role Demotion" ) as null|anything in A.getAllDemotablePositions()
 			if( !role )
 				return
 
 			message_admins( "Admin [key_name_admin(usr)] has removed role [role] from [key_name_admin(M)]", "CANON:" )
-			C.RemoveJob( role )
+			A.RemoveJob( role )
 		if( "Set Department" )
 			var/department = input( user, "Choose a department to induct them into:", "Department Induction" ) as null|anything in job_master.departments
 			if( !department )
 				return
 
 			message_admins( "Admin [key_name_admin(usr)] has set the department of [key_name_admin(M)] to [department]", "CANON:" )
-			C.SetDepartment( department )
+			A.SetDepartment( department )

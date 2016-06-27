@@ -191,7 +191,7 @@
 		if(response == "Yes")
 			transfer_personality(C)
 		else if (response == "Never for this round")
-			C.prefs.selected_character.job_antag ^= BE_ALIEN
+			C.prefs.job_antag ^= BE_ALIEN
 
 /mob/living/simple_animal/borer/proc/transfer_personality(var/client/candidate)
 

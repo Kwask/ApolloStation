@@ -283,7 +283,7 @@
 
 		// antag got caught check goes here
 
-		var/notoriety = traitor.original_character.antag_data["notoriety"]
+		var/notoriety = traitor.original_character.account.antag_data["notoriety"]
 		var/contract_requirement = round( ( notoriety + 1 ) / 2 )
 		if( antag.completed_contracts.len >= contract_requirement )
 			notoriety++
@@ -294,10 +294,10 @@
 		else if( antag.failed_contracts.len > antag.completed_contracts.len )
 			notoriety--
 			traitor.current << "<span class='warning'>You have lost notoriety for failing more contracts than you completed!</span>"
-		traitor.original_character.antag_data["notoriety"] = notoriety
-		traitor.original_character.antag_data["career_length"]++
+		traitor.original_character.account.antag_data["notoriety"] = notoriety
+		traitor.original_character.account.antag_data["career_length"]++
 
-		traitor.current << "<span class='notice'>Your career length is now [traitor.character.antag_data["career_length"]] rounds!</span>"
+		traitor.current << "<span class='notice'>Your career length is now [traitor.character.account.antag_data["career_length"]] rounds!</span>"
 
 
 /datum/game_mode/proc/check_win() //universal trigger to be called at mob death, nuke explosion, etc. To be called from everywhere.
@@ -315,14 +315,14 @@
 		var/special_role = man.mind.special_role
 		if (special_role == "Wizard" || special_role == "Ninja" || special_role == "Mercenary" || special_role == "Vox Raider")
 			continue	//NT intelligence ruled out possiblity that those are too classy to pretend to be a crew.
-		if(man.client.prefs.selected_character.nanotrasen_relation == "Opposed" && prob(50) || \
-		   man.client.prefs.selected_character.nanotrasen_relation == "Skeptical" && prob(20))
+		if(man.client.prefs.selected_character.account.nanotrasen_relation == "Opposed" && prob(50) || \
+			man.client.prefs.selected_character.account.nanotrasen_relation == "Skeptical" && prob(20))
 			suspects += man
 		// Antags
 		else if(special_role == "traitor" && prob(40) || \
-		   special_role == "Changeling" && prob(50) || \
-		   special_role == "Cultist" && prob(30) || \
-		   special_role == "Head Revolutionary" && prob(30))
+			special_role == "Changeling" && prob(50) || \
+			special_role == "Cultist" && prob(30) || \
+			special_role == "Head Revolutionary" && prob(30))
 			suspects += man
 
 			// If they're a traitor or likewise, give them extra TC in exchange.
@@ -628,9 +628,9 @@ proc/get_nt_opposed()
 	var/list/dudes = list()
 	for(var/mob/living/carbon/human/man in player_list)
 		if(man.client)
-			if(man.client.prefs.selected_character.nanotrasen_relation == "Opposed")
+			if(man.client.prefs.selected_character.account.nanotrasen_relation == "Opposed")
 				dudes += man
-			else if(man.client.prefs.selected_character.nanotrasen_relation == "Skeptical" && prob(50))
+			else if(man.client.prefs.selected_character.account.nanotrasen_relation == "Skeptical" && prob(50))
 				dudes += man
 	if(dudes.len == 0) return null
 	return pick(dudes)

@@ -70,7 +70,7 @@
 	var/sql_author_ckey = "'[ckey( user.client.ckey )]'"
 	var/sql_author_name = "'[sql_sanitize_text( user.character.name )]'"
 	var/sql_author_ip = "'[sql_sanitize_text( user.client.address )]'"
-	var/sql_author_md5 = "'[sql_sanitize_text( user.character.unique_identifier )]'"
+	var/sql_author_md5 = "'[sql_sanitize_text( user.character.hash )]'"
 	var/sql_recipient_md5 = "'[sql_sanitize_text( recipient_md5 )]'"
 	var/sql_this_md5 = "'[sql_sanitize_text( md5( title ))]'"
 

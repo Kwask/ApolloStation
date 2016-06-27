@@ -317,7 +317,7 @@
 		if(response == "Yes")
 			transfer_personality(C)
 		else if (response == "Never for this round")
-			C.prefs.selected_character.job_antag ^= BE_PAI
+			C.prefs.job_antag ^= BE_PAI
 
 /mob/living/silicon/robot/drone/proc/transfer_personality(var/client/player)
 

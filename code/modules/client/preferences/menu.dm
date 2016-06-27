@@ -11,8 +11,8 @@
 	. += "<table border='1' width='320'>"
 	if( selected_character )
 		selected_character.update_preview_icon()
-		user << browse_rsc(selected_character.preview_icon_front, "previewicon.png")
-		user << browse_rsc(selected_character.preview_icon_side, "previewicon2.png")
+		user << browse_rsc(selected_character.account.preview_icon_front, "previewicon.png")
+		user << browse_rsc(selected_character.account.preview_icon_side, "previewicon2.png")
 		. += "<tr>"
 		. += "<td><b><a href='byond://?src=\ref[user];preference=[menu_name];task=select_character'>Selected:</a></b></td>"
 		. += "<td colspan='2'>[selected_character.name]</td>"

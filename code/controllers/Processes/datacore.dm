@@ -244,7 +244,7 @@ var/global/ManifestJSON
 		return null
 
 	for( var/datum/character/C in employee_pool )
-		if( C.unique_identifier == employee_pool )
+		if( C.hash == employee_pool )
 			return C
 
 /datum/controller/process/datacore/proc/loadFromDB()
@@ -346,15 +346,15 @@ var/global/ManifestJSON
 		G.fields["m_stat"]		= "Stable"
 		G.fields["sex"]			= H.gender
 		G.fields["species"]		= H.get_species()
-		G.fields["home_system"]	= H.character.home_system
-		G.fields["citizenship"]	= H.character.citizenship
-		G.fields["faction"]		= H.character.faction
-		G.fields["religion"]	= H.character.religion
-		G.fields["photo_front"]	= H.character.preview_icon_front
-		G.fields["photo_side"]	= H.character.preview_icon_side
+		G.fields["home_system"]	= H.character.account.home_system
+		G.fields["citizenship"]	= H.character.account.citizenship
+		G.fields["faction"]		= H.character.account.faction
+		G.fields["religion"]	= H.character.account.religion
+		G.fields["photo_front"]	= H.character.account.preview_icon_front
+		G.fields["photo_side"]	= H.character.account.preview_icon_side
 		G.fields["character"]	= H.character
-		if(H.character.gen_record && !jobban_isbanned(H, "Records"))
-			G.fields["notes"] = H.character.gen_record
+		if(H.character.account.gen_record && !jobban_isbanned(H, "Records"))
+			G.fields["notes"] = H.character.account.gen_record
 		else
 			G.fields["notes"] = "No notes found."
 
@@ -375,8 +375,8 @@ var/global/ManifestJSON
 		M.fields["alg_d"]		= "No allergies have been detected in this patient."
 		M.fields["cdi"]			= "None"
 		M.fields["cdi_d"]		= "No diseases have been diagnosed at the moment."
-		if(H.character.med_record && !jobban_isbanned(H, "Records"))
-			M.fields["notes"] = H.character.med_record
+		if(H.character.account.med_record && !jobban_isbanned(H, "Records"))
+			M.fields["notes"] = H.character.account.med_record
 		else
 			M.fields["notes"] = "No notes found."
 		medical += M
@@ -391,8 +391,8 @@ var/global/ManifestJSON
 		S.fields["ma_crim"]		= "None"
 		S.fields["ma_crim_d"]	= "No major crime convictions."
 		S.fields["notes"]		= "No notes."
-		if(H.character.sec_record && !jobban_isbanned(H, "Records"))
-			S.fields["notes"] = H.character.sec_record
+		if(H.character.account.sec_record && !jobban_isbanned(H, "Records"))
+			S.fields["notes"] = H.character.account.sec_record
 		else
 			S.fields["notes"] = "No notes."
 		security += S
@@ -410,13 +410,13 @@ var/global/ManifestJSON
 		L.fields["enzymes"]		= H.dna.SE // Used in respawning
 		L.fields["identity"]	= H.dna.UI // "
 		L.fields["species"]		= H.get_species()
-		L.fields["home_system"]	= H.character.home_system
-		L.fields["citizenship"]	= H.character.citizenship
-		L.fields["faction"]		= H.character.faction
-		L.fields["religion"]	= H.character.religion
+		L.fields["home_system"]	= H.character.account.home_system
+		L.fields["citizenship"]	= H.character.account.citizenship
+		L.fields["faction"]		= H.character.account.faction
+		L.fields["religion"]	= H.character.account.religion
 		L.fields["image"]		= getFlatIcon(H)	//This is god-awful
-		if(H.character.exploit_record && !jobban_isbanned(H, "Records"))
-			L.fields["exploit_record"] = H.character.exploit_record
+		if(H.character.account.exploit_record && !jobban_isbanned(H, "Records"))
+			L.fields["exploit_record"] = H.character.account.exploit_record
 		else
 			L.fields["exploit_record"] = "No additional information acquired."
 		locked += L

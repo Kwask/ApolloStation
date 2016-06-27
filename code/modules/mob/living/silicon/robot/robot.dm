@@ -175,7 +175,7 @@ var/list/robot_verbs_default = list(
 
 	spawn( 50 )
 		if( mind.character )
-			mind.character.LoadDepartment( SYNTHETIC )
+			mind.character.account.LoadDepartment( SYNTHETIC )
 
 	playsound(loc, 'sound/voice/liveagain.ogg', 75, 1)
 

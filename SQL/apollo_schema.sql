@@ -172,6 +172,7 @@ CREATE TABLE IF NOT EXISTS `preferences` (
 CREATE TABLE IF NOT EXISTS `characters` (
   `id` bigint NOT NULL AUTO_INCREMENT,
   `ckey` varchar(32) NOT NULL,
+  `hash` varchar(32) NOT NULL,
   `name` varchar(100) NOT NULL,
   `gender` varchar(11) NOT NULL,
   `birth_date` varchar(20) NOT NULL,
@@ -195,7 +196,6 @@ CREATE TABLE IF NOT EXISTS `characters` (
   `DNA` varchar(32) NOT NULL,
   `fingerprints` varchar(32) NOT NULL,
   `blood_type` varchar(10) NOT NULL,
-  `hash` varchar(32) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 ;
 

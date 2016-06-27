@@ -287,8 +287,8 @@
 </table>"}
 						var/datum/character/C = active1.fields["character"]
 						if( istype( C ))
-							. += get_paperwork_records( C.unique_identifier )
-							. += "<A href='?src=\ref[src];choice=Add Note;rec_hash=[C.unique_identifier]'>Add Note</A><BR>"
+							. += get_paperwork_records( C.hash )
+							. += "<A href='?src=\ref[src];choice=Add Note;rec_hash=[C.hash]'>Add Note</A><BR>"
 						else
 							. += "Could not find employee in external database."
 

@@ -46,7 +46,7 @@
 		if(response == "Yes")
 			transfer_personality(C,host)
 		else if (response == "Never for this round")
-			C.prefs.selected_character.job_antag ^= BE_PLANT
+			C.prefs.job_antag ^= BE_PLANT
 
 		currently_querying -= C
 

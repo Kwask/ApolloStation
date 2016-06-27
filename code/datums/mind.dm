@@ -313,7 +313,7 @@ datum/mind
 		. += "</td></tr>"
 		. += "</table>"
 		// END OBJECTIVES PANEL //
-			
+
 		memory_browser.set_user( usr )
 		memory_browser.set_content( replacetext( ., "\improper", "" ) )
 		memory_browser.open()
@@ -396,12 +396,12 @@ datum/mind
 				if( "edit_notoriety" ) // Edit the amount of notoriety a character has (FOR THE ORIGINAL CHARACTER TOO!)
 					var/datum/character/char = (isnull(original_character) ? character : original_character)
 
-					var/new_notoriety = input("New notoriety amount", "Notoriety edit", char.antag_data["notoriety"]) as num|null
+					var/new_notoriety = input("New notoriety amount", "Notoriety edit", char.account.antag_data["notoriety"]) as num|null
 					antagonist.notoriety = new_notoriety
 
-					character.antag_data["notoriety"] = new_notoriety
+					character.account.antag_data["notoriety"] = new_notoriety
 					if( original_character )
-						original_character.antag_data["notoriety"] = new_notoriety
+						original_character.account.antag_data["notoriety"] = new_notoriety
 
 					message_admins("[usr] has set [current.name]'s ([key]) notoriety to [new_notoriety]")
 

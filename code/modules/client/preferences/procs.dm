@@ -9,26 +9,25 @@
 	if( !selected_character )
 		return
 
-	return selected_character.GetJobLevel( role )
-
+	return selected_character.account.GetJobLevel( role )
 
 /datum/preferences/proc/GetJobLevelNum( var/role )
 	if( !selected_character )
 		return
 
-	return selected_character.GetJobLevelNum( role )
+	return selected_character.account.GetJobLevelNum( role )
 
 /datum/preferences/proc/GetPlayerAltTitle(datum/job/job)
 	if( !selected_character )
 		return
 
-	return selected_character.GetPlayerAltTitle( job )
+	return selected_character.account.GetPlayerAltTitle( job )
 
 /datum/preferences/proc/beSpecial()
 	if( !selected_character )
 		return
 
-	return selected_character.job_antag
+	return job_antag
 
 /datum/preferences/proc/savePreferences()
 	if( !client )
@@ -78,7 +77,7 @@
 	// Saved characters
 	var/sql_select_ident = "None"
 	if( selected_character )
-		sql_select_ident = html_encode( sql_sanitize_text( selected_character.unique_identifier ))
+		sql_select_ident = html_encode( sql_sanitize_text( selected_character.hash ))
 
 	if(sql_id)
 		//Player already identified previously, we need to just update the 'lastseen', 'ip' and 'computer_id' variables

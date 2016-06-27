@@ -85,11 +85,11 @@
 	if( istype( O, /obj/item/weapon/paper ))
 		if( F in due_papers )
 			if( F.isFilledOut() )
-				var/datum/character/C = due_papers[F]
+				var/datum/account/A = due_papers[F]
 
 				if( istype( O, /obj/item/weapon/paper/form/command_recommendation ))
-					ping( "\The [src] pings, \"[C.name] has been recommended for additional command positions!\"" )
-					addToPaperworkRecord( user, C.unique_identifier,  F.info, "Command Recommendation", "Unclassified", "Employment Recommendation" )
+					ping( "\The [src] pings, \"[A.name] has been recommended for additional command positions!\"" )
+					addToPaperworkRecord( user, A.owner_hash,  F.info, "Command Recommendation", "Unclassified", "Employment Recommendation" )
 					var/obj/item/rcvdcopy
 
 					rcvdcopy = copy(F)
@@ -101,25 +101,25 @@
 					var/obj/item/weapon/paper/form/job/J = O
 					var/datum/job/job_datum
 					if( istype( J, /obj/item/weapon/paper/form/job/induct ))
-						C.SetDepartment( job_master.GetDepartmentByName( J.job ))
-						job_datum = C.department.getLowestPosition()
-						message_admins( "[usr] has inducted [C.name] into [C.department.name]", "CANON:" )
+						A.SetDepartment( job_master.GetDepartmentByName( J.job ))
+						job_datum = A.department.getLowestPosition()
+						message_admins( "[usr] has inducted [A.name] into [A.department.name]", "CANON:" )
 					else if( istype( J, /obj/item/weapon/paper/form/job/termination ))
-						C.LoadDepartment( CIVILIAN )
+						A.LoadDepartment( CIVILIAN )
 						job_datum = job_master.GetJob( "Assistant" )
-						message_admins( "[usr] has terminated [C.name] from [C.department.name]", "CANON:" )
+						message_admins( "[usr] has terminated [A.name] from [A.department.name]", "CANON:" )
 					else if( istype( J, /obj/item/weapon/paper/form/job/promotion ))
 						job_datum = job_master.GetJob( J.job )
 
 						if( job_datum.rank_succesion_level < COMMAND_SUCCESSION_LEVEL )
-							C.AddJob( J.job )
+							A.AddJob( J.job )
 
 						if( job_datum.rank_succesion_level >= COMMAND_SUCCESSION_LEVEL ) // Only admins can add head positions
-							message_admins( "[usr] has promoted [C.name] to [modify.rank]", "CANON:" )
+							message_admins( "[usr] has promoted [A.name] to [modify.rank]", "CANON:" )
 					else if( istype( J, /obj/item/weapon/paper/form/job/demotion ))
-						C.RemoveJob( J.job )
-						job_datum = C.department.getLowestPosition()
-						message_admins( "[usr] has demoted [C.name] from [modify.rank]", "CANON:" )
+						A.RemoveJob( J.job )
+						job_datum = A.department.getLowestPosition()
+						message_admins( "[usr] has demoted [A.name] from [modify.rank]", "CANON:" )
 					else
 						buzz( "\The [src] buzzes, \"This job form is invalid!\"" )
 						return
@@ -135,8 +135,8 @@
 					modify.generateName()
 					callHook("reassign_employee", list(modify))
 
-					ping( "\The [src] pings, \"[C.name] has been [J.job_verb] [J.job]!\"" )
-					addToPaperworkRecord( user, C.unique_identifier, J.info, "[capitalize( J.job_verb )] [J.job]", "Unclassified", "Employment" )
+					ping( "\The [src] pings, \"[A.name] has been [J.job_verb] [J.job]!\"" )
+					addToPaperworkRecord( user, A.owner_hash, J.info, "[capitalize( J.job_verb )] [J.job]", "Unclassified", "Employment" )
 				else
 					buzz( "\The [src] buzzes, \"Unknown form!\"" )
 				due_papers -= F
@@ -183,7 +183,7 @@
 	if( !istype( C.mob ))
 		return
 
-	return C.mob.character.department.name
+	return C.mob.character.account.department.name
 
 /obj/machinery/computer/card/proc/is_inducted()
 	if( !modify || !scan )
@@ -241,13 +241,13 @@
 	var/list/locked_jobs = list()
 	var/list/unlocked_jobs = list()
 
-	if( modify && modify.mob && modify.mob.character && scan && scan.mob && scan.mob.character && scan.mob.character.department )
-		var/datum/department/D = scan.mob.character.department
+	if( modify && modify.account && scan && scan.account && scan.account.department )
+		var/datum/department/D = scan.account.department
 		if( is_centcom() )
-			locked_jobs = modify.mob.character.getAllPromotablePositions( COMMAND_SUCCESSION_LEVEL+1 )
-			unlocked_jobs = modify.mob.character.getAllDemotablePositions( COMMAND_SUCCESSION_LEVEL+1 )
+			locked_jobs = modify.account.getAllPromotablePositions( COMMAND_SUCCESSION_LEVEL+1 )
+			unlocked_jobs = modify.account.getAllDemotablePositions( COMMAND_SUCCESSION_LEVEL+1 )
 		else
-			unlocked_jobs = D.getPromotablePositionNames() & modify.mob.character.roles
+			unlocked_jobs = D.getPromotablePositionNames() & modify.account.roles
 
 			locked_jobs = D.getPromotablePositionNames()
 			locked_jobs.Remove( unlocked_jobs )
@@ -466,7 +466,7 @@
 				buzz("\The [src] buzzes, \"Authorized card is not tied to a NanoTrasen Employee!\"")
 				return
 
-			if( !scan.mob.character.department )
+			if( !scan.account.department )
 				buzz("\The [src] buzzes, \"Authorized card has no active department!\"")
 				return
 
@@ -508,7 +508,7 @@
 				buzz("\The [src] buzzes, \"You may not modify your own card!\"")
 				return
 
-			var/datum/department/J = input(usr, "Choose the department to transfer to:", "Department Transfer")  as null|anything in modify.mob.character.roles
+			var/datum/department/J = input(usr, "Choose the department to transfer to:", "Department Transfer")  as null|anything in modify.account.roles
 
 			var/datum/job/job_datum = job_master.GetJob( J )
 			if( !istype( job_datum ))
@@ -527,7 +527,7 @@
 				buzz("\The [src] buzzes, \"Authorized card is not tied to a NanoTrasen Employee!\"")
 				return
 
-			if( !scan.mob.character.department )
+			if( !scan.account.department )
 				buzz("\The [src] buzzes, \"Authorized card has no active department!\"")
 				return
 

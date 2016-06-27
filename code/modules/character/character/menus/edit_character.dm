@@ -6,8 +6,8 @@
 	var/menu_name = "edit_character"
 
 	update_preview_icon()
-	user << browse_rsc(preview_icon_front, "previewicon.png")
-	user << browse_rsc(preview_icon_side, "previewicon2.png")
+	user << browse_rsc(account.preview_icon_front, "previewicon.png")
+	user << browse_rsc(account.preview_icon_side, "previewicon2.png")
 
 	. = "<html><body><center>"
 	. += "<b>Appearence</b>"

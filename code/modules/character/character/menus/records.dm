@@ -19,22 +19,22 @@
 	. += "<table class='border'>"
 	. += "<tr>"
 	. += "<th style='width:175px'><a href='byond://?src=\ref[src];character=[menu_name];task=med_record'>Medical Records</a></th>"
-	. += "<td>[TextPreview(med_record,40)]</td>"
+	. += "<td>[TextPreview(account.med_record,40)]</td>"
 	. += "</tr>"
 
 	. += "<tr>"
 	. += "<th style='width:175px'><a href='byond://?src=\ref[src];character=[menu_name];task=gen_record'>Employment Records</a></th>"
-	. += "<td>[TextPreview(gen_record,40)]</td>"
+	. += "<td>[TextPreview(account.gen_record,40)]</td>"
 	. += "</tr>"
 
 	. += "<tr>"
 	. += "<th style='width:175px'><a href='byond://?src=\ref[src];character=[menu_name];task=sec_record'>Security Records</a></th>"
-	. += "<td>[TextPreview(sec_record,40)]</td>"
+	. += "<td>[TextPreview(account.sec_record,40)]</td>"
 	. += "</tr>"
 
 	. += "<tr>"
 	. += "<th style='width:175px'><a href='byond://?src=\ref[src];character=[menu_name];task=exploitable_record'>Exploitable Information</a></th>"
-	. += "<td>[TextPreview(exploit_record,40)]</td>"
+	. += "<td>[TextPreview(account.exploit_record,40)]</td>"
 	. += "</tr>"
 
 	. += "</table>"
@@ -45,27 +45,27 @@
 	. += "<table class='border'>"
 	. += "<tr>"
 	. += "<th>Home system:</th>"
-	. += "<td><a href='byond://?src=\ref[src];character=[menu_name];task=home_system'>[home_system]</a></td>"
+	. += "<td><a href='byond://?src=\ref[src];character=[menu_name];task=home_system'>[account.home_system]</a></td>"
 	. += "</tr>"
 
 	. += "<tr>"
 	. += "<th>Citizenship:</th>"
-	. += "<td><a href='byond://?src=\ref[src];character=[menu_name];task=citizenship'>[citizenship]</a></td>"
+	. += "<td><a href='byond://?src=\ref[src];character=[menu_name];task=citizenship'>[account.citizenship]</a></td>"
 	. += "</tr>"
 
 	. += "<tr>"
 	. += "<th>Faction:</th>"
-	. += "<td><a href='byond://?src=\ref[src];character=[menu_name];task=faction'>[faction]</a></td>"
+	. += "<td><a href='byond://?src=\ref[src];character=[menu_name];task=faction'>[account.faction]</a></td>"
 	. += "</tr>"
 
 	. += "<tr>"
 	. += "<th>Nanotrasen Relation:</th>"
-	. += "<td><a href='byond://?src=\ref[src];character=[menu_name];task=nt_relation'>[nanotrasen_relation]</a></td>"
+	. += "<td><a href='byond://?src=\ref[src];character=[menu_name];task=nt_relation'>[account.nanotrasen_relation]</a></td>"
 	. += "</tr>"
 
 	. += "<tr>"
 	. += "<th>Religion:</th>"
-	. += "<td><a href='byond://?src=\ref[src];character=[menu_name];task=religion'>[religion]</a></td>"
+	. += "<td><a href='byond://?src=\ref[src];character=[menu_name];task=religion'>[account.religion]</a></td>"
 	. += "</tr>"
 
 	. += "<tr>"
@@ -114,7 +114,7 @@
 
 	. += "<tr>"
 	. += "<th>Spawn Point:</th>"
-	. += "<td><a href='byond://?src=\ref[src];character=[menu_name];task=spawnpoint'>[spawnpoint]</a></td>"
+	. += "<td><a href='byond://?src=\ref[src];character=[menu_name];task=spawnpoint'>[account.spawnpoint]</a></td>"
 	. += "</tr>"
 
 	. += "</table>"
@@ -157,24 +157,24 @@
 			return
 
 		if( "med_record" )
-			var/medmsg = sanitize(input(usr,"Set your medical notes here. This information is used by medical staff.","Medical Records",html_decode(med_record)) as message, MAX_PAPER_MESSAGE_LEN, extra = 0)
+			var/medmsg = sanitize(input(usr,"Set your medical notes here. This information is used by medical staff.","Medical Records",html_decode(account.med_record)) as message, MAX_PAPER_MESSAGE_LEN, extra = 0)
 			if(medmsg != null)
-				med_record = medmsg
+				account.med_record = medmsg
 
 		if( "sec_record" )
-			var/secmsg = sanitize(input(usr,"Set your security notes here. This information is used by security staff.","Security Records",html_decode(sec_record)) as message, MAX_PAPER_MESSAGE_LEN, extra = 0)
+			var/secmsg = sanitize(input(usr,"Set your security notes here. This information is used by security staff.","Security Records",html_decode(account.sec_record)) as message, MAX_PAPER_MESSAGE_LEN, extra = 0)
 			if(secmsg != null)
-				sec_record = secmsg
+				account.sec_record = secmsg
 
 		if( "gen_record" )
-			var/genmsg = sanitize(input(usr,"Set your employment notes here. This information is used by command staff.","Employment Records",html_decode(gen_record)) as message, MAX_PAPER_MESSAGE_LEN, extra = 0)
+			var/genmsg = sanitize(input(usr,"Set your employment notes here. This information is used by command staff.","Employment Records",html_decode(account.gen_record)) as message, MAX_PAPER_MESSAGE_LEN, extra = 0)
 			if(genmsg != null)
-				gen_record = genmsg
+				account.gen_record = genmsg
 
 		if( "exploitable_record" )
-			var/exploitmsg = sanitize(input(usr,"Set your exploitable information here. This information is used by antags.","Exploitable Information",html_decode(exploit_record)) as message, MAX_PAPER_MESSAGE_LEN, extra = 0)
+			var/exploitmsg = sanitize(input(usr,"Set your exploitable information here. This information is used by antags.","Exploitable Information",html_decode(account.exploit_record)) as message, MAX_PAPER_MESSAGE_LEN, extra = 0)
 			if(exploitmsg != null)
-				exploit_record = exploitmsg
+				account.exploit_record = exploitmsg
 
 		if("language")
 			var/languages_available
@@ -202,7 +202,7 @@
 		if("nt_relation")
 			var/new_relation = input(user, "Choose your relation to NT. Note that this represents what others can find out about your character by researching your background, not what your character actually thinks.", "Character Preference")  as null|anything in list("Loyal", "Supportive", "Neutral", "Skeptical", "Opposed")
 			if(new_relation)
-				nanotrasen_relation = new_relation
+				account.nanotrasen_relation = new_relation
 
 		if("spawnpoint")
 			var/list/spawnkeys = list()
@@ -211,7 +211,7 @@
 			var/choice = input(user, "Where would you like to spawn when latejoining?") as null|anything in spawnkeys
 			if(!choice || !spawntypes[choice])
 				choice = "Arrivals Shuttle"
-			spawnpoint = choice
+			account.spawnpoint = choice
 
 		if("home_system")
 			var/choice = input(user, "Please choose a home system.") as null|anything in home_system_choices + list("Unset","Other")
@@ -221,7 +221,7 @@
 				var/raw_choice = input(user, "Please enter a home system.")  as text|null
 				if(raw_choice)
 					choice = sanitize(raw_choice)
-			home_system = choice
+			account.home_system = choice
 
 		if("citizenship")
 			var/choice = input(user, "Please choose your current citizenship.") as null|anything in citizenship_choices + list("None","Other")
@@ -231,7 +231,7 @@
 				var/raw_choice = input(user, "Please enter your current citizenship.", "Character Preference") as text|null
 				if(raw_choice)
 					choice = sanitize(raw_choice)
-			citizenship = choice
+			account.citizenship = choice
 
 		if("faction")
 			var/choice = input(user, "Please choose a faction to work for.") as null|anything in faction_choices + list("None","Other")
@@ -241,7 +241,7 @@
 				var/raw_choice = input(user, "Please enter a faction.")  as text|null
 				if(raw_choice)
 					choice = sanitize(raw_choice)
-			faction = choice
+			account.faction = choice
 
 		if("religion")
 			var/choice = input(user, "Please choose a religion.") as null|anything in religion_choices + list("None","Other")
@@ -251,7 +251,7 @@
 				var/raw_choice = input(user, "Please enter a religon.")  as text|null
 				if(raw_choice)
 					choice = sanitize(raw_choice)
-			religion = choice
+			account.religion = choice
 		if("disabilities")
 			disabilities = !disabilities
 		if( "pAI" )

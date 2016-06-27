@@ -27,14 +27,7 @@
 
 	return 1
 
-/datum/account/proc/saveCharacter( var/prompt = 0 )
-	if( istype( char_mob ))
-		char_mob.fully_replace_character_name( char_mob.real_name, name )
-		copy_to( char_mob )
-		char_mob.update_hair()
-		char_mob.update_body()
-		char_mob.check_dna( char_mob )
-
+/datum/account/proc/saveAccount()
 	if( temporary ) // If we're just a temporary character, dont save to database
 		return 1
 
@@ -45,23 +38,6 @@
 	if ( IsGuestKey( ckey ))
 		testing( "SAVE CHARACTER: Didn't save [name]'s account / ([ckey]) because they were a guest character" )
 		return 0
-
-	if( prompt && ckey )
-		var/client
-		for( client in clients )
-			if( ckey( client:ckey ) == ckey )
-				break
-
-		var/response
-		if( new_character )
-			response = alert(client, "Are you sure you're finished with character setup? You will no longer be able to change your character name, age, gender, or species after this.", "Save Character","Yes","No")
-		else
-			response = alert(client, "Are you sure you want to save?", "Save Character","Yes","No")
-
-		if( response == "No" )
-			return 1
-
-	new_character = 0
 
 	var/list/variables = list()
 
@@ -187,7 +163,7 @@
 
 	return 1
 
-/datum/account/proc/loadCharacter( var/character_ident )
+/datum/account/proc/loadAccount( var/character_ident )
 	if( !character_ident )
 		log_debug( "No character identity!" )
 		return 0
@@ -270,7 +246,6 @@
 	var/query_names = list2text( variables, "," )
 	var/sql_ident = html_encode( sql_sanitize_text( character_ident ))
 
-	new_character = 0 // If we're loading from the database, we're obviously a pre-existing character
 	temporary = 1 // All characters are temporary until they enter the game
 
 	var/DBQuery/query = dbcon.NewQuery("SELECT [query_names] FROM characters WHERE unique_identifier = '[sql_ident]'")
@@ -312,10 +287,6 @@
 						if( num )
 							birth_date.Add( num )
 
-				if( !birth_date || !birth_date.len == 3 )
-					change_age( rand( 25, 45 ))
-
-				calculate_age()
 				continue
 			if( "department" )
 				LoadDepartment( text2num( value ))
@@ -368,6 +339,6 @@
 
 		vars[variables[i]] = value
 
-	update_preview_icon()
+	owner.update_preview_icon()
 
 	return 1
