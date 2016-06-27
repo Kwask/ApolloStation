@@ -941,3 +941,7 @@ var/list/be_special_flags = list(
 #define TRANSITION_EDGE_BUFFER 3 // How far should someone be placed from the edge if they're entering a sector?
 #define OVERMAP_LOC_ATTEMPTS 10 // How many times it should attempt to place an item
 
+//used for alternate_option
+#define GET_RANDOM_JOB 0
+#define BE_ASSISTANT 1
+#define RETURN_TO_LOBBY 2

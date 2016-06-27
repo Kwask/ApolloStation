@@ -160,6 +160,8 @@ CREATE TABLE IF NOT EXISTS `preferences` (
   `UI_style_alpha` tinyint UNSIGNED NOT NULL DEFAULT '255',
   `toggles` int UNSIGNED NOT NULL DEFAULT '0',
   `last_character` varchar(100),
+  `alternate_spawn_option` int UNSIGNED DEFAULT '2', -- What happens to them if they can't be spawned in as their selected role
+  `job_antag` int UNSIGNED NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `ckey` (`ckey`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 ;
@@ -173,8 +175,6 @@ CREATE TABLE IF NOT EXISTS `characters` (
   `name` varchar(100) NOT NULL,
   `gender` varchar(11) NOT NULL,
   `birth_date` varchar(20) NOT NULL,
-  `spawnpoint` varchar(100) NOT NULL DEFAULT "Arrivals Shuttle",
-  `blood_type` varchar(10) NOT NULL,
   `underwear` tinyint UNSIGNED NOT NULL DEFAULT '1',
   `undershirt` tinyint UNSIGNED NOT NULL DEFAULT '1',
   `backpack` tinyint UNSIGNED NOT NULL DEFAULT '2', -- Different
@@ -188,33 +188,59 @@ CREATE TABLE IF NOT EXISTS `characters` (
   `species` varchar(100) NOT NULL DEFAULT "Human",
   `additional_language` varchar(100),
   `gear` text,
-  `home_system` varchar(100) NOT NULL DEFAULT "Unset",
-  `citizenship` varchar(50) NOT NULL DEFAULT "None",
-  `faction` varchar(50) NOT NULL DEFAULT "None",
-  `religion` varchar(50) NOT NULL DEFAULT "None",
-  `department` tinyint NOT NULL DEFAULT '0',
-  `roles` text,
-  `job_antag` int UNSIGNED NOT NULL DEFAULT '0',
-  `alternate_option` int UNSIGNED DEFAULT '2',
   `organ_data` text,
-  `player_alt_titles` text,
   `flavor_texts_human` text,
   `flavor_texts_robot` text, -- Different
+  `disabilities` int UNSIGNED NOT NULL DEFAULT '0',
+  `DNA` varchar(32) NOT NULL,
+  `fingerprints` varchar(32) NOT NULL,
+  `blood_type` varchar(10) NOT NULL,
+  `hash` varchar(32) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 ;
+
+-- -----------------------------------------------------
+-- Corporates Accounts
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `accounts` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `ckey` varchar(32) NOT NULL,
+  `owner_hash` varchar(32) NOT NULL,
+  `domain_name` varchar(100) NOT NULL DEFAULT "nanotrasen.nt", -- The domain that this account belongs to
+  `username` varchar(100) NOT NULL, -- The username to log into this character's account, is also for their email acc
+  `password` varchar(100) NOT NULL DEFAULT "password", -- The password to log into this character's account
+  `pin` varchar(4) NOT NULL DEFAULT "0000",
+  `security_level` tinyint NOT NULL DEFAULT '1', -- What kind of authorization is needed to log into this acc?
+  `clearence_level` varchar(100) NOT NULL "None",
+  `record_access` int UNSIGNED NOT NULL DEFAULT '0',
+  `name` varchar(100) NOT NULL, -- The username to log into this character's account
+  `gender` varchar(11) NOT NULL,
+  `birth_date` varchar(20) NOT NULL,
+  `spawnpoint` varchar(100) NOT NULL DEFAULT "Arrivals Shuttle",
+  `species` varchar(100) NOT NULL DEFAULT "Human",
+  `additional_language` varchar(100),
+  `home_system` varchar(100) NOT NULL DEFAULT "Unset",
+  `citizenship` varchar(100) NOT NULL DEFAULT "None",
+  `faction` varchar(100) NOT NULL DEFAULT "None",
+  `religion` varchar(100) NOT NULL DEFAULT "None",
+  `department` tinyint NOT NULL DEFAULT '0',
+  `roles` text,
+  `player_alt_titles` text,
   `med_record` text,
   `sec_record` text,
   `gen_record` text,
   `exploit_record` text,
-  `nanotrasen_relation` varchar(50) NOT NULL DEFAULT "Neutral",
-  `disabilities` int UNSIGNED NOT NULL DEFAULT '0',
-  `uplink_location` varchar(50) NOT NULL DEFAULT "PDA",
-  `fingerprints` varchar(32) NOT NULL,
+  `nanotrasen_relation` varchar(100) NOT NULL DEFAULT "Neutral",
   `DNA` varchar(32) NOT NULL,
-  `unique_identifier` varchar(32) NOT NULL,
-  `antag_data` text,
+  `fingerprints` varchar(32) NOT NULL,
+  `blood_type` varchar(10) NOT NULL,
   `employment_status` varchar(100) NOT NULL DEFAULT "Active",
-  `felon` int UNSIGNED NOT NULL DEFAULT '0',
+  `felon` tinyint UNSIGNED NOT NULL DEFAULT '0', 
   `prison_date` text,
-  `round_number` bigint UNSIGNED NOT NULL DEFAULT '0',
+  `antag_data` text,
+  `uplink_location` varchar(100) NOT NULL DEFAULT "PDA",
+  `first_shift_day` bigint UNSIGNED NOT NULL DEFAULT '0',
+  `last_shift_day` bigint UNSIGNED NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 ;
 

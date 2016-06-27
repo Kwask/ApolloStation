@@ -27,6 +27,12 @@ var/list/preferences_datums = list()
 	// Preference toggleables
 	var/toggles = TOGGLES_DEFAULT
 
+	// Special role selection
+	var/job_antag = 0
+
+	// Keeps track of preferrence for not getting any wanted jobs
+	var/alternate_spawn_option = RETURN_TO_LOBBY
+
 	// Saved characters
 	var/datum/character/selected_character
 

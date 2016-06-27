@@ -20,10 +20,14 @@
 	if( !department )
 		LoadDepartment( CIVILIAN )
 
+	nt_account = new( key )
+
 	menu = new( null, "creator", "Character Creator", 710, 610 )
 	menu.window_options = "focus=0;can_close=0;"
 
 	all_characters += src
+
+	..()
 
 /datum/character/Destroy()
 	all_characters -= src
@@ -95,7 +99,42 @@
 			message_admins("[character] ([character.ckey]) has spawned with their gender as plural or neuter. Please notify coders.")
 			gender = MALE
 
+	account.copyFrom( src )
 	enterMob()
+
+/proc/checkCharacter( var/character_ident, var/ckey )
+	establish_db_connection()
+	if( !dbcon.IsConnected() )
+		return 0
+
+	if( !ckey )
+		return 0
+
+	if( !character_ident )
+		return 0
+
+	var/sql_ckey = ckey( ckey )
+	var/sql_character_ident = html_encode( character_ident )
+
+	var/DBQuery/query = dbcon.NewQuery("SELECT id FROM characters WHERE ckey = '[sql_ckey]' AND unique_identifier = '[sql_character_ident]'")
+	if( !query.Execute() )
+		return 0
+
+	if( !query.NextRow() )
+		return 0
+
+	var/sql_id = query.item[1]
+
+	if(!sql_id)
+		return 0
+
+	if(istext(sql_id))
+		sql_id = text2num(sql_id)
+
+	if(!isnum(sql_id))
+		return 0
+
+	return sql_id
 
 /datum/character/proc/saveCharacter( var/prompt = 0 )
 	if( istype( char_mob ))
@@ -140,8 +179,6 @@
 	variables["name"] = html_encode( sql_sanitize_text( name ))
 	variables["gender"] = html_encode( sql_sanitize_text( gender ))
 	variables["birth_date"] = html_encode( list2params( birth_date ))
-	variables["spawnpoint"] = html_encode( sql_sanitize_text( spawnpoint ))
-	variables["blood_type"] = html_encode( sql_sanitize_text( blood_type ))
 
 	// Default clothing
 
@@ -158,6 +195,7 @@
 	// Cosmetic features
 	variables["hair_style"] = html_encode( sql_sanitize_text( hair_style ))
 	variables["hair_face_style"] = html_encode( sql_sanitize_text( hair_face_style ))
+
 	variables["hair_color"] = sanitize_hexcolor( hair_color )
 	variables["hair_face_color"] = sanitize_hexcolor( hair_face_color )
 
@@ -177,60 +215,22 @@
 	// Custom spawn gear
 	variables["gear"] = html_encode( list2params( gear ))
 
-	// Some faction information.
-	variables["home_system"] = html_encode( sql_sanitize_text( home_system ))
-	variables["citizenship"] = html_encode( sql_sanitize_text( citizenship ))
-	variables["faction"] = html_encode( sql_sanitize_text( faction ))
-	variables["religion"] = html_encode( sql_sanitize_text( religion ))
-
-	// Jobs, uses bitflags
-	variables["department"] = sanitize_integer( department.department_id, 0, 255, 0 )
-	variables["roles"] = html_encode( list2params( roles ))
-
-	// Special role selection
-	variables["job_antag"] = sanitize_integer( job_antag, 0, BITFLAGS_MAX, 0 )
-
-	// Keeps track of preferrence for not getting any wanted jobs
-	variables["alternate_option"] = sanitize_integer( alternate_option, 0, BITFLAGS_MAX, 0 )
-
 	// Maps each organ to either null(intact), "cyborg" or "amputated"
 	// will probably not be able to do this for head and torso ;)
 	variables["organ_data"] = html_encode( list2params( organ_data ))
-
-	// The default name of a job like "Medical Doctor"
-	variables["player_alt_titles"] = html_encode( list2params( player_alt_titles ))
 
 	// Flavor texts
 	variables["flavor_texts_human"] = html_encode( sql_sanitize_text( flavor_texts_human ))
 	variables["flavor_texts_robot"] = html_encode( sql_sanitize_text( flavor_texts_robot ))
 
-	// Character records, these are written by the player
-	variables["med_record"] = html_encode( sql_sanitize_text( med_record ))
-	variables["sec_record"] = html_encode( sql_sanitize_text( sec_record ))
-	variables["gen_record"] = html_encode( sql_sanitize_text( gen_record ))
-	variables["exploit_record"] = html_encode( sql_sanitize_text( exploit_record ))
-
-	// Relation to NanoTrasen
-	variables["nanotrasen_relation"] = html_encode( sql_sanitize_text( nanotrasen_relation ))
-
 	// Character disabilities
 	variables["disabilities"] = sanitize_integer( disabilities, 0, BITFLAGS_MAX, 0 )
 
-	// Location of traitor uplink
-	variables["uplink_location"] = html_encode( sql_sanitize_text( uplink_location ))
-
 	// Unique identifiers
-	variables["fingerprints"] = html_encode( sql_sanitize_text( fingerprints ))
 	variables["DNA"] = html_encode( sql_sanitize_text( DNA ))
-	variables["unique_identifier"] = html_encode( sql_sanitize_text( unique_identifier ))
-
-	variables["antag_data"] = html_encode( list2params( antag_data ))
-
-	// Status effects
-	variables["employment_status"] = html_encode( sql_sanitize_text( employment_status ))
-	variables["felon"] = sanitize_integer( felon, 0, BITFLAGS_MAX, 0 )
-	variables["prison_date"] = html_encode( list2params( prison_date ))
-	variables["round_number"] = sanitize_integer( round_number, 0, 1.8446744e+19, 0 )
+	variables["fingerprints"] = html_encode( sql_sanitize_text( fingerprints ))
+	variables["blood_type"] = html_encode( sql_sanitize_text( blood_type ))
+	variables["hash"] = html_encode( sql_sanitize_text( unique_identifier ))
 
 	var/list/names = list()
 	var/list/values = list()
@@ -288,40 +288,6 @@
 
 	return 1
 
-/proc/checkCharacter( var/character_ident, var/ckey )
-	establish_db_connection()
-	if( !dbcon.IsConnected() )
-		return 0
-
-	if( !ckey )
-		return 0
-
-	if( !character_ident )
-		return 0
-
-	var/sql_ckey = ckey( ckey )
-	var/sql_character_ident = html_encode( character_ident )
-
-	var/DBQuery/query = dbcon.NewQuery("SELECT id FROM characters WHERE ckey = '[sql_ckey]' AND unique_identifier = '[sql_character_ident]'")
-	if( !query.Execute() )
-		return 0
-
-	if( !query.NextRow() )
-		return 0
-
-	var/sql_id = query.item[1]
-
-	if(!sql_id)
-		return 0
-
-	if(istext(sql_id))
-		sql_id = text2num(sql_id)
-
-	if(!isnum(sql_id))
-		return 0
-
-	return sql_id
-
 /datum/character/proc/loadCharacter( var/character_ident )
 	if( !character_ident )
 		log_debug( "No character identity!" )
@@ -338,14 +304,10 @@
 
 	var/list/variables = list()
 
-	// Base information
 	variables["name"] = "text"
 	variables["gender"] = "text"
 	variables["birth_date"] = "birth_date"
-	variables["spawnpoint"] = "text"
-	variables["blood_type"] = "text"
 
-	// Default clothing
 	variables["underwear"] = "number"
 	variables["undershirt"] = "number"
 	variables["backpack"] = "number"
@@ -353,10 +315,13 @@
 	// Cosmetic features
 	variables["hair_style"] = "text"
 	variables["hair_face_style"] = "text"
+
 	variables["hair_color"] = "text"
 	variables["hair_face_color"] = "text"
+
 	variables["skin_tone"] = "number"
 	variables["skin_color"] = "text"
+
 	variables["eye_color"] = "text"
 
 	// Character species
@@ -368,56 +333,22 @@
 	// Custom spawn gear
 	variables["gear"] = "params"
 
-	// Some faction information.
-	variables["home_system"] = "text"
-	variables["citizenship"] = "text"
-	variables["faction"] = "text"
-	variables["religion"] = "text"
-
-	// Jobs, uses bitflags
-	variables["roles"] = "roles"
-	variables["department"] = "department"
-
-	// Special role selection
-	variables["job_antag"] = "number"
-
-	// Keeps track of preferrence for not getting any wanted jobs
-	variables["alternate_option"] = "number"
-
 	// Maps each organ to either null(intact), "cyborg" or "amputated"
 	// will probably not be able to do this for head and torso ;)
 	variables["organ_data"] = "params"
-
-	// The default name of a job like "Medical Doctor"
-	variables["player_alt_titles"] = "params"
 
 	// Flavor texts
 	variables["flavor_texts_human"] = "text"
 	variables["flavor_texts_robot"] = "text"
 
-	// Character records, these are written by the player
-	variables["med_record"] = "text"
-	variables["sec_record"] = "text"
-	variables["gen_record"] = "text"
-	variables["exploit_record"] = "text"
-
-	// Relation to NanoTrasen
-	variables["nanotrasen_relation"] = "text"
-
 	// Character disabilities
 	variables["disabilities"] = "number"
 
-	// Location of traitor uplink
-	variables["uplink_location"] = "text"
-
-	variables["fingerprints"] = "text"
+	// Unique identifiers
 	variables["DNA"] = "text"
-	variables["unique_identifier"] = "text"
-	variables["antag_data"] = "antag_data"
-
-	variables["employment_status"] = "text"
-	variables["felon"] = "number"
-	variables["prison_date"] = "prison_date"
+	variables["fingerprints"] = "text"
+	variables["blood_type"] = "text"
+	variables["hash"] = "text"
 
 	var/query_names = list2text( variables, "," )
 	var/sql_ident = html_encode( sql_sanitize_text( character_ident ))
@@ -490,12 +421,6 @@
 							prison_date.Add( num )
 
 				value = prison_date
-/* Disabling this for now until we find out why date proc is messing up
-				if( prison_date && prison_date.len == 3 )
-					var/days = daysTilDate( universe.date, prison_date )
-					if( employment_status == "Active" && days >= PERMAPRISON_SENTENCE )
-						employment_status = "Serving a life sentence"
-*/
 			if( "roles" )
 				var/list/L = params2list( html_decode( value ))
 
@@ -526,6 +451,7 @@
 
 		vars[variables[i]] = value
 
+	account.loadCharacter( hash )
 	update_preview_icon()
 
 	return 1
