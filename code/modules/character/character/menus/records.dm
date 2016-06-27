@@ -258,4 +258,6 @@
 			paiController.recruitWindow(user, 0)
 			return 1
 
+	account.temporary = 0
+
 	RecordsMenu( user )

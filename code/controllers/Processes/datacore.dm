@@ -254,7 +254,7 @@ var/global/ManifestJSON
 
 	var/min_round_number = universe.round_number-max_employee_inactivity
 
-	var/DBQuery/query = dbcon.NewQuery("SELECT unique_identifier FROM characters WHERE round_number > [min_round_number] ORDER BY name")
+	var/DBQuery/query = dbcon.NewQuery("SELECT hash FROM characters WHERE last_shift_day > [min_round_number] ORDER BY name")
 	query.Execute()
 
 	while( query.NextRow() )

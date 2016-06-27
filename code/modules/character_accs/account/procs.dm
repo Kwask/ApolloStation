@@ -25,10 +25,12 @@
 	blood_type = owner.blood_type
 	owner_hash = owner.hash
 
+	temporary = 0 // Data has changed that should be saved now
+
 	return 1
 
-/datum/account/proc/saveAccount()
-	if( temporary ) // If we're just a temporary character, dont save to database
+/datum/account/proc/saveAccount( var/force = 0 )
+	if( temporary && !force ) // If we're just a temporary character and we're not forcing a save, dont save to database
 		return 1
 
 	if( !ckey )
@@ -44,16 +46,16 @@
 	variables["ckey"] = ckey( ckey )
 	variables["owner_hash"] = html_encode( sql_sanitize_text( owner_hash ))
 
-	variables["domain_name"] = html_encode( sql_sanitize_text( username ))
+	variables["domain_name"] = html_encode( sql_sanitize_text( domain_name ))
 
 	variables["username"] = html_encode( sql_sanitize_text( username ))
 	variables["password"] = html_encode( sql_sanitize_text( password ))
 	variables["pin"] = html_encode( sql_sanitize_text( pin ))
 
-	variables["security_level"] = sanitize_integer( department.department_id, 0, 255, 0 )
+	variables["security_level"] = sanitize_integer( security_level, 0, 2, 0 )
 	variables["clearence_level"] = html_encode( sql_sanitize_text( clearence_level ))
 
-	variables["record_access"] = html_encode( sql_sanitize_text( record_access ))
+	variables["record_access"] = sanitize_integer( record_access, 0, 65536, 0 )
 
 	variables["name"] = html_encode( sql_sanitize_text( name ))
 	variables["gender"] = html_encode( sql_sanitize_text( gender ))
@@ -118,7 +120,7 @@
 		testing( "SAVE CHARACTER: Didn't save [name]'s account / ([ckey]) because the database wasn't connected" )
 		return 0
 
-	var/DBQuery/query = dbcon.NewQuery("SELECT id FROM characters WHERE ckey = '[variables["ckey"]]' AND name = '[variables["name"]]'")
+	var/DBQuery/query = dbcon.NewQuery("SELECT id FROM accounts WHERE ckey = '[variables["ckey"]]' AND name = '[variables["name"]]'")
 	query.Execute()
 	var/sql_id = 0
 	while(query.NextRow())
@@ -161,6 +163,8 @@
 			testing( "SAVE CHARACTER: Didn't save [name]'s account / ([ckey]) because the SQL insert failed" )
 			return 0
 
+	new_account = 0
+
 	return 1
 
 /datum/account/proc/loadAccount( var/character_ident )
@@ -180,7 +184,6 @@
 	var/list/variables = list()
 
 	variables["owner_hash"] = "text"
-
 	variables["domain_name"] = "text"
 
 	variables["username"] = "text"
@@ -248,7 +251,7 @@
 
 	temporary = 1 // All characters are temporary until they enter the game
 
-	var/DBQuery/query = dbcon.NewQuery("SELECT [query_names] FROM characters WHERE unique_identifier = '[sql_ident]'")
+	var/DBQuery/query = dbcon.NewQuery("SELECT [query_names] FROM accounts WHERE owner_hash = '[sql_ident]'")
 	if( !query.Execute() )
 		log_debug( "Could not execute query!" )
 		return 0
@@ -339,6 +342,7 @@
 
 		vars[variables[i]] = value
 
+	new_account = 0
 	owner.update_preview_icon()
 
 	return 1

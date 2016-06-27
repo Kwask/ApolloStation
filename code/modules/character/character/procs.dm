@@ -17,10 +17,10 @@
 
 	change_age( 30 )
 
+	account = new( key )
+
 	if( !account.department )
 		account.LoadDepartment( CIVILIAN )
-
-	account = new( key )
 
 	menu = new( null, "creator", "Character Creator", 710, 610 )
 	menu.window_options = "focus=0;can_close=0;"
@@ -116,7 +116,7 @@
 	var/sql_ckey = ckey( ckey )
 	var/sql_character_ident = html_encode( character_ident )
 
-	var/DBQuery/query = dbcon.NewQuery("SELECT id FROM characters WHERE ckey = '[sql_ckey]' AND unique_identifier = '[sql_character_ident]'")
+	var/DBQuery/query = dbcon.NewQuery("SELECT id FROM characters WHERE ckey = '[sql_ckey]' AND hash = '[sql_character_ident]'")
 	if( !query.Execute() )
 		return 0
 
@@ -144,8 +144,7 @@
 		char_mob.update_body()
 		char_mob.check_dna( char_mob )
 
-
-	if( temporary ) // If we're just a temporary character, dont save to database
+	if( temporary && !prompt ) // If we're just a temporary character and the user isnt forcing this save, dont save to database
 		return 1
 
 	if( !ckey )
@@ -170,8 +169,6 @@
 
 		if( response == "No" )
 			return 1
-
-	new_character = 0
 
 	var/list/variables = list()
 
@@ -286,6 +283,13 @@
 			testing( "SAVE CHARACTER: Didn't save [name] / ([ckey]) because the SQL insert failed" )
 			return 0
 
+	if( new_character )
+		account.copyFrom( src )
+
+	account.saveAccount()
+
+	new_character = 0
+
 	return 1
 
 /datum/character/proc/loadCharacter( var/character_ident )
@@ -356,7 +360,7 @@
 	new_character = 0 // If we're loading from the database, we're obviously a pre-existing character
 	temporary = 1 // All characters are temporary until they enter the game
 
-	var/DBQuery/query = dbcon.NewQuery("SELECT [query_names] FROM characters WHERE unique_identifier = '[sql_ident]'")
+	var/DBQuery/query = dbcon.NewQuery("SELECT [query_names] FROM characters WHERE hash = '[sql_ident]'")
 	if( !query.Execute() )
 		log_debug( "Could not execute query!" )
 		return 0
@@ -403,6 +407,7 @@
 
 		vars[variables[i]] = value
 
+	account.loadAccount( hash )
 	update_preview_icon()
 
 	return 1
@@ -781,5 +786,5 @@
 	temporary = new_character // If we're a new character, then we're also temporary
 	account.last_shift_day = universe.round_number
 
-	if( account.first_shift_day )
+	if( !account.first_shift_day )
 		account.first_shift_day = universe.round_number

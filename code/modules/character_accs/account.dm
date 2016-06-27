@@ -91,4 +91,5 @@
 	var/icon/preview_icon_side = null
 	var/species_preview   // Used for the species selection window.
 
+	var/new_account = 1 // Is this a new character?
 	var/temporary = 1 // Should we avoid saving this datum on round end? By default it isnt saved unless changes are made

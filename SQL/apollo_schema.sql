@@ -211,7 +211,7 @@ CREATE TABLE IF NOT EXISTS `accounts` (
   `password` varchar(100) NOT NULL DEFAULT "password", -- The password to log into this character's account
   `pin` varchar(4) NOT NULL DEFAULT "0000",
   `security_level` tinyint NOT NULL DEFAULT '1', -- What kind of authorization is needed to log into this acc?
-  `clearence_level` varchar(100) NOT NULL "None",
+  `clearence_level` varchar(100) NOT NULL DEFAULT "None",
   `record_access` int UNSIGNED NOT NULL DEFAULT '0',
   `name` varchar(100) NOT NULL, -- The username to log into this character's account
   `gender` varchar(11) NOT NULL,

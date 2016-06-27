@@ -129,7 +129,7 @@
 			if( !is_complete )
 				query_input = "LIKE '%[query]%'"
 
-			var/DBQuery/db_query = dbcon.NewQuery("SELECT name, gender, birth_date, blood_type, fingerprints, unique_identifier FROM characters WHERE [query_type] [query_input] LIMIT [return_limit]")
+			var/DBQuery/db_query = dbcon.NewQuery("SELECT name, gender, birth_date, blood_type, fingerprints, hash FROM characters WHERE [query_type] [query_input] LIMIT [return_limit]")
 
 			if( !db_query.Execute() )
 				. += {"<table class='outline'>
@@ -373,7 +373,7 @@ What a mess.*/
 
 				query = href_list["hash"]
 				tempname = href_list["name"]
-				query_type = "unique_identifier"
+				query_type = "hash"
 
 			if( "View Paperwork" )
 				var/sql_id = text2num( href_list["id"] )

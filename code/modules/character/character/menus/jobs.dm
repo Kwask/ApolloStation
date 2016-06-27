@@ -217,6 +217,8 @@
 		if("input")
 			account.SetJob(user, href_list["text"])
 
+	account.temporary = 0
+
 	JobChoicesMenu( user )
 
 // This takes a list of jobs, and returns an associative list of departments with their roles tied to them
