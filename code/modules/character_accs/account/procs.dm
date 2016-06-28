@@ -62,10 +62,9 @@
 	return add_zero( num2text( rand( 0, 9999 )), 4 )
 
 /datum/account/proc/generatePassword()
-	return ckey( "[pick( alphabet_phonetic )][rand( 0, 100 )]" )
+	return ckey( "[pick( adjectives )][rand( 0, 100 )]" )
 
 /datum/account/proc/generateUsername()
-	// Format firlastbd
 	if( owner )
 		name = owner.name
 
