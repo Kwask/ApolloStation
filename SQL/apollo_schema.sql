@@ -175,7 +175,7 @@ CREATE TABLE IF NOT EXISTS `characters` (
   `hash` varchar(32) NOT NULL,
   `name` varchar(100) NOT NULL,
   `gender` varchar(11) NOT NULL,
-  `birth_date` varchar(20) NOT NULL,
+  `birth_date` varchar(100) NOT NULL,
   `underwear` tinyint UNSIGNED NOT NULL DEFAULT '1',
   `undershirt` tinyint UNSIGNED NOT NULL DEFAULT '1',
   `backpack` tinyint UNSIGNED NOT NULL DEFAULT '2', -- Different
@@ -215,7 +215,7 @@ CREATE TABLE IF NOT EXISTS `accounts` (
   `record_access` int UNSIGNED NOT NULL DEFAULT '0',
   `name` varchar(100) NOT NULL, -- The username to log into this character's account
   `gender` varchar(11) NOT NULL,
-  `birth_date` varchar(20) NOT NULL,
+  `birth_date` varchar(100) NOT NULL,
   `spawnpoint` varchar(100) NOT NULL DEFAULT "Arrivals Shuttle",
   `species` varchar(100) NOT NULL DEFAULT "Human",
   `additional_language` varchar(100),
