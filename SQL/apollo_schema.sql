@@ -224,6 +224,8 @@ CREATE TABLE IF NOT EXISTS `accounts` (
   `faction` varchar(100) NOT NULL DEFAULT "None",
   `religion` varchar(100) NOT NULL DEFAULT "None",
   `department` tinyint NOT NULL DEFAULT '0',
+  `last_job` varchar(100) NOT NULL DEFAULT "Unassigned",
+  `last_role` varchar(100) NOT NULL DEFAULT "Unassigned",
   `roles` text,
   `player_alt_titles` text,
   `med_record` text,

@@ -22,7 +22,6 @@
 	schedule_interval = 50
 
 	data_core.loadFromDB()
-	data_core.queue_manifest()
 
 /datum/controller/process/datacore/proc/get_manifest(monochrome, OOC)
 	var/list/heads = new()
@@ -50,6 +49,9 @@
 	var/even = 0
 	// sort mobs
 	for(var/datum/data/record/t in data_core.general)
+		if( !t.fields["is_crew"] )
+			continue
+
 		var/name = t.fields["name"]
 		var/rank = t.fields["rank"]
 		var/real_rank = t.fields["real_rank"]
@@ -168,6 +170,9 @@ var/global/ManifestJSON
 	var/bot[0]
 	var/misc[0]
 	for(var/datum/data/record/t in data_core.general)
+		if( !t.fields["is_crew"] )
+			continue
+
 		var/name = sanitize(t.fields["name"])
 		var/rank = sanitize(t.fields["rank"])
 		var/real_rank = t.fields["real_rank"]
@@ -280,7 +285,7 @@ var/global/ManifestJSON
 /datum/controller/process/datacore/proc/manifest()
 	for(var/mob/living/carbon/human/H in player_list)
 		crewmembers += H.character
-		manifest_inject(H)
+		manifest_inject(H.character.account)
 	return
 
 /datum/controller/process/datacore/proc/manifest_sort()
@@ -317,111 +322,107 @@ var/global/ManifestJSON
 
 	manifest_sort()
 
-/datum/controller/process/datacore/proc/manifest_inject(var/mob/living/carbon/human/H)
+/datum/controller/process/datacore/proc/manifest_inject( var/datum/account/A )
+	if( !istype( A ))
+		return
+
 	if(PDA_Manifest.len)
 		PDA_Manifest.Cut()
 
-	if(H.mind && (H.mind.assigned_role != "MODE"))
-		var/assignment
-		if(H.mind.role_alt_title)
-			assignment = H.mind.role_alt_title
-		else if(H.mind.assigned_role)
-			assignment = H.mind.assigned_role
-		else if(H.job)
-			assignment = H.job
-		else
-			assignment = "Unassigned"
+	var/is_crew = A.crew
 
-		var/id = add_zero(num2hex(rand(1, 1.6777215E7)), 6)	//this was the best they could come up with? A large random number? *sigh*
+	//General Record
+	var/datum/data/record/G = new()
+	G.fields["id"]			= A.username
+	G.fields["name"]		= A.name
+	G.fields["real_rank"]	= A.last_job
+	G.fields["rank"]		= A.last_role
+	G.fields["birth_date"]	= print_date( A.birth_date )
+	G.fields["fingerprint"]	= A.fingerprints
+	G.fields["p_stat"]		= A.employment_status
+	G.fields["m_stat"]		= "Stable"
+	G.fields["sex"]			= A.gender
+	G.fields["species"]		= A.species
+	G.fields["home_system"]	= A.home_system
+	G.fields["citizenship"]	= A.citizenship
+	G.fields["faction"]		= A.faction
+	G.fields["religion"]	= A.religion
+	G.fields["photo_front"]	= A.preview_icon_front
+	G.fields["photo_side"]	= A.preview_icon_side
+	G.fields["character"]	= A.owner
+	if( A.gen_record )
+		G.fields["notes"] = A.gen_record
+	else
+		G.fields["notes"] = "No notes found."
+	G.fields["is_crew"] = is_crew
 
-		//General Record
-		var/datum/data/record/G = new()
-		G.fields["id"]			= id
-		G.fields["name"]		= H.real_name
-		G.fields["real_rank"]	= H.mind.assigned_role
-		G.fields["rank"]		= assignment
-		G.fields["age"]			= H.character.age
-		G.fields["fingerprint"]	= md5(H.dna.uni_identity)
-		G.fields["p_stat"]		= "Active"
-		G.fields["m_stat"]		= "Stable"
-		G.fields["sex"]			= H.gender
-		G.fields["species"]		= H.get_species()
-		G.fields["home_system"]	= H.character.account.home_system
-		G.fields["citizenship"]	= H.character.account.citizenship
-		G.fields["faction"]		= H.character.account.faction
-		G.fields["religion"]	= H.character.account.religion
-		G.fields["photo_front"]	= H.character.account.preview_icon_front
-		G.fields["photo_side"]	= H.character.account.preview_icon_side
-		G.fields["character"]	= H.character
-		if(H.character.account.gen_record && !jobban_isbanned(H, "Records"))
-			G.fields["notes"] = H.character.account.gen_record
-		else
-			G.fields["notes"] = "No notes found."
+	general += G
 
-		general += G
+	//Medical Record
+	var/datum/data/record/M = new()
+	M.fields["id"]			= A.username
+	M.fields["name"]		= A.name
+	M.fields["b_type"]		= A.blood_type
+	M.fields["b_dna"]		= A.DNA
+	M.fields["mi_dis"]		= "None"
+	M.fields["mi_dis_d"]	= "No minor disabilities have been declared."
+	M.fields["ma_dis"]		= "None"
+	M.fields["ma_dis_d"]	= "No major disabilities have been diagnosed."
+	M.fields["alg"]			= "None"
+	M.fields["alg_d"]		= "No allergies have been detected in this patient."
+	M.fields["cdi"]			= "None"
+	M.fields["cdi_d"]		= "No diseases have been diagnosed at the moment."
+	if( A.med_record )
+		M.fields["notes"] = A.med_record
+	else
+		M.fields["notes"] = "No notes found."
+	M.fields["is_crew"] = is_crew
 
+	medical += M
 
-		//Medical Record
-		var/datum/data/record/M = new()
-		M.fields["id"]			= id
-		M.fields["name"]		= H.character.name
-		M.fields["b_type"]		= H.character.blood_type
-		M.fields["b_dna"]		= H.dna.unique_enzymes
-		M.fields["mi_dis"]		= "None"
-		M.fields["mi_dis_d"]	= "No minor disabilities have been declared."
-		M.fields["ma_dis"]		= "None"
-		M.fields["ma_dis_d"]	= "No major disabilities have been diagnosed."
-		M.fields["alg"]			= "None"
-		M.fields["alg_d"]		= "No allergies have been detected in this patient."
-		M.fields["cdi"]			= "None"
-		M.fields["cdi_d"]		= "No diseases have been diagnosed at the moment."
-		if(H.character.account.med_record && !jobban_isbanned(H, "Records"))
-			M.fields["notes"] = H.character.account.med_record
-		else
-			M.fields["notes"] = "No notes found."
-		medical += M
+	//Security Record
+	var/datum/data/record/S = new()
+	S.fields["id"]			= A.username
+	S.fields["name"]		= A.name
+	S.fields["criminal"]	= "None"
+	S.fields["mi_crim"]		= "None"
+	S.fields["mi_crim_d"]	= "No minor crime convictions."
+	S.fields["ma_crim"]		= "None"
+	S.fields["ma_crim_d"]	= "No major crime convictions."
+	S.fields["notes"]		= "No notes."
+	if( A.sec_record )
+		S.fields["notes"] = A.sec_record
+	else
+		S.fields["notes"] = "No notes."
+	S.fields["is_crew"] = is_crew
 
-		//Security Record
-		var/datum/data/record/S = new()
-		S.fields["id"]			= id
-		S.fields["name"]		= H.real_name
-		S.fields["criminal"]	= "None"
-		S.fields["mi_crim"]		= "None"
-		S.fields["mi_crim_d"]	= "No minor crime convictions."
-		S.fields["ma_crim"]		= "None"
-		S.fields["ma_crim_d"]	= "No major crime convictions."
-		S.fields["notes"]		= "No notes."
-		if(H.character.account.sec_record && !jobban_isbanned(H, "Records"))
-			S.fields["notes"] = H.character.account.sec_record
-		else
-			S.fields["notes"] = "No notes."
-		security += S
+	security += S
 
-		//Locked Record
-		var/datum/data/record/L = new()
-		L.fields["id"]			= md5("[H.real_name][H.mind.assigned_role]")
-		L.fields["name"]		= H.character.name
-		L.fields["rank"] 		= H.mind.assigned_role
-		L.fields["age"]			= H.character.age
-		L.fields["fingerprint"]	= md5(H.dna.uni_identity)
-		L.fields["sex"]			= H.character.gender
-		L.fields["b_type"]		= H.character.blood_type
-		L.fields["b_dna"]		= H.dna.unique_enzymes
-		L.fields["enzymes"]		= H.dna.SE // Used in respawning
-		L.fields["identity"]	= H.dna.UI // "
-		L.fields["species"]		= H.get_species()
-		L.fields["home_system"]	= H.character.account.home_system
-		L.fields["citizenship"]	= H.character.account.citizenship
-		L.fields["faction"]		= H.character.account.faction
-		L.fields["religion"]	= H.character.account.religion
-		L.fields["image"]		= getFlatIcon(H)	//This is god-awful
-		if(H.character.account.exploit_record && !jobban_isbanned(H, "Records"))
-			L.fields["exploit_record"] = H.character.account.exploit_record
-		else
-			L.fields["exploit_record"] = "No additional information acquired."
-		locked += L
+	//Locked Record
+	var/datum/data/record/L = new()
+	L.fields["id"]			= A.username
+	L.fields["name"]		= A.name
+	L.fields["rank"] 		= A.last_role
+	L.fields["birth_date"]	= print_date( A.birth_date )
+	L.fields["fingerprint"]	= A.fingerprints
+	L.fields["sex"]			= A.gender
+	L.fields["b_type"]		= A.blood_type
+	L.fields["b_dna"]		= A.DNA
+	L.fields["species"]		= A.species
+	L.fields["home_system"]	= A.home_system
+	L.fields["citizenship"]	= A.citizenship
+	L.fields["faction"]		= A.faction
+	L.fields["religion"]	= A.religion
+	L.fields["image"]		= A.preview_icon
+	if( A.exploit_record )
+		L.fields["exploit_record"] = A.exploit_record
+	else
+		L.fields["exploit_record"] = "No additional information acquired."
+	L.fields["is_crew"] = is_crew
 
-		manifest_sort()
+	locked += L
+
+	manifest_sort()
 
 	return
 

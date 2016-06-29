@@ -8,7 +8,7 @@
 	G.fields["rank"] = "Unassigned"
 	G.fields["real_rank"] = "Unassigned"
 	G.fields["sex"] = "Male"
-	G.fields["age"] = "Unknown"
+	G.fields["birth_date"] = "Unknown"
 	G.fields["fingerprint"] = "Unknown"
 	G.fields["p_stat"] = "Active"
 	G.fields["m_stat"] = "Stable"

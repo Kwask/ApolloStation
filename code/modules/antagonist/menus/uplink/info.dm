@@ -92,7 +92,7 @@
 			info["exploit_record"] = replacetext(info["exploit_record"], "\n", "<br>")	// change line breaks into <br>
 			info["name"] =  html_encode(L.fields["name"])
 			info["sex"] =  html_encode(L.fields["sex"])
-			info["age"] =  html_encode(L.fields["age"])
+			info["birth_date"] =  html_encode(L.fields["birth_date"])
 			info["species"] =  html_encode(L.fields["species"])
 			info["rank"] =  html_encode(L.fields["rank"])
 			info["home_system"] =  html_encode(L.fields["home_system"])

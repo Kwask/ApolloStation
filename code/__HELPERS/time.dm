@@ -59,7 +59,6 @@ proc/isDay(var/month, var/day)
 	if( month < 1 || month > 12 )
 		return "ERROR"
 
-	var/list/months = list( "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" )
 	return months[month]
 
 /proc/print_date( var/list/date )

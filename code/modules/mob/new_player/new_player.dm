@@ -385,8 +385,9 @@
 
 		//ticker.mode.latespawn(character)
 
-		if(character.mind.assigned_role != "Cyborg")
-			data_core.manifest_inject(character)
+		var/mob/living/carbon/human/H = character
+		if( istype( H ))
+			data_core.manifest_inject( H.character.account )
 			ticker.minds += character.mind//Cyborgs and AIs handle this in the transform proc.	//TODO!!!!! ~Carn
 
 			//Grab some data from the character prefs for use in random news procs.
@@ -479,13 +480,6 @@
 			if(is_alien_whitelisted(src, client.prefs.selected_character.additional_language) || !config.usealienwhitelist || !(chosen_language.flags & WHITELISTED) || (new_character.species && (chosen_language.name in new_character.species.secondary_langs)))
 				new_character.add_language("[client.prefs.selected_character.additional_language]")
 
-		if(ticker.random_players)
-			new_character.gender = pick(MALE, FEMALE)
-			client.prefs.selected_character.name = random_name(new_character.gender)
-			client.prefs.selected_character.randomize_appearance_for(new_character)
-		else
-			client.prefs.selected_character.copy_to(new_character)
-
 		src << sound(null, repeat = 0, wait = 0, volume = 85, channel = 1) // MAD JAMS cant last forever yo
 
 		if(mind)
@@ -495,6 +489,13 @@
 				new_character.rename_self("clown")
 			mind.original = new_character
 			mind.transfer_to(new_character)					//won't transfer key since the mind is not active
+
+		if(ticker.random_players)
+			new_character.gender = pick(MALE, FEMALE)
+			client.prefs.selected_character.name = random_name(new_character.gender)
+			client.prefs.selected_character.randomize_appearance_for(new_character)
+		else
+			client.prefs.selected_character.copy_to(new_character)
 
 		new_character.name = real_name
 		new_character.dna.ready_dna(new_character)

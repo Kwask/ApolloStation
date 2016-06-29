@@ -351,7 +351,7 @@ var/global/list/datum/dna/gene/dna_genes[0]
 			ResetSE()
 
 		if(length(unique_enzymes) != 32)
-			unique_enzymes = md5(character.real_name)
+			unique_enzymes = character.character.DNA
 	else
 		if(length(uni_identity) != 3*DNA_UI_LENGTH)
 			uni_identity = "00600200A00E0110148FC01300B0095BD7FD3F4"
@@ -365,5 +365,4 @@ var/global/list/datum/dna/gene/dna_genes[0]
 
 	ResetSE()
 
-	unique_enzymes = md5(character.real_name)
-	reg_dna[unique_enzymes] = character.real_name
+	unique_enzymes = character.character.DNA

@@ -204,7 +204,7 @@ datum/nano_item_lists
 				nanoui_data["exploit"]["nanoui_exploit_record"] = replacetext(nanoui_data["exploit"]["nanoui_exploit_record"], "\n", "<br>")    // change line breaks into <br>
 				nanoui_data["exploit"]["name"] =  html_encode(L.fields["name"])
 				nanoui_data["exploit"]["sex"] =  html_encode(L.fields["sex"])
-				nanoui_data["exploit"]["age"] =  html_encode(L.fields["age"])
+				nanoui_data["exploit"]["birth_date"] =  html_encode(L.fields["birth_date"])
 				nanoui_data["exploit"]["species"] =  html_encode(L.fields["species"])
 				nanoui_data["exploit"]["rank"] =  html_encode(L.fields["rank"])
 				nanoui_data["exploit"]["home_system"] =  html_encode(L.fields["home_system"])

@@ -96,7 +96,6 @@ var/list/bombers = list(  )
 var/list/admin_log = list (  )
 var/list/lastsignalers = list(	)	//keeps last 100 signals here in format: "[src] used \ref[src] @ location [src.loc]: [freq]/[code]"
 var/list/lawchanges = list(  ) //Stores who uploaded laws to which silicon-based lifeform, and what the law was
-var/list/reg_dna = list(  )
 //	list/traitobj = list(  )
 
 var/rodent_respawn_time = 5 //Amount of time that must pass between a player dying as a mouse and repawning as a mouse. In minutes.
@@ -270,3 +269,4 @@ var/global/datum/subsystem/cell_auto/cell_auto_manager = new()
 
 //For client IC automute management
 var/global/list/non_spawn_emote = list("gasps","shivers","drools","chokes","moans","twitches violently","twitches","sneezes","snores","yawns")
+var/global/list/months = list( "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" )

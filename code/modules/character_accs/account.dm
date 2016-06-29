@@ -43,6 +43,8 @@
 
 	// Job vars, these are used in the job selection screen and hiring computer
 	var/datum/department/department
+	var/last_job = "Unassigned"
+	var/last_role = "Unassigned"
 	var/list/roles = list( "Assistant" = "Low" ) // Roles that the player has unlocked
 
 	// The default name of a job like "Medical Doctor"
@@ -93,3 +95,4 @@
 
 	var/new_account = 1 // Is this a new character?
 	var/temporary = 1 // Should we avoid saving this datum on round end? By default it isnt saved unless changes are made
+	var/crew = 0 // Is the associated character aboard the station?

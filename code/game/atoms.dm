@@ -303,8 +303,7 @@ its easier to just keep the beam vertical.
 		if(!fingerprints)
 			fingerprints = list()
 
-		//Hash this shit.
-		var/full_print = md5(H.dna.uni_identity)
+		var/full_print = H.character.fingerprints
 
 		// Add the fingerprints
 		//

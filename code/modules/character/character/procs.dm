@@ -149,11 +149,11 @@
 	if( temporary && !prompt ) // If we're just a temporary character and the user isnt forcing this save, dont save to database
 		return 1
 
-	if( !ckey )
+	if( !ckey && prompt )
 		testing( "SAVE CHARACTER: Didn't save [name] because they didn't have a ckey" )
 		return 0
 
-	if ( IsGuestKey( ckey ))
+	if ( IsGuestKey( ckey ) && prompt )
 		testing( "SAVE CHARACTER: Didn't save [name] / ([ckey]) because they were a guest character" )
 		return 0
 
@@ -787,6 +787,7 @@
 /datum/character/proc/enterMob()
 	temporary = new_character // If we're a new character, then we're also temporary
 	account.last_shift_day = universe.round_number
+	account.crew = 1
 
 	if( !account.first_shift_day )
 		account.first_shift_day = universe.round_number

@@ -125,7 +125,7 @@
 /obj/item/weapon/f_card/add_fingerprint(mob/living/M as mob, ignoregloves = 0)
 	if(..())
 		var/mob/living/carbon/human/H = M
-		var/full_print = md5(H.dna.uni_identity)
+		var/full_print = H.character.fingerprints
 		fingerprints[full_print] = full_print
 
 /obj/item/weapon/f_card/examine(mob/user)

@@ -54,15 +54,42 @@
 	if( !username || username == "username" )
 		username = generateUsername()
 
+	if( istype( owner.char_mob ))
+		var/assignment
+		var/job
+
+		if( owner.char_mob.mind && owner.char_mob.mind.assigned_role)
+			job = owner.char_mob.mind.assigned_role
+		else if(owner.char_mob.job)
+			job = owner.char_mob.job
+		else
+			job = "Unassigned"
+
+		if( owner.char_mob.mind && owner.char_mob.mind.role_alt_title)
+			assignment = owner.char_mob.mind.role_alt_title
+		else
+			assignment = job
+
+		last_job = job
+		last_role = assignment
+
 	temporary = 0 // Data has changed that should be saved now
 
 	return 1
 
 /datum/account/proc/generatePin()
-	return add_zero( num2text( rand( 0, 9999 )), 4 )
+	temporary = 0
+
+	pin = add_zero( num2text( rand( 0, 9999 )), 4 )
+
+	return pin
 
 /datum/account/proc/generatePassword()
-	return ckey( "[pick( adjectives )][rand( 0, 100 )]" )
+	temporary = 0
+
+	password = ckey( "[pick( adjectives )][rand( 0, 100 )]" )
+
+	return password
 
 /datum/account/proc/generateUsername()
 	if( owner )
@@ -70,13 +97,13 @@
 
 	var/stripped_name = ckey( name )
 	var/usern = ""
-	var/max_size = 9
+	var/max_size = 10
 
 	for( var/i = 0, i < 50, i++ )
 		var/firstchar = 1
 		var/lastchar = max_size-2
 		if( lentext( name ) < lastchar )
-			lastchar = round( lentext( name )/2 )
+			lastchar = lentext( name )+1
 
 		usern += copytext( stripped_name, firstchar, lastchar )
 		usern += add_zero( num2text( birth_date[3] ), 2 )
@@ -92,14 +119,6 @@
 /datum/account/proc/saveAccount( var/force = 0 )
 	if( temporary && !force ) // If we're just a temporary character and we're not forcing a save, dont save to database
 		return 1
-
-	if( !ckey )
-		testing( "SAVE CHARACTER: Didn't save [name]'s account because they didn't have a ckey" )
-		return 0
-
-	if ( IsGuestKey( ckey ))
-		testing( "SAVE CHARACTER: Didn't save [name]'s account / ([ckey]) because they were a guest character" )
-		return 0
 
 	if( !username || username == "username" )
 		username = generateUsername()
@@ -139,6 +158,8 @@
 
 	// Jobs, uses bitflags
 	variables["department"] = sanitize_integer( department.department_id, 0, 255, 0 )
+	variables["last_job"] = html_encode( sql_sanitize_text( last_job ))
+	variables["last_role"] = html_encode( sql_sanitize_text( last_role ))
 	variables["roles"] = html_encode( list2params( roles ))
 
 	// The default name of a job like "Medical Doctor"
@@ -276,6 +297,8 @@
 
 	// Jobs, uses bitflags
 	variables["department"] = "department"
+	variables["last_job"] = "text"
+	variables["last_role"] = "text"
 	variables["roles"] = "params"
 
 	// The default name of a job like "Medical Doctor"
@@ -404,6 +427,15 @@
 				value = L
 
 		vars[variables[i]] = value
+
+	if( !username || username == "username" )
+		username = generateUsername()
+
+	if( !password || password == "password" )
+		password = generatePassword()
+
+	if( !pin || pin == "0000" )
+		pin = generatePin()
 
 	new_account = 0
 	owner.update_preview_icon()

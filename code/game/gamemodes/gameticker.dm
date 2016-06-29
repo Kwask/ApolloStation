@@ -131,6 +131,8 @@ var/global/datum/controller/gameticker/ticker
 	setup_economy()
 	current_state = GAME_STATE_PLAYING
 
+	data_core.queue_manifest()
+
 	callHook("roundstart")
 
 	shuttle_controller.setup_shuttle_docks()
