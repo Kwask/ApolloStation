@@ -24,37 +24,37 @@
 /datum/account/New( var/key, var/datum/character/char )
 	if( istype( char ))
 		owner = char
-		copyFrom( char )
 
 	ckey = ckey( key )
-
-	password = generatePassword()
-	pin = generatePin()
 
 	if( !department )
 		LoadDepartment( CIVILIAN )
 
 	..()
 
+	temporary = 1
+
 /datum/account/proc/copyFrom( var/datum/character/C )
 	if( !istype( C ))
 		return 0
 
 	owner = C
-
-	name = owner.name
-	gender = owner.gender
-	birth_date = owner.birth_date
-	species = owner.species
-	DNA = owner.DNA
-	fingerprints = owner.fingerprints
-	blood_type = owner.blood_type
 	owner_hash = owner.hash
 
-	if( !username || username == "username" )
-		username = generateUsername()
+	birth_date = owner.birth_date
 
-	if( istype( owner.char_mob ))
+	updateVar( "name" )
+	updateVar( "gender" )
+	updateVar( "species" )
+	updateVar( "DNA" )
+	updateVar( "fingerprints" )
+	updateVar( "birth_date" )
+	updateVar( "blood_type" )
+
+	if( !username || username == "username" )
+		username = generateUsername( 1 )
+
+	if( istype( owner.char_mob ) && crew )
 		var/assignment
 		var/job
 
@@ -70,28 +70,56 @@
 		else
 			assignment = job
 
-		last_job = job
-		last_role = assignment
+		if( last_job != job )
+			last_job = job
+			log_debug( "Updating job" )
+			temporary = 0
 
-	temporary = 0 // Data has changed that should be saved now
+		if( last_role != assignment )
+			last_role = assignment
+			log_debug( "Updating assignment" )
+			temporary = 0
 
 	return 1
 
-/datum/account/proc/generatePin()
+/datum/account/proc/updateVar( var/var_name )
+	if( !istype( owner ))
+		return 0
+
+	if( !var_name )
+		return 0
+
+	if( !owner.vars[var_name] )
+		return 0
+
+	if( !src.vars[var_name] )
+		return 0
+
+	if( src.vars[var_name] == owner.vars[var_name] )
+		return 0
+
+	src.vars[var_name] = owner.vars[var_name]
 	temporary = 0
+
+	return 1
+
+/datum/account/proc/generatePin( var/temp = 0 )
+	temporary = temp
 
 	pin = add_zero( num2text( rand( 0, 9999 )), 4 )
 
 	return pin
 
-/datum/account/proc/generatePassword()
-	temporary = 0
+/datum/account/proc/generatePassword( var/temp = 0 )
+	temporary = temp
 
 	password = ckey( "[pick( adjectives )][rand( 0, 100 )]" )
 
 	return password
 
-/datum/account/proc/generateUsername()
+/datum/account/proc/generateUsername( var/temp = 0 )
+	temporary = temp
+
 	if( owner )
 		name = owner.name
 
@@ -106,7 +134,10 @@
 			lastchar = lentext( name )+1
 
 		usern += copytext( stripped_name, firstchar, lastchar )
-		usern += add_zero( num2text( birth_date[3] ), 2 )
+		if( birth_date && birth_date.len == 3 )
+			usern += add_zero( num2text( birth_date[3] ), 2 )
+		else
+			usern += add_zero( rand( 0, 99 ), 2 )
 		usern += num2text( rand( 0, 9 ))
 
 		if( !accUsernameExists( usern ) && usern != "username" )
@@ -118,10 +149,8 @@
 
 /datum/account/proc/saveAccount( var/force = 0 )
 	if( temporary && !force ) // If we're just a temporary character and we're not forcing a save, dont save to database
-		return 1
-
-	if( !username || username == "username" )
-		username = generateUsername()
+		log_debug( "SAVE CHARACTER: Didn't save [name]'s account because they were temporary!" )
+		return 0
 
 	var/list/variables = list()
 
@@ -134,7 +163,7 @@
 	variables["password"] = html_encode( sql_sanitize_text( password ))
 	variables["pin"] = html_encode( sql_sanitize_text( pin ))
 
-	variables["security_level"] = sanitize_integer( security_level, 0, 2, 0 )
+	variables["security_level"] = sanitize_integer( security_level, 0, 255, 0 )
 	variables["clearence_level"] = html_encode( sql_sanitize_text( clearence_level ))
 
 	variables["record_access"] = sanitize_integer( record_access, 0, 65536, 0 )
@@ -201,10 +230,10 @@
 
 	establish_db_connection()
 	if( !dbcon.IsConnected() )
-		testing( "SAVE CHARACTER: Didn't save [name]'s account / ([ckey]) because the database wasn't connected" )
+		log_debug( "SAVE CHARACTER: Didn't save [name]'s account / ([ckey]) because the database wasn't connected" )
 		return 0
 
-	var/DBQuery/query = dbcon.NewQuery("SELECT id FROM accounts WHERE ckey = '[variables["ckey"]]' AND name = '[variables["name"]]'")
+	var/DBQuery/query = dbcon.NewQuery("SELECT id FROM accounts WHERE owner_hash = '[variables["owner_hash"]]'")
 	query.Execute()
 	var/sql_id = 0
 	while(query.NextRow())
@@ -216,12 +245,12 @@
 		if(istext(sql_id))
 			sql_id = text2num(sql_id)
 		if(!isnum(sql_id))
-			testing( "SAVE CHARACTER: Didn't save [name]'s account / ([ckey]) because of an invalid sql ID" )
+			log_debug( "SAVE CHARACTER: Didn't save [name]'s account / ([ckey]) because of an invalid sql ID" )
 			return 0
 
 	if(sql_id)
 		if( names.len != values.len )
-			testing( "SAVE CHARACTER: Didn't save [name]'s account / ([ckey]) because the variables length did not match the values" )
+			log_debug( "SAVE CHARACTER: Didn't save [name]'s account / ([ckey]) because the variables length did not match the values" )
 			return 0
 
 		var/query_params = ""
@@ -230,9 +259,9 @@
 			if( i != names.len )
 				query_params += ","
 
-		var/DBQuery/query_update = dbcon.NewQuery("UPDATE accounts SET [query_params] WHERE ckey = '[variables["ckey"]]' AND name = '[variables["name"]]'")
+		var/DBQuery/query_update = dbcon.NewQuery("UPDATE accounts SET [query_params] WHERE owner_hash = '[variables["owner_hash"]]'")
 		if( !query_update.Execute())
-			testing( "SAVE CHARACTER: Didn't save [name]'s account / ([ckey]) because the SQL update failed" )
+			log_debug( "SAVE CHARACTER: Didn't save [name]'s account / ([ckey]) because the SQL update failed" )
 			return 0
 	else
 		var/query_names = list2text( names, "," )
@@ -244,7 +273,7 @@
 		// This needs a single quote before query_values because otherwise there will be an odd number of single quotes
 		var/DBQuery/query_insert = dbcon.NewQuery("INSERT INTO accounts ([query_names]) VALUES ('[query_values])")
 		if( !query_insert.Execute() )
-			testing( "SAVE CHARACTER: Didn't save [name]'s account / ([ckey]) because the SQL insert failed" )
+			log_debug( "SAVE CHARACTER: Didn't save [name]'s account / ([ckey]) because the SQL insert failed" )
 			return 0
 
 	new_account = 0
@@ -272,6 +301,7 @@
 
 	variables["username"] = "text"
 	variables["password"] = "text"
+	variables["pin"] = "text"
 
 	variables["security_level"] = "text"
 	variables["clearence_level"] = "text"
@@ -426,18 +456,22 @@
 							L["Medical Doctor"] = "High"
 				value = L
 
-		vars[variables[i]] = value
-
-	if( !username || username == "username" )
-		username = generateUsername()
-
-	if( !password || password == "password" )
-		password = generatePassword()
-
-	if( !pin || pin == "0000" )
-		pin = generatePin()
+		src.vars[variables[i]] = value
 
 	new_account = 0
 	owner.update_preview_icon()
+
+	// Src vars dont update quick enough to use immediately
+	if( !username || username == "username" )
+		log_debug( "Username was [username], regen'ing" )
+		username = generateUsername()
+
+	if( !password || password == "password" )
+		log_debug( "Password was [password], regen'ing" )
+		password = generatePassword()
+
+	if( !pin || pin == "0000" )
+		log_debug( "Pin was [pin], regen'ing" )
+		pin = generatePin()
 
 	return 1

@@ -45,7 +45,7 @@
 	STUI.processing |= 6
 
 	for(var/client/C in admins)
-		if(C.prefs.toggles & CHAT_DEBUGLOGS)
+		if( C && C.prefs && ( C.prefs.toggles & CHAT_DEBUGLOGS ))
 			C << "DEBUG: [text]"
 
 
