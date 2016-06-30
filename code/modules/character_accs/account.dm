@@ -2,7 +2,8 @@
 	var/datum/character/owner
 
 	var/ckey
-	var/owner_hash
+	var/owner_guid
+	var/guid
 
 	var/domain_name = "apollo.nt"
 

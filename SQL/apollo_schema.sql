@@ -1,69 +1,15 @@
-CREATE SCHEMA IF NOT EXISTS `apollo` DEFAULT CHARACTER SET latin1 ;
-USE `apollo` ;
-
 -- -----------------------------------------------------
--- Death Tracking
+-- STAFF SCHEMA
+-- This schema is for all staff related stuff, so make sure to keep it hidden
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `deaths` (
-  `id` INT(11) NOT NULL AUTO_INCREMENT ,
-  `round_id` INT(11) NOT NULL,
-  `pod` TEXT NOT NULL COMMENT 'Place of death' ,
-  `coord` TEXT NOT NULL COMMENT 'X, Y, Z POD' ,
-  `tod` DATETIME NOT NULL COMMENT 'Time of death' ,
-  `job` TEXT NOT NULL ,
-  `special` TEXT NOT NULL ,
-  `name` TEXT NOT NULL ,
-  `byondkey` TEXT NOT NULL ,
-  `laname` TEXT NOT NULL COMMENT 'Last attacker name' ,
-  `lakey` TEXT NOT NULL COMMENT 'Last attacker key' ,
-  `gender` TEXT NOT NULL ,
-  `bruteloss` INT(11) NOT NULL ,
-  `brainloss` INT(11) NOT NULL ,
-  `fireloss` INT(11) NOT NULL ,
-  `oxyloss` INT(11) NOT NULL ,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 ;
-
--- -----------------------------------------------------
--- Library Books
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `library` (
-  `id` INT(11) NOT NULL AUTO_INCREMENT ,
-  `author` TEXT NOT NULL ,
-  `title` TEXT NOT NULL ,
-  `content` MEDIUMTEXT NOT NULL ,
-  `category` TEXT NOT NULL ,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 ;
-
--- -----------------------------------------------------
--- Account Items
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `acc_items` (
-  `id` INT(11) NOT NULL AUTO_INCREMENT ,
-  `ckey` TEXT NOT NULL ,
-  `item` TEXT NOT NULL ,
-  `time` DATETIME NOT NULL ,
-  `donator` BIT NOT NULL ,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 ;
-
--- -----------------------------------------------------
--- Population Tracking
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `population` (
-  `id` INT(11) NOT NULL AUTO_INCREMENT ,
-  `playercount` INT(11) NULL DEFAULT NULL ,
-  `admincount` INT(11) NULL DEFAULT NULL ,
-  `time` DATETIME NOT NULL ,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 ;
+CREATE SCHEMA IF NOT EXISTS `staff` DEFAULT CHARACTER SET latin1 ;
+USE `staff` ;
 
 -- -----------------------------------------------------
 -- Admin Permissions
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `admins` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` bigint NOT NULL AUTO_INCREMENT,
   `ckey` varchar(32) NOT NULL,
   `rank` varchar(32) NOT NULL DEFAULT 'Administrator',
   `level` int(2) NOT NULL DEFAULT '0',
@@ -75,7 +21,7 @@ CREATE TABLE IF NOT EXISTS `admins` (
 -- Admin Permissions
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `admin_log` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` bigint NOT NULL AUTO_INCREMENT,
   `datetime` datetime NOT NULL,
   `adminckey` varchar(32) NOT NULL,
   `adminip` varchar(18) NOT NULL,
@@ -87,7 +33,7 @@ CREATE TABLE IF NOT EXISTS `admin_log` (
 -- Bans
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `ban` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` bigint NOT NULL AUTO_INCREMENT,
   `bantime` datetime NOT NULL,
   `serverip` varchar(32) NOT NULL,
   `bantype` varchar(32) NOT NULL,
@@ -114,10 +60,27 @@ CREATE TABLE IF NOT EXISTS `ban` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 ;
 
 -- -----------------------------------------------------
+-- Player Notes
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `player_notes` (
+  `id` int(32) NOT NULL AUTO_INCREMENT,
+  `player_ckey` varchar(32) NOT NULL,
+  `player_ip` varchar(18) NOT NULL,
+  `player_cid` varchar(32) NOT NULL,
+  `author_ckey` varchar(32) NOT NULL,
+  `author_ip` varchar(18) NOT NULL,
+  `author_cid` varchar(32) NOT NULL,
+  `author_rank` varchar(32) NOT NULL,
+  `date_time` datetime NOT NULL,
+  `info` TEXT NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 ;
+
+-- -----------------------------------------------------
 -- Error logging
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `feedback` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` bigint NOT NULL AUTO_INCREMENT,
   `time` datetime NOT NULL,
   `round_id` int(8) NOT NULL,
   `var_name` varchar(32) NOT NULL,
@@ -127,10 +90,17 @@ CREATE TABLE IF NOT EXISTS `feedback` (
 ) ENGINE=MyISAM  DEFAULT CHARSET=latin1 ;
 
 -- -----------------------------------------------------
+-- CLIENTS SCHEMA
+-- This schema is for client and client data
+-- -----------------------------------------------------
+CREATE SCHEMA IF NOT EXISTS `clients` DEFAULT CHARACTER SET latin1 ;
+USE `clients` ;
+
+-- -----------------------------------------------------
 -- Unique Players
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `player` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` bigint NOT NULL AUTO_INCREMENT,
   `ckey` varchar(32) NOT NULL,
   `firstseen` datetime NOT NULL,
   `lastseen` datetime NOT NULL,
@@ -151,7 +121,7 @@ CREATE TABLE IF NOT EXISTS `player` (
 -- Player Preferences
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `preferences` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` bigint NOT NULL AUTO_INCREMENT,
   `ckey` varchar(32) NOT NULL,
   `joined_date` date NOT NULL,
   `OOC_color` varchar(7) NOT NULL DEFAULT "#0033CC",
@@ -167,45 +137,30 @@ CREATE TABLE IF NOT EXISTS `preferences` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 ;
 
 -- -----------------------------------------------------
--- Player Characters
+-- Account Items
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `characters` (
+CREATE TABLE IF NOT EXISTS `acc_items` (
   `id` bigint NOT NULL AUTO_INCREMENT,
-  `ckey` varchar(32) NOT NULL,
-  `hash` varchar(32) NOT NULL,
-  `name` varchar(100) NOT NULL,
-  `gender` varchar(11) NOT NULL,
-  `birth_date` varchar(100) NOT NULL,
-  `underwear` tinyint UNSIGNED NOT NULL DEFAULT '1',
-  `undershirt` tinyint UNSIGNED NOT NULL DEFAULT '1',
-  `backpack` tinyint UNSIGNED NOT NULL DEFAULT '2', -- Different
-  `hair_style` varchar(50) NOT NULL DEFAULT "Bald",
-  `hair_face_style` varchar(50) NOT NULL DEFAULT "Shaved",
-  `hair_color` varchar(7) NOT NULL DEFAULT "#FFFFFF",
-  `hair_face_color` varchar(7) NOT NULL DEFAULT "#FFFFFF",
-  `skin_tone` smallint NOT NULL DEFAULT '35',
-  `skin_color` varchar(7) NOT NULL DEFAULT "#FFFFFF",
-  `eye_color` varchar(7) NOT NULL DEFAULT "#FFFFFF",
-  `species` varchar(100) NOT NULL DEFAULT "Human",
-  `additional_language` varchar(100),
-  `gear` text,
-  `organ_data` text,
-  `flavor_texts_human` text,
-  `flavor_texts_robot` text, -- Different
-  `disabilities` int UNSIGNED NOT NULL DEFAULT '0',
-  `DNA` varchar(32) NOT NULL,
-  `fingerprints` varchar(32) NOT NULL,
-  `blood_type` varchar(10) NOT NULL,
+  `ckey` TEXT NOT NULL ,
+  `item` TEXT NOT NULL ,
+  `time` DATETIME NOT NULL ,
+  `donator` BIT NOT NULL ,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 ;
 
 -- -----------------------------------------------------
--- Corporates Accounts
+-- ACCOUNTS SCHEMA
+-- This schema stores account data
+-- -----------------------------------------------------
+CREATE SCHEMA IF NOT EXISTS `account` DEFAULT CHARACTER SET latin1 ;
+USE `account` ;
+
+-- -----------------------------------------------------
+-- Corporate Accounts
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `accounts` (
   `id` bigint NOT NULL AUTO_INCREMENT,
   `ckey` varchar(32) NOT NULL,
-  `owner_hash` varchar(32) NOT NULL,
   `domain_name` varchar(100) NOT NULL DEFAULT "apollo.nt", -- The domain that this account belongs to
   `username` varchar(100) NOT NULL DEFAULT "username", -- The username to log into this character's account, is also for their email acc
   `password` varchar(100) NOT NULL DEFAULT "password", -- The password to log into this character's account
@@ -213,6 +168,17 @@ CREATE TABLE IF NOT EXISTS `accounts` (
   `security_level` tinyint NOT NULL DEFAULT '1', -- What kind of authorization is needed to log into this acc?
   `clearence_level` varchar(100) NOT NULL DEFAULT "None",
   `record_access` int UNSIGNED NOT NULL DEFAULT '0',
+  `datetime_login` datetime NOT NULL, -- When the account was last logged in
+  `datetime_created` datetime NOT NULL, -- When the account was created
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 ;
+
+-- -----------------------------------------------------
+-- Character Records
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `character_records` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `acc_id` bigint NOT NULL, -- ID of the assocaited account
   `name` varchar(100) NOT NULL, -- The username to log into this character's account
   `gender` varchar(11) NOT NULL,
   `birth_date` varchar(100) NOT NULL,
@@ -243,19 +209,27 @@ CREATE TABLE IF NOT EXISTS `accounts` (
   `uplink_location` varchar(100) NOT NULL DEFAULT "PDA",
   `first_shift_day` bigint UNSIGNED NOT NULL DEFAULT '0',
   `last_shift_day` bigint UNSIGNED NOT NULL DEFAULT '0',
+  FOREIGN KEY (`acc_id`) REFERENCES accounts(`id`),
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 ;
 
 -- -----------------------------------------------------
--- Universe Data
+-- RECORDS SCHEMA
+-- This schema stores BOOKS, paperwork, and any other type of record
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `universe` (
-	`id` int(11) NOT NULL AUTO_INCREMENT,
-	`name` varchar(255) NOT NULL,
-	`ic_date` varchar(20) NOT NULL,
-	`stocks` text,
-	`news` text,
-	PRIMARY KEY (`id`)
+CREATE SCHEMA IF NOT EXISTS `records` DEFAULT CHARACTER SET latin1 ;
+USE `records` ;
+
+-- -----------------------------------------------------
+-- Library Books
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `library` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `author` TEXT NOT NULL ,
+  `title` TEXT NOT NULL ,
+  `content` MEDIUMTEXT NOT NULL ,
+  `category` TEXT NOT NULL ,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 ;
 
 -- -----------------------------------------------------
@@ -266,33 +240,75 @@ CREATE TABLE IF NOT EXISTS `paperwork_records` (
   `author_ckey` varchar(32) NOT NULL,
   `author_name` varchar(32) NOT NULL,
   `author_ip` varchar(18) NOT NULL,
-  `author_md5` varchar(32) NOT NULL,
-  `recipient_md5` varchar(32),
-  `this_md5` varchar(32) NOT NULL,
+  `author_id` bigint NOT NULL,
+  `recipient_id` bigint NOT NULL, -- ID of the account that this record belongs to
   `clearence` varchar(32) NOT NULL DEFAULT  "Unclassified",
   `category` varchar(255) NOT NULL DEFAULT "Uncategorized",
   `date_time` datetime NOT NULL,
   `title` varchar(50),
   `info` MEDIUMTEXT NOT NULL,
+  FOREIGN KEY (`author_id`) REFERENCES account.accounts(`id`),
+  FOREIGN KEY (`recipient_id`) REFERENCES account.accounts(`id`),
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 ;
 
 -- -----------------------------------------------------
--- Player Notes
+-- Universe Data
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `player_notes` (
-  `id` int(32) NOT NULL AUTO_INCREMENT,
-  `player_ckey` varchar(32) NOT NULL,
-  `player_ip` varchar(18) NOT NULL,
-  `player_cid` varchar(32) NOT NULL,
-  `author_ckey` varchar(32) NOT NULL,
-  `author_ip` varchar(18) NOT NULL,
-  `author_cid` varchar(32) NOT NULL,
-  `author_rank` varchar(32) NOT NULL,
-  `date_time` datetime NOT NULL,
-  `info` TEXT NOT NULL,
+CREATE TABLE IF NOT EXISTS `universe` (
+	`id` int(11) NOT NULL AUTO_INCREMENT,
+	`name` varchar(255) NOT NULL,
+	`ic_date` varchar(20) NOT NULL,
+	PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 ;
+
+-- -----------------------------------------------------
+-- CHARACTER SCHEMA
+-- This schema stores character data
+-- -----------------------------------------------------
+CREATE SCHEMA IF NOT EXISTS `character` DEFAULT CHARACTER SET latin1 ;
+USE `character` ;
+
+-- -----------------------------------------------------
+-- Player Characters
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `characters` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `acc_id` bigint NOT NULL,
+  `ckey` varchar(32) NOT NULL,
+  `name` varchar(100) NOT NULL,
+  `gender` varchar(11) NOT NULL,
+  `birth_date` varchar(100) NOT NULL,
+  `underwear` tinyint UNSIGNED NOT NULL DEFAULT '1',
+  `undershirt` tinyint UNSIGNED NOT NULL DEFAULT '1',
+  `backpack` tinyint UNSIGNED NOT NULL DEFAULT '2', -- Different
+  `hair_style` varchar(50) NOT NULL DEFAULT "Bald",
+  `hair_face_style` varchar(50) NOT NULL DEFAULT "Shaved",
+  `hair_color` varchar(7) NOT NULL DEFAULT "#FFFFFF",
+  `hair_face_color` varchar(7) NOT NULL DEFAULT "#FFFFFF",
+  `skin_tone` smallint NOT NULL DEFAULT '35',
+  `skin_color` varchar(7) NOT NULL DEFAULT "#FFFFFF",
+  `eye_color` varchar(7) NOT NULL DEFAULT "#FFFFFF",
+  `species` varchar(100) NOT NULL DEFAULT "Human",
+  `additional_language` varchar(100),
+  `gear` text,
+  `organ_data` text,
+  `flavor_texts_human` text,
+  `flavor_texts_robot` text, -- Different
+  `disabilities` int UNSIGNED NOT NULL DEFAULT '0',
+  `DNA` varchar(32) NOT NULL,
+  `fingerprints` varchar(32) NOT NULL,
+  `blood_type` varchar(10) NOT NULL,
+  FOREIGN KEY (`acc_id`) REFERENCES account.accounts(`id`),
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 ;
+
+-- -----------------------------------------------------
+-- POLLS SCHEMA
+-- This schema is for poll related data, unused at the moment
+-- -----------------------------------------------------
+CREATE SCHEMA IF NOT EXISTS `polls` DEFAULT CHARACTER SET latin1 ;
+USE `polls` ;
 
 -- -----------------------------------------------------
 -- Poll Options
@@ -353,6 +369,13 @@ CREATE TABLE IF NOT EXISTS `poll_vote` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 ;
 
 -- -----------------------------------------------------
+-- STATS SCHEMA
+-- This schema stores stats about the game and the rounds
+-- -----------------------------------------------------
+CREATE SCHEMA IF NOT EXISTS `stats` DEFAULT CHARACTER SET latin1 ;
+USE `stats` ;
+
+-- -----------------------------------------------------
 -- End Round Stats
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `round_stats` (
@@ -403,5 +426,39 @@ CREATE TABLE IF NOT EXISTS `round_ai_laws` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `round_id` int(11) NOT NULL,
   `law` TEXT NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 ;
+
+-- -----------------------------------------------------
+-- Population Tracking
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `population` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `playercount` INT(11) NULL DEFAULT NULL ,
+  `admincount` INT(11) NULL DEFAULT NULL ,
+  `time` DATETIME NOT NULL ,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 ;
+
+-- -----------------------------------------------------
+-- Death Tracking
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `deaths` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `round_id` INT(11) NOT NULL,
+  `pod` TEXT NOT NULL COMMENT 'Place of death' ,
+  `coord` TEXT NOT NULL COMMENT 'X, Y, Z POD' ,
+  `tod` DATETIME NOT NULL COMMENT 'Time of death' ,
+  `job` TEXT NOT NULL ,
+  `special` TEXT NOT NULL ,
+  `name` TEXT NOT NULL ,
+  `byondkey` TEXT NOT NULL ,
+  `laname` TEXT NOT NULL COMMENT 'Last attacker name' ,
+  `lakey` TEXT NOT NULL COMMENT 'Last attacker key' ,
+  `gender` TEXT NOT NULL ,
+  `bruteloss` INT(11) NOT NULL ,
+  `brainloss` INT(11) NOT NULL ,
+  `fireloss` INT(11) NOT NULL ,
+  `oxyloss` INT(11) NOT NULL ,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 ;

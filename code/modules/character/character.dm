@@ -51,7 +51,7 @@
 
 	var/DNA
 	var/fingerprints
-	var/hash // The character's unique md5 hash
+	var/guid // The character's unique md5 hash
 
 	// Skills
 	var/used_skillpoints = 0
