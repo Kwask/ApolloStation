@@ -149,7 +149,6 @@
 
 /datum/account/proc/saveAccount( var/force = 0 )
 	if( temporary && !force ) // If we're just a temporary character and we're not forcing a save, dont save to database
-		log_debug( "SAVE CHARACTER: Didn't save [name]'s account because they were temporary!" )
 		return 0
 
 	var/list/variables = list()

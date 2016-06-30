@@ -13,7 +13,7 @@
 	. += "<b>Appearence</b>"
 	. += " - "
 	. += "<b><a href='byond://?src=\ref[src];character=switch_menu;task=records_menu'>Records</a></b>"
-	if( !temporary )
+	if( !temporary || !account.crew ) // If we're not a temporary char, or not on station yet, allow records to be modified
 		. += " - "
 		. += "<b><a href='byond://?src=\ref[src];character=switch_menu;task=job_menu'>Occupation</a></b>"
 		. += " - "
@@ -595,9 +595,10 @@
 			flavor_texts_robot = msg
 
 		if( "close" )
-			if( alert( user, "Do you want to save your changes?", "Save Character","Yes","No" ) == "Yes" )
-				if( !saveCharacter( 0 ))
-					alert( user, "Character could not be saved to the database, please contact an admin." )
+			if( !temporary || !account.crew )
+				if( alert( user, "Do you want to save your changes?", "Save Character","Yes","No" ) == "Yes" )
+					if( !saveCharacter( 0 ))
+						alert( user, "Character could not be saved to the database, please contact an admin." )
 
 			EditCharacterMenuDisable( user )
 

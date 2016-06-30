@@ -20,8 +20,9 @@
 	. += "<b><a href='byond://?src=\ref[src];character=switch_menu;task=records_menu'>Records</a></b>"
 	. += " - "
 	. += "<b>Occupation</b>"
-	. += " - "
-	. += "<b><a href='byond://?src=\ref[src];character=switch_menu;task=antag_options_menu'>Antag Options</a></b>"
+	if( !temporary || !account.crew )
+		. += " - "
+		. += "<b><a href='byond://?src=\ref[src];character=switch_menu;task=antag_options_menu'>Antag Options</a></b>"
 	. += "</center><hr>"
 
 	if( !job_master )

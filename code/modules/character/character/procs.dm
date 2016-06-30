@@ -146,7 +146,7 @@
 		char_mob.update_body()
 		char_mob.check_dna( char_mob )
 
-	if( temporary && !prompt ) // If we're just a temporary character and the user isnt forcing this save, dont save to database
+	if(( temporary && account.crew ) || ( temporary && !prompt )) // If we're just a temporary character and the user isnt forcing this save, dont save to database
 		return 1
 
 	if( !ckey && prompt )
@@ -157,17 +157,12 @@
 		log_debug( "SAVE CHARACTER: Didn't save [name] / ([ckey]) because they were a guest character" )
 		return 0
 
-	if( prompt && ckey )
-		var/client
-		for( client in clients )
-			if( ckey( client:ckey ) == ckey )
-				break
-
+	if( prompt && usr )
 		var/response
 		if( new_character )
-			response = alert(client, "Are you sure you're finished with character setup? You will no longer be able to change your character name, age, gender, or species after this.", "Save Character","Yes","No")
+			response = alert(usr, "Are you sure you're finished with character setup? You will no longer be able to change your character name, age, gender, or species after this.", "Save Character","Yes","No")
 		else
-			response = alert(client, "Are you sure you want to save?", "Save Character","Yes","No")
+			response = alert(usr, "Are you sure you want to save?", "Save Character","Yes","No")
 
 		if( response == "No" )
 			return 1

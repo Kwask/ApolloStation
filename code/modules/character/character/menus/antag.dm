@@ -9,8 +9,9 @@
 	. += " - "
 	. += "<b><a href='byond://?src=\ref[src];character=switch_menu;task=records_menu'>Records</a></b>"
 	. += " - "
-	. += "<b><a href='byond://?src=\ref[src];character=switch_menu;task=job_menu'>Occupation</a></b>"
-	. += " - "
+	if( !temporary || !account.crew )
+		. += "<b><a href='byond://?src=\ref[src];character=switch_menu;task=job_menu'>Occupation</a></b>"
+		. += " - "
 	. += "<b>Antag Options</b>"
 	. += "</center><hr>"
 

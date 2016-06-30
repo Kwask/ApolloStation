@@ -8,7 +8,7 @@ var/ert_base_chance = 10 // Default base chance. Will be incremented by incremen
 var/can_call_ert
 
 /client/proc/response_team()
-	set name = "Dispatch Emergency Response Team"
+	set name = "Dispatch ERT"
 	set category = "Special Verbs"
 	set desc = "Send an emergency response team to the station"
 
@@ -40,8 +40,8 @@ var/can_call_ert
 
 
 client/verb/JoinResponseTeam()
-	set name = "Join Response Team"
-	set category = "IC"
+	set name = "Join ERT"
+	set category = "Ghost"
 
 	if(istype(usr,/mob/dead/observer) || istype(usr,/mob/new_player))
 		if(!send_emergency_team)
@@ -56,19 +56,22 @@ client/verb/JoinResponseTeam()
 
 		if(response_team_members.len > 5) usr << "The emergency response team is already full!"
 
-
 		for (var/obj/effect/landmark/L in landmarks_list) if (L.name == "Commando")
 			L.name = null//Reserving the place.
-			var/new_name = sanitizeSafe(input(usr, "Pick a name","Name") as null|text, MAX_NAME_LEN)
-			if(!new_name)//Somebody changed his mind, place is available again.
+			if( alert("Are you sure you want to join the ERT?",,"Yes","No") != "Yes" )
 				L.name = "Commando"
 				return
+
 			var/leader_selected = isemptylist(response_team_members)
-			var/mob/living/carbon/human/new_commando = create_response_team(L.loc, leader_selected, new_name)
-			qdel(L)
+			var/mob/living/carbon/human/new_commando = create_response_team(L.loc, leader_selected, "Responder [capitalize( pick(alphabet_phonetic))]")
+
 			new_commando.mind.key = usr.key
 			new_commando.key = usr.key
+			new_commando.character.account.crew = 1
 			new_commando.character.EditCharacterMenu( new_commando )
+
+			landmarks_list -= L
+			qdel(L)
 
 			new_commando << "<span class='notice'>You are [!leader_selected?"a member":"the <B>LEADER</B></span>"] of an Emergency Response Team, a type of military division, under CentComm's service. There is a code red alert on [station_name()], you are tasked to go and fix the problem."
 			new_commando << "<b>You should first gear up and discuss a plan with your team. More members may be joining, don't move out before you're ready."

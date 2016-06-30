@@ -7,11 +7,12 @@
 	. += "<b><a href='byond://?src=\ref[src];character=switch_menu;task=edit_character_menu'>Appearence</a></b>"
 	. += " - "
 	. += "<b>Records</b>"
-	. += " - "
-	. += "<b><a href='byond://?src=\ref[src];character=switch_menu;task=job_menu'>Occupation</a></b>"
-	. += " - "
-	. += "<b><a href='byond://?src=\ref[src];character=switch_menu;task=antag_options_menu'>Antag Options</a></b>"
-	. += "<hr>"
+	if( !temporary || !account.crew )
+		. += " - "
+		. += "<b><a href='byond://?src=\ref[src];character=switch_menu;task=job_menu'>Occupation</a></b>"
+		. += " - "
+		. += "<b><a href='byond://?src=\ref[src];character=switch_menu;task=antag_options_menu'>Antag Options</a></b>"
+	. += "</center><hr>"
 
 	. += "<table width='100%'>"
 	. += "<tr><td valign='top'>"
