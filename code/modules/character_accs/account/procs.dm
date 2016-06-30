@@ -3,7 +3,7 @@
 	if( !dbcon.IsConnected() )
 		return 0
 
-	var/DBQuery/query = dbcon.NewQuery("SELECT id FROM accounts WHERE username = '[username]'")
+	var/DBQuery/query = dbcon.NewQuery("SELECT id FROM account.accounts WHERE username = '[username]'")
 	query.Execute()
 
 	var/sql_id = 0
@@ -232,7 +232,7 @@
 		log_debug( "SAVE CHARACTER: Didn't save [name]'s account / ([ckey]) because the database wasn't connected" )
 		return 0
 
-	var/DBQuery/query = dbcon.NewQuery("SELECT id FROM accounts WHERE owner_hash = '[variables["owner_hash"]]'")
+	var/DBQuery/query = dbcon.NewQuery("SELECT id FROM account.accounts WHERE owner_hash = '[variables["owner_hash"]]'")
 	query.Execute()
 	var/sql_id = 0
 	while(query.NextRow())
@@ -258,7 +258,7 @@
 			if( i != names.len )
 				query_params += ","
 
-		var/DBQuery/query_update = dbcon.NewQuery("UPDATE accounts SET [query_params] WHERE owner_hash = '[variables["owner_hash"]]'")
+		var/DBQuery/query_update = dbcon.NewQuery("UPDATE account.accounts SET [query_params] WHERE owner_hash = '[variables["owner_hash"]]'")
 		if( !query_update.Execute())
 			log_debug( "SAVE CHARACTER: Didn't save [name]'s account / ([ckey]) because the SQL update failed" )
 			return 0
@@ -270,7 +270,7 @@
 		query_values += "', null"
 
 		// This needs a single quote before query_values because otherwise there will be an odd number of single quotes
-		var/DBQuery/query_insert = dbcon.NewQuery("INSERT INTO accounts ([query_names]) VALUES ('[query_values])")
+		var/DBQuery/query_insert = dbcon.NewQuery("INSERT INTO account.accounts ([query_names]) VALUES ('[query_values])")
 		if( !query_insert.Execute() )
 			log_debug( "SAVE CHARACTER: Didn't save [name]'s account / ([ckey]) because the SQL insert failed" )
 			return 0
@@ -366,7 +366,7 @@
 
 	temporary = 1 // All characters are temporary until they enter the game
 
-	var/DBQuery/query = dbcon.NewQuery("SELECT [query_names] FROM accounts WHERE owner_hash = '[sql_ident]'")
+	var/DBQuery/query = dbcon.NewQuery("SELECT [query_names] FROM account.accounts WHERE owner_hash = '[sql_ident]'")
 	if( !query.Execute() )
 		log_debug( "Could not execute query!" )
 		return 0

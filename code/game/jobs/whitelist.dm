@@ -52,7 +52,7 @@
 	var/whitelist = 0
 	var/sql_ckey = ckey(C.key)
 
-	var/DBQuery/query = dbcon.NewQuery("SELECT whitelist_flags FROM player WHERE ckey = '[sql_ckey]'")
+	var/DBQuery/query = dbcon.NewQuery("SELECT whitelist_flags FROM client.player WHERE ckey = '[sql_ckey]'")
 	query.Execute()
 
 	if(query.NextRow())
@@ -83,14 +83,13 @@
 
 	var/ckey = ckey(key)
 
-	var/DBQuery/query = dbcon.NewQuery("SELECT id FROM player WHERE ckey = '[ckey]'")
+	var/DBQuery/query = dbcon.NewQuery("SELECT id FROM client.player WHERE ckey = '[ckey]'")
 	query.Execute()
 
 	if( !query.NextRow() )
 		return 0
 
-	var/sql = "UPDATE player SET whitelist_flags = '[flags]' WHERE ckey = '[ckey]'"
-	var/DBQuery/query_insert = dbcon.NewQuery(sql)
+	var/DBQuery/query_insert = dbcon.NewQuery("UPDATE client.player SET whitelist_flags = '[flags]' WHERE ckey = '[ckey]'")
 	query_insert.Execute()
 
 	return 1
@@ -99,9 +98,9 @@
 	var/DBQuery/query
 
 	if( ckey )
-		query = dbcon.NewQuery("SELECT ckey, whitelist_flags FROM player WHERE ckey = '[ckey( ckey )]'")
+		query = dbcon.NewQuery("SELECT ckey, whitelist_flags FROM client.player WHERE ckey = '[ckey( ckey )]'")
 	else
-		query = dbcon.NewQuery("SELECT ckey, whitelist_flags FROM player")
+		query = dbcon.NewQuery("SELECT ckey, whitelist_flags FROM client.player")
 	query.Execute()
 
 	while( query.NextRow() )
@@ -111,7 +110,7 @@
 		if( whitelist )
 			var/tokens = list2params( list( "Command" = 3 ))
 
-			var/DBQuery/query_insert = dbcon.NewQuery("UPDATE player SET character_tokens = '[tokens]' WHERE ckey = '[ckey]'")
+			var/DBQuery/query_insert = dbcon.NewQuery("UPDATE client.player SET character_tokens = '[tokens]' WHERE ckey = '[ckey]'")
 			query_insert.Execute()
 
 /proc/get_alien_flag( var/species )
@@ -150,7 +149,7 @@
 	var/a_whitelist = 0
 	var/sql_ckey = ckey(key)
 
-	var/DBQuery/query = dbcon.NewQuery("SELECT species_flags FROM player WHERE ckey = '[sql_ckey]'")
+	var/DBQuery/query = dbcon.NewQuery("SELECT species_flags FROM client.player WHERE ckey = '[sql_ckey]'")
 	query.Execute()
 
 	if(query.NextRow())
@@ -186,7 +185,7 @@
 
 	var/ckey = ckey(key)
 
-	var/DBQuery/query = dbcon.NewQuery("SELECT species_flags FROM player WHERE ckey = '[ckey]'")
+	var/DBQuery/query = dbcon.NewQuery("SELECT species_flags FROM client.player WHERE ckey = '[ckey]'")
 	query.Execute()
 
 	if( !query.NextRow() )
@@ -199,8 +198,7 @@
 
 	existing_flags |= flags
 
-	var/sql = "UPDATE player SET species_flags = '[existing_flags]' WHERE ckey = '[ckey]'"
-	var/DBQuery/query_insert = dbcon.NewQuery(sql)
+	var/DBQuery/query_insert = dbcon.NewQuery("UPDATE client.player SET species_flags = '[existing_flags]' WHERE ckey = '[ckey]'")
 	query_insert.Execute()
 
 	return 1

@@ -18,18 +18,6 @@ CREATE TABLE IF NOT EXISTS `admins` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 ;
 
 -- -----------------------------------------------------
--- Admin Permissions
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `admin_log` (
-  `id` bigint NOT NULL AUTO_INCREMENT,
-  `datetime` datetime NOT NULL,
-  `adminckey` varchar(32) NOT NULL,
-  `adminip` varchar(18) NOT NULL,
-  `log` text NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 ;
-
--- -----------------------------------------------------
 -- Bans
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `ban` (
@@ -77,6 +65,13 @@ CREATE TABLE IF NOT EXISTS `player_notes` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 ;
 
 -- -----------------------------------------------------
+-- FEEDBACK SCHEMA
+-- This schema is for bug and error reporting
+-- -----------------------------------------------------
+CREATE SCHEMA IF NOT EXISTS `feedback` DEFAULT CHARACTER SET latin1 ;
+USE `feedback` ;
+
+-- -----------------------------------------------------
 -- Error logging
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `feedback` (
@@ -90,11 +85,23 @@ CREATE TABLE IF NOT EXISTS `feedback` (
 ) ENGINE=MyISAM  DEFAULT CHARSET=latin1 ;
 
 -- -----------------------------------------------------
+-- Admin Logs
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `admin_log` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `datetime` datetime NOT NULL,
+  `adminckey` varchar(32) NOT NULL,
+  `adminip` varchar(18) NOT NULL,
+  `log` text NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 ;
+
+-- -----------------------------------------------------
 -- CLIENTS SCHEMA
 -- This schema is for client and client data
 -- -----------------------------------------------------
-CREATE SCHEMA IF NOT EXISTS `clients` DEFAULT CHARACTER SET latin1 ;
-USE `clients` ;
+CREATE SCHEMA IF NOT EXISTS `client` DEFAULT CHARACTER SET latin1 ;
+USE `client` ;
 
 -- -----------------------------------------------------
 -- Unique Players
