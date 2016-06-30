@@ -135,7 +135,7 @@
 
 					totalPlayersReady++
 
-					var/datum/account/A = C.prefs.selected_character.account
+					var/datum/account/character/A = C.prefs.selected_character.account
 					var/datum/job/J = job_master.GetJob( A.GetHighestLevelJob() )
 
 					var/datum/department/D = job_master.GetDepartment( J.department_id )

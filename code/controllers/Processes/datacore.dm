@@ -249,7 +249,7 @@ var/global/ManifestJSON
 		return null
 
 	for( var/datum/character/C in employee_pool )
-		if( C.hash == ident )
+		if( C.id == ident )
 			return C
 
 /datum/controller/process/datacore/proc/loadFromDB()
@@ -322,7 +322,7 @@ var/global/ManifestJSON
 
 	manifest_sort()
 
-/datum/controller/process/datacore/proc/manifest_inject( var/datum/account/A )
+/datum/controller/process/datacore/proc/manifest_inject( var/datum/account/character/A )
 	if( !istype( A ))
 		return
 
@@ -349,7 +349,7 @@ var/global/ManifestJSON
 	G.fields["religion"]	= A.religion
 	G.fields["photo_front"]	= A.preview_icon_front
 	G.fields["photo_side"]	= A.preview_icon_side
-	G.fields["character"]	= A.owner
+	G.fields["account"]		= A
 	if( A.gen_record )
 		G.fields["notes"] = A.gen_record
 	else
@@ -376,6 +376,7 @@ var/global/ManifestJSON
 		M.fields["notes"] = A.med_record
 	else
 		M.fields["notes"] = "No notes found."
+	M.fields["account"]		= A
 	M.fields["is_crew"] = is_crew
 
 	medical += M
@@ -395,6 +396,7 @@ var/global/ManifestJSON
 	else
 		S.fields["notes"] = "No notes."
 	S.fields["is_crew"] = is_crew
+	S.fields["account"]		= A
 
 	security += S
 
@@ -419,6 +421,7 @@ var/global/ManifestJSON
 	else
 		L.fields["exploit_record"] = "No additional information acquired."
 	L.fields["is_crew"] = is_crew
+	L.fields["account"]	= A
 
 	locked += L
 

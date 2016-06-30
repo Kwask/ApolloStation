@@ -7,7 +7,7 @@
 
 	var/mob/user = usr
 
-	var/datum/account/A = M.character.account
+	var/datum/account/character/A = M.character.account
 
 	var/type = input( user, "What type of role modification?", "Set Department" ) as null|anything in list( "Set Department", "Promotion", "Demotion" )
 

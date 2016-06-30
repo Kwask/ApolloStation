@@ -22,23 +22,23 @@
 /obj/machinery/court_scanner/attackby( obj/item/weapon/card/id/O as obj, user as mob)
 	if( console && istype( O ))
 		var/obj/item/weapon/card/id/C = O
-		if( console.incident && C.mob )
-			if( console.incident.isInTrial( C.mob ) )
+		if( console.incident && C.account )
+			if( console.incident.isInTrial( C.account ) )
 				user << "<span class='alert'>That person already has a role in the trial! Clear them from the console first to change their role.</span>"
 				return
 
-			if( console.incident.criminal == C.mob ) // Wont ping if you accindetally click it after being verified
+			if( console.incident.criminal == C.account ) // Wont ping if you accindetally click it after being verified
 				return
 
 			if( console.incident.criminal )
 				user << "<span class='alert'>There is already a defendant! Clear them from the console to take their place.</span>"
 			else
-				console.incident.criminal = C.mob
-				ping( "\The [src] pings, \"Defendant [C.mob] verified.\"" )
+				console.incident.criminal = C.account
+				ping( "\The [src] pings, \"Defendant [C.account] verified.\"" )
 		else
 			if( !console.incident )
 				user << "<span class='alert'>Console has no active trial!</span>"
-			else if( !C.mob )
+			else if( !C.account )
 				user << "<span class='alert'>ID is not tied to a NanoTrasen Employee!</span>"
 		return
 
@@ -50,16 +50,16 @@
 /obj/machinery/court_scanner/arbiter/attackby(obj/item/weapon/card/id/O as obj, user as mob)
 	if( console && istype( O ))
 		var/obj/item/weapon/card/id/C = O
-		if( console.incident && C.mob )
+		if( console.incident && C.account )
 			var/error = console.incident.addArbiter( C, title )
 			if( !error )
-				ping( "\The [src] pings, \"[title] [C.mob] verified.\"" )
+				ping( "\The [src] pings, \"[title] [C.account] verified.\"" )
 			else
 				user << "<span class='alert'>[error]</span>"
 		else
 			if( !console.incident )
 				user << "<span class='alert'>Console has no active trial!</span>"
-			else if( !C.mob )
+			else if( !C.account )
 				user << "<span class='alert'>ID is not tied to a NanoTrasen Employee!</span>"
 
 		return

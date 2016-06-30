@@ -177,7 +177,7 @@
 
 	return .
 
-/obj/machinery/computer/employment/proc/get_paperwork_records( var/rec_md5 )
+/obj/machinery/computer/employment/proc/get_paperwork_records( var/rec_id )
 	. = ""
 
 	establish_db_connection()
@@ -190,9 +190,7 @@
 		. += "<A href='?src=\ref[src];choice=Return'>Back</A>"
 		return .
 
-	var/sql_rec_md5 = sql_sanitize_text( rec_md5 )
-
-	var/DBQuery/db_query = dbcon.NewQuery("SELECT date_time, title, id FROM character.paperwork_records WHERE recipient_md5 = '[sql_rec_md5]'")
+	var/DBQuery/db_query = dbcon.NewQuery("SELECT date_time, title, id FROM character.paperwork_records WHERE recipient_id = '[rec_id]'")
 
 	if( !db_query.Execute() )
 		. += {"<table class='outline'>
@@ -285,10 +283,10 @@
 <th>Paperwork Records: [active1.fields["name"]]</th>
 </tr>
 </table>"}
-						var/datum/character/C = active1.fields["character"]
-						if( istype( C ))
-							. += get_paperwork_records( C.hash )
-							. += "<A href='?src=\ref[src];choice=Add Note;rec_hash=[C.hash]'>Add Note</A><BR>"
+						var/datum/account/A = active1.fields["account"]
+						if( istype( A ))
+							. += get_paperwork_records( A.id )
+							. += "<A href='?src=\ref[src];choice=Add Note;rec_id=[A.id]'>Add Note</A><BR>"
 						else
 							. += "Could not find employee in external database."
 
@@ -399,8 +397,8 @@ What a mess.*/
 					if( !title )
 						title = "Note"
 
-					var/rec_hash = href_list["rec_hash"]
-					if( !addToPaperworkRecord( usr, rec_hash, P.info, "[title]", "Unclassified", "Employment Notes" ))
+					var/rec_id = href_list["rec_id"]
+					if( !addToPaperworkRecord( usr, rec_id, P.info, "[title]", "Unclassified", "Employment Notes" ))
 						buzz( "\The [src] buzzes, \"Could not add note!\"" )
 					else
 						ping( "\The [src] pings, \"Note successfully added!.\"" )

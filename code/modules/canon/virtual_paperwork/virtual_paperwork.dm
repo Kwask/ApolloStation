@@ -1,5 +1,5 @@
 /datum/virtual_paperwork
-	var/datum/character/recipient // The recipient of this new record
+	var/datum/account/recipient // The recipient of this new record
 	var/obj/item/weapon/paper/paper // The paper to be put in their records
 	var/record_title // The title of the record, if any
 	var/record_type = "Uncategorized" // general, security, or medical, what this paper goes into
@@ -32,4 +32,4 @@
 
 // This is the proc used to file the record
 /datum/virtual_paperwork/proc/filePaperwork( var/user )
-	return addToPaperworkRecord( user, recipient.hash,  paper.info, "[record_title]", "Unclassified", "[record_type]" )
+	return addToPaperworkRecord( user, recipient.id,  paper.info, "[record_title]", "Unclassified", "[record_type]" )

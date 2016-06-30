@@ -77,7 +77,7 @@
 	// Saved characters
 	var/sql_select_ident = "None"
 	if( selected_character )
-		sql_select_ident = html_encode( sql_sanitize_text( selected_character.hash ))
+		sql_select_ident = html_encode( sql_sanitize_text( num2text( selected_character.id )))
 
 	if(sql_id)
 		//Player already identified previously, we need to just update the 'lastseen', 'ip' and 'computer_id' variables

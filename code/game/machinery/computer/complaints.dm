@@ -63,16 +63,15 @@
 
 	return "[add_zero(text, pad_length)]"
 
-/proc/addToPaperworkRecord( mob/living/carbon/human/user, var/recipient_md5, var/info, var/title, var/clearence = "Unclassified", var/category = "Uncategorized" )
+/proc/addToPaperworkRecord( mob/living/carbon/human/user, var/recipient_id, var/info, var/title, var/clearence = "Unclassified", var/category = "Uncategorized" )
 	if( !istype( user ) || !user.client || !user.character )
 		return 0
 
 	var/sql_author_ckey = "'[ckey( user.client.ckey )]'"
 	var/sql_author_name = "'[sql_sanitize_text( user.character.name )]'"
 	var/sql_author_ip = "'[sql_sanitize_text( user.client.address )]'"
-	var/sql_author_md5 = "'[sql_sanitize_text( user.character.hash )]'"
-	var/sql_recipient_md5 = "'[sql_sanitize_text( recipient_md5 )]'"
-	var/sql_this_md5 = "'[sql_sanitize_text( md5( title ))]'"
+	var/sql_author_id = "'[sql_sanitize_text( user.character.account.id )]'"
+	var/sql_recipient_id = "'[sql_sanitize_text( recipient_id )]'"
 
 	var/sql_clearence = "'[sql_sanitize_text( clearence )]'"
 	var/sql_category = "'[sql_sanitize_text( category )]'"
@@ -93,8 +92,8 @@
 		return 0
 
 	var/DBQuery/query_insert = dbcon.NewQuery("INSERT INTO records.paperwork_records \
-	(id, author_ckey, author_name, author_ip, author_md5, recipient_md5, this_md5, clearence, category, date_time, title, info) \
-	VALUES (null, [sql_author_ckey], [sql_author_name], [sql_author_ip], [sql_author_md5], [sql_recipient_md5], [sql_this_md5], [sql_clearence], [sql_category], [sql_datetime], [sql_title], [sql_info])")
+	(id, author_ckey, author_name, author_ip, author_id, recipient_id, clearence, category, date_time, title, info) \
+	VALUES (null, [sql_author_ckey], [sql_author_name], [sql_author_ip], [sql_author_id], [sql_recipient_id], [sql_clearence], [sql_category], [sql_datetime], [sql_title], [sql_info])")
 	if( !query_insert.Execute() )
 		return 0
 

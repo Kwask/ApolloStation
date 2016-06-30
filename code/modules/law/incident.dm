@@ -7,7 +7,7 @@
 	var/list/evidence = list() // If its a prison sentence, it'll require evidence
 
 	var/list/arbiters = list( "Witness" = list() ) // The person or list of people who were involved in the conviction of the criminal
-	var/mob/living/carbon/human/criminal // The person who committed the crimes
+	var/datum/account/character/criminal // The person who committed the crimes
 
 	var/brig_sentence = 0 // How long do they stay in the brig on the station, PERMABRIG_SENTENCE minutes = permabrig
 	var/prison_sentence = 0 // How long do they stay in prison, PERMAPRISON_SENTENCE days = life sentence
@@ -20,12 +20,15 @@
 
 	..()
 
-/datum/crime_incident/proc/isInTrial( var/mob/M )
-	if( criminal == M )
+/datum/crime_incident/proc/isInTrial( var/datum/account/A )
+	if( !istype( A ))
+		return 0
+
+	if( criminal == A )
 		return 1
 
 	for( var/arbiter in arbiters )
-		if( arbiters[arbiter] == M )
+		if( arbiters[arbiter] == A )
 			return 1
 
 	return 0
@@ -35,16 +38,16 @@
 	if( !istype( C ))
 		return "Invalid ID card!"
 
-	if( !C.mob )
+	if( !C.account )
 		return "ID card not tied to a NanoTrasen Employee!"
 
-	if( criminal == C.mob )
+	if( criminal == C.account )
 		return "The criminal cannot hold official court positions in his own trial!"
 
 	if( title != "Witness" && arbiters[title] )
 		return "Someone has already filled the role of [title]! Clear them from the console to take their place."
 
-	if( title != "Witness" && isInTrial( C.mob ))
+	if( title != "Witness" && isInTrial( C.account ))
 		return "That person already has a role in the trial! Clear them from the console first to change their role."
 
 	var/list/same_access // The card requires one of these access codes to become this titl
@@ -53,7 +56,7 @@
 	switch( title )
 		if( "Witness" ) // anyone can be a witness
 			var/list/L = arbiters[title]
-			L += list( C.mob ) // some reason adding a mob counts as adding a list, so it would add the mob contents
+			L += list( C.account ) // some reason adding a mob counts as adding a list, so it would add the mob contents
 			arbiters[title] = L
 
 			return 0
@@ -81,10 +84,10 @@
 		return "The severity of the incident does not call for a [title]."
 
 	if( same_access && same_access.len )
-		arbiters[title] = C.mob
+		arbiters[title] = C.account
 		return 0
 	else
-		return "Could not add [C.mob] as [title]. They do not have sufficient access to act in that capacity in a [getCourtType()]."
+		return "Could not add [C.account] as [title]. They do not have sufficient access to act in that capacity in a [getCourtType()]."
 
 /datum/crime_incident/proc/missingCourtReq()
 	var/error = missingSentenceReq()
@@ -218,19 +221,19 @@
 	if( !criminal )
 		return
 
-	addToPaperworkRecord( user, criminal.character.hash,  generateReport(), "Criminal Sentence", "Classified", "Security Records" )
+	addToPaperworkRecord( user, criminal.id,  generateReport(), "Criminal Sentence", "Classified", "Security Records" )
 
 	if( prison_sentence )
 		if( prison_sentence >= PERMAPRISON_SENTENCE )
-			criminal.character.account.employment_status = "Serving a life sentence"
+			criminal.employment_status = "Serving a life sentence"
 		else
-			criminal.character.account.prison_date = progessDate( universe.date, prison_sentence+1 )
+			criminal.prison_date = progessDate( universe.date, prison_sentence+1 )
 
 	if( getMaxSeverity() >= FELONY_LEVEL )
-		criminal.character.account.felon = 1
+		criminal.felon = 1
 
-	if( !criminal.character.new_character ) // If they already exist in the database
-		criminal.character.saveCharacter()
+	if( !criminal.new_account ) // If they already exist in the database
+		criminal.saveAccount( 1 )
 
 /datum/crime_incident/proc/generateReport()
 	. = "<center>Security Incident Report</center><hr>"

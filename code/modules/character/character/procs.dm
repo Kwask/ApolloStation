@@ -10,7 +10,6 @@
 
 	DNA = md5( "DNA[name][blood_type][gender][eye_color][time2text(world.timeofday,"hh:mm")]" )
 	fingerprints = md5( DNA )
-	hash = md5( fingerprints )
 
 	new_character = new_char
 	temporary = temp
@@ -35,13 +34,6 @@
 	all_characters -= src
 
 	..()
-
-// Primarily for copying role data to antags
-/datum/account/proc/copy_metadata_to( var/datum/account/A )
-	A.roles = src.roles
-	A.department = src.department
-	A.antag_data = src.antag_data.Copy()
-	A.uplink_location = src.uplink_location
 
 /datum/character/proc/copy_to( mob/living/carbon/human/character )
 	if( !istype( character ))
@@ -118,7 +110,7 @@
 	var/sql_ckey = ckey( ckey )
 	var/sql_character_ident = html_encode( character_ident )
 
-	var/DBQuery/query = dbcon.NewQuery("SELECT id FROM character.characters WHERE ckey = '[sql_ckey]' AND hash = '[sql_character_ident]'")
+	var/DBQuery/query = dbcon.NewQuery("SELECT id FROM character.characters WHERE ckey = '[sql_ckey]' AND id = '[sql_character_ident]'")
 	if( !query.Execute() )
 		return 0
 
@@ -166,6 +158,12 @@
 
 		if( response == "No" )
 			return 1
+
+	if( new_character || prompt )
+		account.copyFrom( src )
+
+	if( save_acc )
+		acc_id = account.saveAccount()
 
 	var/list/variables = list()
 
@@ -224,7 +222,7 @@
 	variables["DNA"] = html_encode( sql_sanitize_text( DNA ))
 	variables["fingerprints"] = html_encode( sql_sanitize_text( fingerprints ))
 	variables["blood_type"] = html_encode( sql_sanitize_text( blood_type ))
-	variables["hash"] = html_encode( sql_sanitize_text( hash ))
+	variables["acc_id"] = html_encode( sql_sanitize_text( acc_id ))
 
 	var/list/names = list()
 	var/list/values = list()
@@ -237,7 +235,7 @@
 		log_debug( "SAVE CHARACTER: Didn't save [name] / ([ckey]) because the database wasn't connected" )
 		return 0
 
-	var/DBQuery/query = dbcon.NewQuery("SELECT id FROM character.characters WHERE hash = '[variables["hash"]]'")
+	var/DBQuery/query = dbcon.NewQuery("SELECT id FROM character.characters WHERE id = '[id]'")
 	query.Execute()
 	var/sql_id = 0
 	while(query.NextRow())
@@ -263,7 +261,7 @@
 			if( i != names.len )
 				query_params += ","
 
-		var/DBQuery/query_update = dbcon.NewQuery("UPDATE character.characters SET [query_params] WHERE hash = '[variables["hash"]]'")
+		var/DBQuery/query_update = dbcon.NewQuery("UPDATE character.characters SET [query_params] WHERE id = '[sql_id]'")
 		if( !query_update.Execute())
 			log_debug( "SAVE CHARACTER: Didn't save [name] / ([ckey]) because the SQL update failed" )
 			return 0
@@ -279,12 +277,6 @@
 		if( !query_insert.Execute() )
 			log_debug( "SAVE CHARACTER: Didn't save [name] / ([ckey]) because the SQL insert failed" )
 			return 0
-
-	if( new_character || prompt )
-		account.copyFrom( src )
-
-	if( save_acc )
-		account.saveAccount()
 
 	new_character = 0
 
@@ -350,15 +342,14 @@
 	variables["DNA"] = "text"
 	variables["fingerprints"] = "text"
 	variables["blood_type"] = "text"
-	variables["hash"] = "text"
+	variables["acc_id"] = "number"
 
 	var/query_names = list2text( variables, "," )
-	var/sql_ident = html_encode( sql_sanitize_text( character_ident ))
 
 	new_character = 0 // If we're loading from the database, we're obviously a pre-existing character
 	temporary = 1 // All characters are temporary until they enter the game
 
-	var/DBQuery/query = dbcon.NewQuery("SELECT [query_names] FROM character.characters WHERE hash = '[sql_ident]'")
+	var/DBQuery/query = dbcon.NewQuery("SELECT [query_names] FROM character.characters WHERE id = '[character_ident]'")
 	if( !query.Execute() )
 		log_debug( "Could not execute query!" )
 		return 0
@@ -405,7 +396,7 @@
 
 		vars[variables[i]] = value
 
-	account.loadAccount( hash )
+	account.loadAccount( acc_id )
 	account.copyFrom( src )
 
 	update_preview_icon()

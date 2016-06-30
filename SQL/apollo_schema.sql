@@ -136,7 +136,7 @@ CREATE TABLE IF NOT EXISTS `preferences` (
   `UI_style_color` varchar(7) NOT NULL DEFAULT "#FFFFFF",
   `UI_style_alpha` tinyint UNSIGNED NOT NULL DEFAULT '255',
   `toggles` int UNSIGNED NOT NULL DEFAULT '0',
-  `last_character` varchar(100),
+  `last_character` bigint,
   `alternate_spawn_option` int UNSIGNED DEFAULT '2', -- What happens to them if they can't be spawned in as their selected role
   `job_antag` int UNSIGNED NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),

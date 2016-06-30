@@ -25,7 +25,7 @@
 				flick( "jobchange_deny", src )
 				return
 
-		if( !istype( C.mob ))
+		if( !istype( C.account ))
 			buzz("\The [src] buzzes, \"Card is not tied to a NanoTrasen Employee!\"")
 			flick( "jobchange_deny", src )
 			return
