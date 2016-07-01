@@ -141,6 +141,11 @@
 	if(( temporary && account.crew ) || ( temporary && !prompt )) // If we're just a temporary character and the user isnt forcing this save, dont save to database
 		return 1
 
+	establish_db_connection()
+	if( !dbcon.IsConnected() )
+		log_debug( "SAVE CHARACTER: Didn't save [name] / ([ckey]) because the database wasn't connected" )
+		return 0
+
 	if( !ckey && prompt )
 		log_debug( "SAVE CHARACTER: Didn't save [name] because they didn't have a ckey" )
 		return 0
@@ -222,7 +227,7 @@
 	variables["DNA"] = html_encode( sql_sanitize_text( DNA ))
 	variables["fingerprints"] = html_encode( sql_sanitize_text( fingerprints ))
 	variables["blood_type"] = html_encode( sql_sanitize_text( blood_type ))
-	variables["acc_id"] = html_encode( sql_sanitize_text( acc_id ))
+	variables["acc_id"] = "[acc_id]"
 
 	var/list/names = list()
 	var/list/values = list()
@@ -230,12 +235,7 @@
 		names += sql_sanitize_text( name )
 		values += variables[name]
 
-	establish_db_connection()
-	if( !dbcon.IsConnected() )
-		log_debug( "SAVE CHARACTER: Didn't save [name] / ([ckey]) because the database wasn't connected" )
-		return 0
-
-	var/DBQuery/query = dbcon.NewQuery("SELECT id FROM characters WHERE id = '[id]'")
+	var/DBQuery/query = dbcon.NewQuery("SELECT id FROM characters WHERE acc_id = '[acc_id]'")
 	query.Execute()
 	var/sql_id = 0
 	while(query.NextRow())

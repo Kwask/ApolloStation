@@ -150,7 +150,7 @@ CREATE TABLE IF NOT EXISTS `accounts` (
   `security_level` tinyint NOT NULL DEFAULT '1', -- What kind of authorization is needed to log into this acc?
   `clearence_level` varchar(100) NOT NULL DEFAULT "None",
   `record_access` int UNSIGNED NOT NULL DEFAULT '0',
-  `datetime_login` datetime NOT NULL, -- When the account was last logged in
+  `datetime_login` datetime, -- When the account was last logged in
   `datetime_created` datetime NOT NULL, -- When the account was created
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 ;
@@ -267,7 +267,7 @@ CREATE TABLE IF NOT EXISTS `characters` (
   `DNA` varchar(32) NOT NULL,
   `fingerprints` varchar(32) NOT NULL,
   `blood_type` varchar(10) NOT NULL,
-  FOREIGN KEY (`acc_id`) REFERENCES accounts(`id`),
+  FOREIGN KEY (`acc_id`) REFERENCES character_records(`id`),
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 ;
 

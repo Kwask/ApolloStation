@@ -15,9 +15,15 @@
 	if(sql_id)
 		if(istext(sql_id))
 			sql_id = text2num(sql_id)
+		if(!isnum(sql_id))
+			log_debug( "Could not load sql_id [sql_id]!" )
+			return 0
 
 	if( sql_id )
+		log_debug( "Returning sql_id [sql_id]" )
 		return sql_id
+
+	log_debug( "No sql_id found!" )
 
 	return 0
 
@@ -63,6 +69,15 @@
 	if( temporary && !force ) // If we're just a temporary character and we're not forcing a save, dont save to database
 		return 0
 
+	establish_db_connection()
+	if( !dbcon.IsConnected() )
+		log_debug( "SAVE CHARACTER: Didn't save [username]'s account / ([ckey]) because the database wasn't connected" )
+		return 0
+
+	var/DBQuery/query = dbcon.NewQuery("SELECT id FROM accounts WHERE id = '[id]'")
+	query.Execute()
+	var/sql_id = getUsernameID( username )
+
 	var/list/variables = list()
 
 	variables["ckey"] = ckey( ckey )
@@ -78,20 +93,16 @@
 
 	variables["record_access"] = sanitize_integer( record_access, 0, 65536, 0 )
 
+	variables["datetime_login"] = html_encode( sql_sanitize_text( datetime_login ))
+
+	if( !sql_id )
+		variables["datetime_created"] = html_encode( sql_sanitize_text( universe.getDateTime() ))
+
 	var/list/names = list()
 	var/list/values = list()
 	for( var/N in variables )
 		names += sql_sanitize_text( N )
 		values += variables[N]
-
-	establish_db_connection()
-	if( !dbcon.IsConnected() )
-		log_debug( "SAVE CHARACTER: Didn't save [username]'s account / ([ckey]) because the database wasn't connected" )
-		return 0
-
-	var/DBQuery/query = dbcon.NewQuery("SELECT id FROM accounts WHERE id = '[id]'")
-	query.Execute()
-	var/sql_id = getUsernameID( username )
 
 	if(sql_id)
 		if( names.len != values.len )
@@ -125,6 +136,8 @@
 
 	new_account = 0
 
+	id = sql_id
+
 	return sql_id
 
 /datum/account/proc/loadAccount( var/character_ident )
@@ -156,6 +169,9 @@
 	variables["clearence_level"] = "text"
 
 	variables["record_access"] = "number"
+
+	variables["datetime_login"] = "text"
+	variables["datetime_created"] = "text"
 
 	var/query_names = list2text( variables, "," )
 

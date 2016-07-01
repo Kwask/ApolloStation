@@ -259,20 +259,20 @@ var/global/ManifestJSON
 
 	var/min_round_number = universe.round_number-max_employee_inactivity
 
-	var/DBQuery/query = dbcon.NewQuery("SELECT id FROM accounts WHERE last_shift_day > [min_round_number] ORDER BY name")
+	var/DBQuery/query = dbcon.NewQuery("SELECT acc_id FROM character_records WHERE last_shift_day > [min_round_number] ORDER BY name")
 	query.Execute()
 
 	while( query.NextRow() )
-		var/datum/character/C = new()
+		var/datum/account/A = new()
 		var/ident = text2num( query.item[1] )
 
 		if( !ident )
-			log_debug( "Failed to load character" )
-			qdel( C )
+			log_debug( "Failed to load account" )
+			qdel( A )
 			continue
 
-		C.loadCharacter( ident )
-		employee_pool += C
+		A.loadAccount( ident )
+		employee_pool += A
 
 /datum/controller/process/datacore/proc/queue_manifest(var/nosleep = 0)
 	if(!nosleep)

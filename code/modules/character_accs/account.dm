@@ -20,6 +20,8 @@
 	var/clearence_level = "None"
 	var/record_access = 0
 
+	var/datetime_login = "2560-1-1 8:00:00"
+	var/datetime_created = "2560-1-1 8:00:00"
 
 	// Non-saved variables, these are for one round
 	var/new_account = 1 // Is this a new character?

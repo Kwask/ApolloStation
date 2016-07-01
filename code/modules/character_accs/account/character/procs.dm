@@ -1,3 +1,30 @@
+/proc/getCharRecordID( var/id )
+	establish_db_connection()
+	if( !dbcon.IsConnected() )
+		return 0
+
+	var/DBQuery/query = dbcon.NewQuery("SELECT id FROM character_records WHERE acc_id = '[id]'")
+	query.Execute()
+
+	var/sql_id = 0
+	while( query.NextRow() )
+		sql_id = query.item[1]
+		break
+
+	//Just the standard check to see if it's actually a number
+	if(sql_id)
+		if(istext(sql_id))
+			sql_id = text2num(sql_id)
+		if(!isnum(sql_id))
+			log_debug( "Could not load sql_id [sql_id]!" )
+			return 0
+
+	if( sql_id )
+		log_debug( "Returning sql_id [sql_id]" )
+		return sql_id
+
+	log_debug( "No sql_id found!" )
+
 /datum/account/character/New( var/key, var/datum/character/char )
 	if( istype( char ))
 		owner = char
@@ -110,10 +137,17 @@
 	if( temporary && !force ) // If we're just a temporary character and we're not forcing a save, dont save to database
 		return 0
 
-	if( !..() )
+	id = ..()
+
+	if( !id )
+		log_debug( "SAVE CHARACTER: Didn't save [username]'s account / ([ckey]) because they didnt have a valid acc_id" )
 		return 0
 
+	var/sql_id = getCharRecordID( id )
+
 	var/list/variables = list()
+
+	variables["acc_id"] = num2text( id )
 
 	variables["name"] = html_encode( sql_sanitize_text( name ))
 	variables["gender"] = html_encode( sql_sanitize_text( gender ))
@@ -175,15 +209,6 @@
 		names += sql_sanitize_text( name )
 		values += variables[name]
 
-	establish_db_connection()
-	if( !dbcon.IsConnected() )
-		log_debug( "SAVE CHARACTER: Didn't save [name]'s account / ([ckey]) because the database wasn't connected" )
-		return 0
-
-	var/DBQuery/query = dbcon.NewQuery("SELECT id FROM character_records WHERE id = '[id]'")
-	query.Execute()
-	var/sql_id = getUsernameID( username )
-
 	if(sql_id)
 		if( names.len != values.len )
 			log_debug( "SAVE CHARACTER: Didn't save [name]'s account / ([ckey]) because the variables length did not match the values" )
@@ -212,7 +237,8 @@
 			log_debug( "SAVE CHARACTER: Didn't save [name]'s account / ([ckey]) because the SQL insert failed" )
 			return 0
 
-		sql_id = getUsernameID( username )
+		id = getUsernameID( username )
+		sql_id = getCharRecordID( id )
 
 	new_account = 0
 
