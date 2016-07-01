@@ -54,7 +54,7 @@
 	..()
 
 /obj/machinery/computer/complaints/proc/getTicketNumber()
-	var/DBQuery/query = dbcon.NewQuery("SELECT id FROM records.paperwork_records WHERE category = '[category]'")
+	var/DBQuery/query = dbcon.NewQuery("SELECT id FROM paperwork_records WHERE category = '[category]'")
 	if( !query.Execute() )
 		return "0000000000"
 
@@ -91,7 +91,7 @@
 		testing( "PAPERWORK: Didn't save [title] because the database wasn't connected" )
 		return 0
 
-	var/DBQuery/query_insert = dbcon.NewQuery("INSERT INTO records.paperwork_records \
+	var/DBQuery/query_insert = dbcon.NewQuery("INSERT INTO paperwork_records \
 	(id, author_ckey, author_name, author_ip, author_id, recipient_id, clearence, category, date_time, title, info) \
 	VALUES (null, [sql_author_ckey], [sql_author_name], [sql_author_ip], [sql_author_id], [sql_recipient_id], [sql_clearence], [sql_category], [sql_datetime], [sql_title], [sql_info])")
 	if( !query_insert.Execute() )

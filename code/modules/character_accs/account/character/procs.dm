@@ -1,26 +1,3 @@
-/proc/accUsernameExists( var/username )
-	establish_db_connection()
-	if( !dbcon.IsConnected() )
-		return 0
-
-	var/DBQuery/query = dbcon.NewQuery("SELECT id FROM account.accounts WHERE username = '[username]'")
-	query.Execute()
-
-	var/sql_id = 0
-	while( query.NextRow() )
-		sql_id = query.item[1]
-		break
-
-	//Just the standard check to see if it's actually a number
-	if(sql_id)
-		if(istext(sql_id))
-			sql_id = text2num(sql_id)
-
-	if( sql_id )
-		return 1
-
-	return 0
-
 /datum/account/character/New( var/key, var/datum/character/char )
 	if( istype( char ))
 		owner = char
@@ -125,7 +102,7 @@
 			usern += add_zero( rand( 0, 99 ), 2 )
 		usern += num2text( rand( 0, 9 ))
 
-		if( !accUsernameExists( usern ) && usern != "username" )
+		if( !getUsernameID( usern ) && usern != "username" )
 			username = usern
 			return usern
 
@@ -203,7 +180,7 @@
 		log_debug( "SAVE CHARACTER: Didn't save [name]'s account / ([ckey]) because the database wasn't connected" )
 		return 0
 
-	var/DBQuery/query = dbcon.NewQuery("SELECT id FROM account.accounts WHERE id = '[id]'")
+	var/DBQuery/query = dbcon.NewQuery("SELECT id FROM character_records WHERE id = '[id]'")
 	query.Execute()
 	var/sql_id = getUsernameID( username )
 
@@ -218,7 +195,7 @@
 			if( i != names.len )
 				query_params += ","
 
-		var/DBQuery/query_update = dbcon.NewQuery("UPDATE account.accounts SET [query_params] WHERE id = '[sql_id]'")
+		var/DBQuery/query_update = dbcon.NewQuery("UPDATE character_records SET [query_params] WHERE id = '[sql_id]'")
 		if( !query_update.Execute())
 			log_debug( "SAVE CHARACTER: Didn't save [name]'s account / ([ckey]) because the SQL update failed" )
 			return 0
@@ -230,7 +207,7 @@
 		query_values += "', null"
 
 		// This needs a single quote before query_values because otherwise there will be an odd number of single quotes
-		var/DBQuery/query_insert = dbcon.NewQuery("INSERT INTO account.accounts ([query_names]) VALUES ('[query_values])")
+		var/DBQuery/query_insert = dbcon.NewQuery("INSERT INTO character_records ([query_names]) VALUES ('[query_values])")
 		if( !query_insert.Execute() )
 			log_debug( "SAVE CHARACTER: Didn't save [name]'s account / ([ckey]) because the SQL insert failed" )
 			return 0
@@ -318,7 +295,7 @@
 
 	temporary = 1 // All characters are temporary until they enter the game
 
-	var/DBQuery/query = dbcon.NewQuery("SELECT [query_names] FROM account.accounts WHERE id = '[character_ident]'")
+	var/DBQuery/query = dbcon.NewQuery("SELECT [query_names] FROM character_records WHERE id = '[character_ident]'")
 	if( !query.Execute() )
 		log_debug( "Could not execute query!" )
 		return 0

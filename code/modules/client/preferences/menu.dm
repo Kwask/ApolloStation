@@ -220,7 +220,7 @@
 
 	establish_db_connection()
 	if( dbcon.IsConnected() )
-		var/DBQuery/query = dbcon.NewQuery("SELECT employment_status, prison_date, name, owner_hash, gender, department FROM account.accounts WHERE ckey = '[sql_ckey]' ORDER BY name")
+		var/DBQuery/query = dbcon.NewQuery("SELECT employment_status, prison_date, name, id, gender, department FROM accounts WHERE ckey = '[sql_ckey]' ORDER BY name")
 		query.Execute()
 
 		. += "<tr>"
@@ -245,7 +245,7 @@
 
 			. += "<tr>"
 			var/name = query.item[3]
-			var/ident = query.item[4]
+			var/ident = text2num( query.item[4] )
 			if( selected_character && selected_character.name == name )
 				. += "<td><b>[name]</b> - Selected</td>"
 			else

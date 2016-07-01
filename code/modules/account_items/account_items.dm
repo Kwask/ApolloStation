@@ -19,7 +19,7 @@ var/global/list/account_items = list()
 	var/sql_ckey = ckey(ckey)
 	var/sql_item = sanitizeSQL(obj_type)
 
-	var/DBQuery/query = dbcon.NewQuery("SELECT id FROM client.acc_items WHERE ckey = '[sql_ckey]' AND item = '[sql_item]'")
+	var/DBQuery/query = dbcon.NewQuery("SELECT id FROM acc_items WHERE ckey = '[sql_ckey]' AND item = '[sql_item]'")
 	query.Execute()
 	var/sql_id = 0
 
@@ -33,7 +33,7 @@ var/global/list/account_items = list()
 
 	var/sql_time = time2text(world.realtime, "YYYY-MM-DD hh:mm:ss")
 
-	var/DBQuery/query_insert = dbcon.NewQuery("INSERT INTO client.acc_items (id, ckey, item, time, donator) VALUES (null, '[sql_ckey]', '[sql_item]', '[sql_time]', 0)")
+	var/DBQuery/query_insert = dbcon.NewQuery("INSERT INTO acc_items (id, ckey, item, time, donator) VALUES (null, '[sql_ckey]', '[sql_item]', '[sql_time]', 0)")
 	query_insert.Execute()
 
 	return 1
@@ -54,7 +54,7 @@ var/global/list/account_items = list()
 	var/sql_ckey = ckey(ckey)
 	var/sql_item = sanitizeSQL(obj_type)
 
-	var/DBQuery/query = dbcon.NewQuery("SELECT id FROM client.acc_items WHERE ckey = '[sql_ckey]' AND item = '[sql_item]'")
+	var/DBQuery/query = dbcon.NewQuery("SELECT id FROM acc_items WHERE ckey = '[sql_ckey]' AND item = '[sql_item]'")
 	query.Execute()
 	var/sql_id = 0
 
@@ -66,7 +66,7 @@ var/global/list/account_items = list()
 	if(!sql_id)
 		return 0
 
-	var/DBQuery/query_insert = dbcon.NewQuery("DELETE FROM client.acc_items WHERE id ='[sql_id]'")
+	var/DBQuery/query_insert = dbcon.NewQuery("DELETE FROM acc_items WHERE id ='[sql_id]'")
 	query_insert.Execute()
 
 	return 1

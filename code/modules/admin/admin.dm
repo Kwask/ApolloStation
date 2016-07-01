@@ -262,7 +262,7 @@ var/global/floorIsLava = 0
 		return .
 
 	// Searching the player database because all entries are unique
-	var/DBQuery/db_query = dbcon.NewQuery( "SELECT ckey, ip, computerid FROM client.player WHERE ckey LIKE '%[ckey( search )]%' LIMIT [limit]" )
+	var/DBQuery/db_query = dbcon.NewQuery( "SELECT ckey, ip, computerid FROM player WHERE ckey LIKE '%[ckey( search )]%' LIMIT [limit]" )
 
 	if(	!db_query.Execute() )
 		. += "<br>Invalid query!"
@@ -306,7 +306,7 @@ var/global/floorIsLava = 0
 
 	var/sql_rkey = ckey( rkey )
 
-	var/DBQuery/db_select = dbcon.NewQuery("SELECT ip, computerid FROM client.player WHERE ckey = '[sql_rkey]'")
+	var/DBQuery/db_select = dbcon.NewQuery("SELECT ip, computerid FROM player WHERE ckey = '[sql_rkey]'")
 
 	var/ip
 	var/cid
@@ -331,21 +331,21 @@ var/global/floorIsLava = 0
 
 	// Compiling the lists of entries
 	if( sql_rkey )
-		var/DBQuery/db_query = dbcon.NewQuery("SELECT date_time, info, author_ckey, author_rank, id FROM staff.player_notes WHERE player_ckey = '[sql_rkey]'")
+		var/DBQuery/db_query = dbcon.NewQuery("SELECT date_time, info, author_ckey, author_rank, id FROM player_notes WHERE player_ckey = '[sql_rkey]'")
 		if( db_query.Execute() )
 			while( db_query.NextRow() )
 				var/list/entry = list( "date" = db_query.item[1], "info" = db_query.item[2], "author_ckey" = db_query.item[3], "author_rank" = db_query.item[4], "id" = db_query.item[5] )
 				general_notes += list( entry ) // Adding a list within a list because byond automatically adds the contents of lists to lists
 
 	if( sql_rip )
-		var/DBQuery/db_query = dbcon.NewQuery("SELECT date_time, info, author_ckey, author_rank, id FROM staff.player_notes WHERE player_ip = '[sql_rip]' AND player_ckey != '[sql_rkey]'")
+		var/DBQuery/db_query = dbcon.NewQuery("SELECT date_time, info, author_ckey, author_rank, id FROM player_notes WHERE player_ip = '[sql_rip]' AND player_ckey != '[sql_rkey]'")
 		if( db_query.Execute() )
 			while( db_query.NextRow() )
 				var/list/entry = list( "date" = db_query.item[1], "info" = db_query.item[2], "author_ckey" = db_query.item[3], "author_rank" = db_query.item[4], "id" = db_query.item[5] )
 				ip_notes += list( entry )
 
 	if( sql_rcid )
-		var/DBQuery/db_query = dbcon.NewQuery("SELECT date_time, info, author_ckey, author_rank, id FROM staff.player_notes WHERE player_cid = '[sql_rcid]' AND player_ckey != '[sql_rkey]' AND player_ip != '[sql_rip]'")
+		var/DBQuery/db_query = dbcon.NewQuery("SELECT date_time, info, author_ckey, author_rank, id FROM player_notes WHERE player_cid = '[sql_rcid]' AND player_ckey != '[sql_rkey]' AND player_ip != '[sql_rip]'")
 		if( db_query.Execute() )
 			while( db_query.NextRow() )
 				var/list/entry = list( "date" = db_query.item[1], "info" = db_query.item[2], "author_ckey" = db_query.item[3], "author_rank" = db_query.item[4], "id" = db_query.item[5] )

@@ -322,7 +322,15 @@ proc/setup_database_connection()
 		return 0
 
 	if(!dbcon)
-		dbcon = new("dbi:mysql:[sqldb]:[sqladdress]:[sqlport]","[sqllogin]","[sqlpass]")
+		dbcon = new()
+
+	var/user = sqllogin
+	var/pass = sqlpass
+	var/db = sqldb
+	var/address = sqladdress
+	var/port = sqlport
+
+	dbcon.Connect("dbi:mysql:[db]:[address]:[port]","[user]","[pass]")
 
 	. = dbcon.IsConnected()
 	if ( . )

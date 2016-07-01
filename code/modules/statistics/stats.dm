@@ -149,7 +149,7 @@ datum/round_stats/proc/save_stats()
 	var/gamemode = ticker.mode.name
 
 	// Due to the size of this query it's easier to debug when it's split up over multiple lines...
-	var/q = "INSERT INTO stats.round_stats ("
+	var/q = "INSERT INTO round_stats ("
 	q = q + "id,"
 	q = q + "game_mode,"
 	q = q + "end_time,"
@@ -212,7 +212,7 @@ datum/round_stats/proc/save_stats()
 		return 0
 
 	// Try to grab the round id for the newly inserted row
-	query.Execute("SELECT id FROM stats.round_stats ORDER BY id DESC LIMIT 1")
+	query.Execute("SELECT id FROM round_stats ORDER BY id DESC LIMIT 1")
 	if(query.RowCount() != 1)
 		return 0
 	query.NextRow()

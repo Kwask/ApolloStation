@@ -129,7 +129,7 @@
 			if( !is_complete )
 				query_input = "LIKE '%[query]%'"
 
-			var/DBQuery/db_query = dbcon.NewQuery("SELECT name, gender, birth_date, blood_type, fingerprints, hash FROM character.characters WHERE [query_type] [query_input] LIMIT [return_limit]")
+			var/DBQuery/db_query = dbcon.NewQuery("SELECT name, gender, birth_date, blood_type, fingerprints, hash FROM characters WHERE [query_type] [query_input] LIMIT [return_limit]")
 
 			if( !db_query.Execute() )
 				. += {"<table class='outline'>
@@ -190,7 +190,7 @@
 		. += "<A href='?src=\ref[src];choice=Return'>Back</A>"
 		return .
 
-	var/DBQuery/db_query = dbcon.NewQuery("SELECT date_time, title, id FROM character.paperwork_records WHERE recipient_id = '[rec_id]'")
+	var/DBQuery/db_query = dbcon.NewQuery("SELECT date_time, title, id FROM paperwork_records WHERE recipient_id = '[rec_id]'")
 
 	if( !db_query.Execute() )
 		. += {"<table class='outline'>
@@ -377,7 +377,7 @@ What a mess.*/
 				var/sql_id = text2num( href_list["id"] )
 				var/DBQuery/db_query
 
-				db_query = dbcon.NewQuery("SELECT title, info FROM character.paperwork_records WHERE id = [sql_id]")
+				db_query = dbcon.NewQuery("SELECT title, info FROM paperwork_records WHERE id = [sql_id]")
 
 				if( !db_query.Execute() )
 					return

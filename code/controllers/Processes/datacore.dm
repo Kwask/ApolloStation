@@ -259,14 +259,14 @@ var/global/ManifestJSON
 
 	var/min_round_number = universe.round_number-max_employee_inactivity
 
-	var/DBQuery/query = dbcon.NewQuery("SELECT owner_hash FROM account.accounts WHERE last_shift_day > [min_round_number] ORDER BY name")
+	var/DBQuery/query = dbcon.NewQuery("SELECT id FROM accounts WHERE last_shift_day > [min_round_number] ORDER BY name")
 	query.Execute()
 
 	while( query.NextRow() )
 		var/datum/character/C = new()
-		var/ident = html_decode( sanitize_text( query.item[1], "ERROR" ))
+		var/ident = text2num( query.item[1] )
 
-		if( !ident || ident == "ERROR" )
+		if( !ident )
 			log_debug( "Failed to load character" )
 			qdel( C )
 			continue

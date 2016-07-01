@@ -1,9 +1,5 @@
--- -----------------------------------------------------
--- STAFF SCHEMA
--- This schema is for all staff related stuff, so make sure to keep it hidden
--- -----------------------------------------------------
-CREATE SCHEMA IF NOT EXISTS `staff` DEFAULT CHARACTER SET latin1 ;
-USE `staff` ;
+CREATE SCHEMA IF NOT EXISTS `apollo` DEFAULT CHARACTER SET latin1 ;
+USE `apollo` ;
 
 -- -----------------------------------------------------
 -- Admin Permissions
@@ -65,13 +61,6 @@ CREATE TABLE IF NOT EXISTS `player_notes` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 ;
 
 -- -----------------------------------------------------
--- FEEDBACK SCHEMA
--- This schema is for bug and error reporting
--- -----------------------------------------------------
-CREATE SCHEMA IF NOT EXISTS `feedback` DEFAULT CHARACTER SET latin1 ;
-USE `feedback` ;
-
--- -----------------------------------------------------
 -- Error logging
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `feedback` (
@@ -95,13 +84,6 @@ CREATE TABLE IF NOT EXISTS `admin_log` (
   `log` text NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 ;
-
--- -----------------------------------------------------
--- CLIENTS SCHEMA
--- This schema is for client and client data
--- -----------------------------------------------------
-CREATE SCHEMA IF NOT EXISTS `client` DEFAULT CHARACTER SET latin1 ;
-USE `client` ;
 
 -- -----------------------------------------------------
 -- Unique Players
@@ -154,13 +136,6 @@ CREATE TABLE IF NOT EXISTS `acc_items` (
   `donator` BIT NOT NULL ,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 ;
-
--- -----------------------------------------------------
--- ACCOUNTS SCHEMA
--- This schema stores account data
--- -----------------------------------------------------
-CREATE SCHEMA IF NOT EXISTS `account` DEFAULT CHARACTER SET latin1 ;
-USE `account` ;
 
 -- -----------------------------------------------------
 -- Corporate Accounts
@@ -221,13 +196,6 @@ CREATE TABLE IF NOT EXISTS `character_records` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 ;
 
 -- -----------------------------------------------------
--- RECORDS SCHEMA
--- This schema stores BOOKS, paperwork, and any other type of record
--- -----------------------------------------------------
-CREATE SCHEMA IF NOT EXISTS `records` DEFAULT CHARACTER SET latin1 ;
-USE `records` ;
-
--- -----------------------------------------------------
 -- Library Books
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `library` (
@@ -254,8 +222,8 @@ CREATE TABLE IF NOT EXISTS `paperwork_records` (
   `date_time` datetime NOT NULL,
   `title` varchar(50),
   `info` MEDIUMTEXT NOT NULL,
-  FOREIGN KEY (`author_id`) REFERENCES account.accounts(`id`),
-  FOREIGN KEY (`recipient_id`) REFERENCES account.accounts(`id`),
+  FOREIGN KEY (`author_id`) REFERENCES accounts(`id`),
+  FOREIGN KEY (`recipient_id`) REFERENCES accounts(`id`),
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 ;
 
@@ -268,13 +236,6 @@ CREATE TABLE IF NOT EXISTS `universe` (
 	`ic_date` varchar(20) NOT NULL,
 	PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 ;
-
--- -----------------------------------------------------
--- CHARACTER SCHEMA
--- This schema stores character data
--- -----------------------------------------------------
-CREATE SCHEMA IF NOT EXISTS `character` DEFAULT CHARACTER SET latin1 ;
-USE `character` ;
 
 -- -----------------------------------------------------
 -- Player Characters
@@ -306,16 +267,9 @@ CREATE TABLE IF NOT EXISTS `characters` (
   `DNA` varchar(32) NOT NULL,
   `fingerprints` varchar(32) NOT NULL,
   `blood_type` varchar(10) NOT NULL,
-  FOREIGN KEY (`acc_id`) REFERENCES account.accounts(`id`),
+  FOREIGN KEY (`acc_id`) REFERENCES accounts(`id`),
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 ;
-
--- -----------------------------------------------------
--- POLLS SCHEMA
--- This schema is for poll related data, unused at the moment
--- -----------------------------------------------------
-CREATE SCHEMA IF NOT EXISTS `polls` DEFAULT CHARACTER SET latin1 ;
-USE `polls` ;
 
 -- -----------------------------------------------------
 -- Poll Options
@@ -374,13 +328,6 @@ CREATE TABLE IF NOT EXISTS `poll_vote` (
   `rating` int(2) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 ;
-
--- -----------------------------------------------------
--- STATS SCHEMA
--- This schema stores stats about the game and the rounds
--- -----------------------------------------------------
-CREATE SCHEMA IF NOT EXISTS `stats` DEFAULT CHARACTER SET latin1 ;
-USE `stats` ;
 
 -- -----------------------------------------------------
 -- End Round Stats

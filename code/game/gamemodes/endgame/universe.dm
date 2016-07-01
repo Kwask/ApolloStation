@@ -105,7 +105,7 @@
 	var/sql_name = sql_sanitize_text( name )
 	var/sql_date = html_encode( list2params( date ))
 
-	var/DBQuery/query = dbcon.NewQuery("SELECT id FROM records.universe WHERE name = '[sql_name]'")
+	var/DBQuery/query = dbcon.NewQuery("SELECT id FROM universe WHERE name = '[sql_name]'")
 	query.Execute()
 	var/sql_id = 0
 	while(query.NextRow())
@@ -129,12 +129,12 @@
 	if(sql_id)
 		var/DBQuery/query_update
 
-		query_update = dbcon.NewQuery("UPDATE records.universe SET name = '[sql_name]', ic_date = '[sql_date]' WHERE id = '[sql_id]'")
+		query_update = dbcon.NewQuery("UPDATE universe SET name = '[sql_name]', ic_date = '[sql_date]' WHERE id = '[sql_id]'")
 		query_update.Execute()
 	else
 		var/DBQuery/query_insert
 
-		query_insert = dbcon.NewQuery("INSERT INTO records.universe (id, name, ic_date) VALUES (null, '[sql_name]', '[sql_date]')")
+		query_insert = dbcon.NewQuery("INSERT INTO universe (id, name, ic_date) VALUES (null, '[sql_name]', '[sql_date]')")
 		query_insert.Execute()
 
 /datum/universal_state/proc/loadFromDB( var/univ_name = "C-137" )
@@ -147,7 +147,7 @@
 
 	var/sql_name = sql_sanitize_text( univ_name )
 
-	var/DBQuery/query = dbcon.NewQuery("SELECT ic_date FROM records.universe WHERE name = '[sql_name]'")
+	var/DBQuery/query = dbcon.NewQuery("SELECT ic_date FROM universe WHERE name = '[sql_name]'")
 	query.Execute()
 
 	if( !query.NextRow() )

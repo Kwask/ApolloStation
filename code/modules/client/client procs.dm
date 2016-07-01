@@ -74,7 +74,7 @@
 
 	var/DBQuery/query
 
-	query = dbcon.NewQuery("SELECT character_tokens FROM client.player WHERE ckey = '[ckey( ckey )]'")
+	query = dbcon.NewQuery("SELECT character_tokens FROM player WHERE ckey = '[ckey( ckey )]'")
 	query.Execute()
 
 	if( !query.NextRow() )
@@ -92,7 +92,7 @@
 
 	var/DBQuery/query
 
-	query = dbcon.NewQuery("SELECT antag_weights FROM client.player WHERE ckey = '[ckey( ckey )]'")
+	query = dbcon.NewQuery("SELECT antag_weights FROM player WHERE ckey = '[ckey( ckey )]'")
 	query.Execute()
 
 	if( !query.NextRow() )
@@ -353,7 +353,7 @@
 
 	var/sql_ckey = sql_sanitize_text(ckey(key))
 
-	var/DBQuery/query = dbcon.NewQuery("SELECT datediff(Now(),firstseen) as age FROM client.player WHERE ckey = '[sql_ckey]'")
+	var/DBQuery/query = dbcon.NewQuery("SELECT datediff(Now(),firstseen) as age FROM player WHERE ckey = '[sql_ckey]'")
 	query.Execute()
 
 	if(query.NextRow())
@@ -381,7 +381,7 @@
 
 	var/sql_ckey = ckey( ckey )
 
-	var/DBQuery/query_insert = dbcon.NewQuery("UPDATE client.player SET character_tokens = [tokens] WHERE ckey = '[sql_ckey]'")
+	var/DBQuery/query_insert = dbcon.NewQuery("UPDATE player SET character_tokens = [tokens] WHERE ckey = '[sql_ckey]'")
 	query_insert.Execute()
 
 /client/proc/saveAntagWeights()
@@ -395,7 +395,7 @@
 	if( !dbcon.IsConnected() )
 		return 0
 
-	var/DBQuery/query_insert = dbcon.NewQuery("UPDATE client.player SET antag_weights = '[list2params( antag_weights )]' WHERE ckey = '[ckey( ckey )]'")
+	var/DBQuery/query_insert = dbcon.NewQuery("UPDATE player SET antag_weights = '[list2params( antag_weights )]' WHERE ckey = '[ckey( ckey )]'")
 	query_insert.Execute()
 
 /client/proc/log_client_to_db( var/log_playtime = 0 )
@@ -408,7 +408,7 @@
 
 	var/sql_ckey = ckey(src.ckey)
 
-	var/DBQuery/query = dbcon.NewQuery("SELECT id, datediff(Now(),firstseen) as age FROM client.player WHERE ckey = '[sql_ckey]'")
+	var/DBQuery/query = dbcon.NewQuery("SELECT id, datediff(Now(),firstseen) as age FROM player WHERE ckey = '[sql_ckey]'")
 	query.Execute()
 	var/sql_id = 0
 	player_age = 0	// New players won't have an entry so knowing we have a connection we set this to zero to be updated if their is a record.
@@ -417,14 +417,14 @@
 		player_age = text2num(query.item[2])
 		break
 
-	var/DBQuery/query_ip = dbcon.NewQuery("SELECT ckey FROM client.player WHERE ip = '[address]'")
+	var/DBQuery/query_ip = dbcon.NewQuery("SELECT ckey FROM player WHERE ip = '[address]'")
 	query_ip.Execute()
 	related_accounts_ip = ""
 	while(query_ip.NextRow())
 		related_accounts_ip += "[query_ip.item[1]], "
 		break
 
-	var/DBQuery/query_cid = dbcon.NewQuery("SELECT ckey FROM client.player WHERE computerid = '[computer_id]'")
+	var/DBQuery/query_cid = dbcon.NewQuery("SELECT ckey FROM player WHERE computerid = '[computer_id]'")
 	query_cid.Execute()
 	related_accounts_cid = ""
 	while(query_cid.NextRow())
@@ -457,9 +457,9 @@
 		var/DBQuery/query_update
 
 		if( total_playtime && log_playtime )
-			query_update = dbcon.NewQuery("UPDATE client.player SET lastseen = Now(), ip = '[sql_ip]', computerid = '[sql_computerid]', lastadminrank = '[sql_admin_rank]', playtime = '[total_playtime]' WHERE id = [sql_id]")
+			query_update = dbcon.NewQuery("UPDATE player SET lastseen = Now(), ip = '[sql_ip]', computerid = '[sql_computerid]', lastadminrank = '[sql_admin_rank]', playtime = '[total_playtime]' WHERE id = [sql_id]")
 		else
-			query_update = dbcon.NewQuery("UPDATE client.player SET lastseen = Now(), ip = '[sql_ip]', computerid = '[sql_computerid]', lastadminrank = '[sql_admin_rank]' WHERE id = [sql_id]")
+			query_update = dbcon.NewQuery("UPDATE player SET lastseen = Now(), ip = '[sql_ip]', computerid = '[sql_computerid]', lastadminrank = '[sql_admin_rank]' WHERE id = [sql_id]")
 		query_update.Execute()
 
 		return 1
@@ -467,9 +467,9 @@
 		//New player!! Need to insert all the stuff
 		var/DBQuery/query_insert
 		if( total_playtime && log_playtime )
-			query_insert = dbcon.NewQuery("INSERT INTO client.player (id, ckey, firstseen, lastseen, ip, computerid, lastadminrank, playtime) VALUES (null, '[sql_ckey]', Now(), Now(), '[sql_ip]', '[sql_computerid]', '[sql_admin_rank]', '[total_playtime]')")
+			query_insert = dbcon.NewQuery("INSERT INTO player (id, ckey, firstseen, lastseen, ip, computerid, lastadminrank, playtime) VALUES (null, '[sql_ckey]', Now(), Now(), '[sql_ip]', '[sql_computerid]', '[sql_admin_rank]', '[total_playtime]')")
 		else
-			query_insert = dbcon.NewQuery("INSERT INTO client.player (id, ckey, firstseen, lastseen, ip, computerid, lastadminrank) VALUES (null, '[sql_ckey]', Now(), Now(), '[sql_ip]', '[sql_computerid]', '[sql_admin_rank]')")
+			query_insert = dbcon.NewQuery("INSERT INTO player (id, ckey, firstseen, lastseen, ip, computerid, lastadminrank) VALUES (null, '[sql_ckey]', Now(), Now(), '[sql_ip]', '[sql_computerid]', '[sql_admin_rank]')")
 		query_insert.Execute()
 		return 2
 
@@ -489,7 +489,7 @@
 
 	var/sql_ckey = ckey(src.ckey)
 
-	var/DBQuery/query_playtime = dbcon.NewQuery("SELECT playtime FROM client.player WHERE ckey = '[sql_ckey]'")
+	var/DBQuery/query_playtime = dbcon.NewQuery("SELECT playtime FROM player WHERE ckey = '[sql_ckey]'")
 	query_playtime.Execute()
 
 	while(query_playtime.NextRow())
@@ -518,7 +518,7 @@
 
 	var/sql_ckey = ckey(src.ckey)
 
-	var/DBQuery/query = dbcon.NewQuery("SELECT id, datediff(Now(),firstseen) as age FROM client.player WHERE ckey = '[sql_ckey]'")
+	var/DBQuery/query = dbcon.NewQuery("SELECT id, datediff(Now(),firstseen) as age FROM player WHERE ckey = '[sql_ckey]'")
 	query.Execute()
 	player_age = 0	// New players won't have an entry so knowing we have a connection we set this to zero to be updated if their is a record.
 	while(query.NextRow())
@@ -620,7 +620,7 @@ client/proc/loadAccountItems()
 
 	var/sql_ckey = ckey(ckey)
 
-	var/DBQuery/query = dbcon.NewQuery("SELECT item FROM client.acc_items WHERE ckey = '[sql_ckey]'")
+	var/DBQuery/query = dbcon.NewQuery("SELECT item FROM acc_items WHERE ckey = '[sql_ckey]'")
 	query.Execute()
 
 	while(query.NextRow())

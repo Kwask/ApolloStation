@@ -5,7 +5,7 @@ proc/get_donator(client/C)
 	var/donator = 0
 	var/sql_ckey = sql_sanitize_text(ckey(C.key))
 
-	var/DBQuery/query = dbcon.NewQuery("SELECT donator_flags FROM client.player WHERE ckey = '[sql_ckey]'")
+	var/DBQuery/query = dbcon.NewQuery("SELECT donator_flags FROM player WHERE ckey = '[sql_ckey]'")
 	query.Execute()
 
 	if(query.NextRow())		donator |= text2num(query.item[1])
@@ -64,13 +64,13 @@ proc/get_donator(client/C)
 
 	var/ckey = ckey(key)
 
-	var/DBQuery/query = dbcon.NewQuery("SELECT id FROM client.player WHERE ckey = '[ckey]'")
+	var/DBQuery/query = dbcon.NewQuery("SELECT id FROM player WHERE ckey = '[ckey]'")
 	query.Execute()
 
 	if( !query.NextRow() )
 		return 0
 
-	var/DBQuery/query_insert = dbcon.NewQuery("UPDATE client.player SET donator_flags = '[flags]' WHERE ckey = '[ckey]'")
+	var/DBQuery/query_insert = dbcon.NewQuery("UPDATE player SET donator_flags = '[flags]' WHERE ckey = '[ckey]'")
 	query_insert.Execute()
 
 	return 1

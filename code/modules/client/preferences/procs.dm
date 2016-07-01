@@ -45,7 +45,7 @@
 
 	var/sql_ckey = ckey( client.ckey )
 
-	var/DBQuery/query = dbcon.NewQuery("SELECT id FROM client.preferences WHERE ckey = '[sql_ckey]'")
+	var/DBQuery/query = dbcon.NewQuery("SELECT id FROM preferences WHERE ckey = '[sql_ckey]'")
 	query.Execute()
 	var/sql_id = 0
 	while(query.NextRow())
@@ -81,11 +81,11 @@
 
 	if(sql_id)
 		//Player already identified previously, we need to just update the 'lastseen', 'ip' and 'computer_id' variables
-		var/DBQuery/query_update = dbcon.NewQuery("UPDATE client.preferences SET OOC_color = '[sql_OOC_color]', UI_style = '[sql_UI_style]', UI_style_color = '[sql_UI_color]', UI_style_alpha = '[sql_UI_alpha]', toggles = '[sql_toggles]', last_character = '[sql_select_ident]' WHERE id = [sql_id]")
+		var/DBQuery/query_update = dbcon.NewQuery("UPDATE preferences SET OOC_color = '[sql_OOC_color]', UI_style = '[sql_UI_style]', UI_style_color = '[sql_UI_color]', UI_style_alpha = '[sql_UI_alpha]', toggles = '[sql_toggles]', last_character = '[sql_select_ident]' WHERE id = [sql_id]")
 		query_update.Execute()
 	else
 		//New player!! Need to insert all the stuff
-		var/DBQuery/query_insert = dbcon.NewQuery("INSERT INTO client.preferences (id, ckey, joined_date, OOC_color, UI_style, UI_style_color, UI_style_alpha, toggles, last_character) VALUES (null, '[sql_ckey]', '[sql_join_date]', '[sql_OOC_color]', '[sql_UI_style]', '[sql_UI_color]', '[sql_UI_alpha]', '[sql_toggles]', '[sql_select_ident]')")
+		var/DBQuery/query_insert = dbcon.NewQuery("INSERT INTO preferences (id, ckey, joined_date, OOC_color, UI_style, UI_style_color, UI_style_alpha, toggles, last_character) VALUES (null, '[sql_ckey]', '[sql_join_date]', '[sql_OOC_color]', '[sql_UI_style]', '[sql_UI_color]', '[sql_UI_alpha]', '[sql_toggles]', '[sql_select_ident]')")
 
 		query_insert.Execute()
 
@@ -104,7 +104,7 @@
 
 	var/sql_ckey = ckey( client.ckey )
 
-	var/DBQuery/query = dbcon.NewQuery("SELECT joined_date, OOC_color, UI_style, UI_style_color, UI_style_alpha, toggles, last_character FROM client.preferences WHERE ckey = '[sql_ckey]'")
+	var/DBQuery/query = dbcon.NewQuery("SELECT joined_date, OOC_color, UI_style, UI_style_color, UI_style_alpha, toggles, last_character FROM preferences WHERE ckey = '[sql_ckey]'")
 	query.Execute()
 
 	while(query.NextRow())
@@ -140,7 +140,7 @@
 	var/sql_ckey = ckey( ckey )
 	var/sql_name = sql_sanitize_text( html_encode(  character_name ))
 
-	var/DBQuery/query = dbcon.NewQuery("DELETE FROM character.characters WHERE ckey = '[sql_ckey]' AND name = '[sql_name]'")
+	var/DBQuery/query = dbcon.NewQuery("DELETE FROM characters WHERE ckey = '[sql_ckey]' AND name = '[sql_name]'")
 
 	if( !query.Execute() )
 		return 0

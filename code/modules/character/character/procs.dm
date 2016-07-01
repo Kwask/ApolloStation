@@ -110,7 +110,7 @@
 	var/sql_ckey = ckey( ckey )
 	var/sql_character_ident = html_encode( character_ident )
 
-	var/DBQuery/query = dbcon.NewQuery("SELECT id FROM character.characters WHERE ckey = '[sql_ckey]' AND id = '[sql_character_ident]'")
+	var/DBQuery/query = dbcon.NewQuery("SELECT id FROM characters WHERE ckey = '[sql_ckey]' AND id = '[sql_character_ident]'")
 	if( !query.Execute() )
 		return 0
 
@@ -235,7 +235,7 @@
 		log_debug( "SAVE CHARACTER: Didn't save [name] / ([ckey]) because the database wasn't connected" )
 		return 0
 
-	var/DBQuery/query = dbcon.NewQuery("SELECT id FROM character.characters WHERE id = '[id]'")
+	var/DBQuery/query = dbcon.NewQuery("SELECT id FROM characters WHERE id = '[id]'")
 	query.Execute()
 	var/sql_id = 0
 	while(query.NextRow())
@@ -261,7 +261,7 @@
 			if( i != names.len )
 				query_params += ","
 
-		var/DBQuery/query_update = dbcon.NewQuery("UPDATE character.characters SET [query_params] WHERE id = '[sql_id]'")
+		var/DBQuery/query_update = dbcon.NewQuery("UPDATE characters SET [query_params] WHERE id = '[sql_id]'")
 		if( !query_update.Execute())
 			log_debug( "SAVE CHARACTER: Didn't save [name] / ([ckey]) because the SQL update failed" )
 			return 0
@@ -273,7 +273,7 @@
 		query_values += "', null"
 
 		// This needs a single quote before query_values because otherwise there will be an odd number of single quotes
-		var/DBQuery/query_insert = dbcon.NewQuery("INSERT INTO character.characters ([query_names]) VALUES ('[query_values])")
+		var/DBQuery/query_insert = dbcon.NewQuery("INSERT INTO characters ([query_names]) VALUES ('[query_values])")
 		if( !query_insert.Execute() )
 			log_debug( "SAVE CHARACTER: Didn't save [name] / ([ckey]) because the SQL insert failed" )
 			return 0
@@ -349,7 +349,7 @@
 	new_character = 0 // If we're loading from the database, we're obviously a pre-existing character
 	temporary = 1 // All characters are temporary until they enter the game
 
-	var/DBQuery/query = dbcon.NewQuery("SELECT [query_names] FROM character.characters WHERE id = '[character_ident]'")
+	var/DBQuery/query = dbcon.NewQuery("SELECT [query_names] FROM characters WHERE id = '[character_ident]'")
 	if( !query.Execute() )
 		log_debug( "Could not execute query!" )
 		return 0
