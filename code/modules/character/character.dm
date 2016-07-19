@@ -52,7 +52,6 @@
 	var/DNA
 	var/fingerprints
 	var/id // The character's index # in the database
-	var/acc_id
 
 	// Skills
 	var/used_skillpoints = 0

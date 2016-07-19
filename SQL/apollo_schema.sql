@@ -138,6 +138,38 @@ CREATE TABLE IF NOT EXISTS `acc_items` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 ;
 
 -- -----------------------------------------------------
+-- Player Characters
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `characters` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `ckey` varchar(32) NOT NULL,
+  `name` varchar(100) NOT NULL,
+  `gender` varchar(11) NOT NULL,
+  `birth_date` varchar(100) NOT NULL,
+  `underwear` tinyint UNSIGNED NOT NULL DEFAULT '1',
+  `undershirt` tinyint UNSIGNED NOT NULL DEFAULT '1',
+  `backpack` tinyint UNSIGNED NOT NULL DEFAULT '2', -- Different
+  `hair_style` varchar(50) NOT NULL DEFAULT "Bald",
+  `hair_face_style` varchar(50) NOT NULL DEFAULT "Shaved",
+  `hair_color` varchar(7) NOT NULL DEFAULT "#FFFFFF",
+  `hair_face_color` varchar(7) NOT NULL DEFAULT "#FFFFFF",
+  `skin_tone` smallint NOT NULL DEFAULT '35',
+  `skin_color` varchar(7) NOT NULL DEFAULT "#FFFFFF",
+  `eye_color` varchar(7) NOT NULL DEFAULT "#FFFFFF",
+  `species` varchar(100) NOT NULL DEFAULT "Human",
+  `additional_language` varchar(100),
+  `gear` text,
+  `organ_data` text,
+  `flavor_texts_human` text,
+  `flavor_texts_robot` text, -- Different
+  `disabilities` int UNSIGNED NOT NULL DEFAULT '0',
+  `DNA` varchar(32) NOT NULL,
+  `fingerprints` varchar(32) NOT NULL,
+  `blood_type` varchar(10) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 ;
+
+-- -----------------------------------------------------
 -- Corporate Accounts
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `accounts` (
@@ -161,6 +193,7 @@ CREATE TABLE IF NOT EXISTS `accounts` (
 CREATE TABLE IF NOT EXISTS `character_records` (
   `id` bigint NOT NULL AUTO_INCREMENT,
   `acc_id` bigint NOT NULL, -- ID of the assocaited account
+  `char_id` bigint NOT NULL, -- ID of the assocaited account
   `name` varchar(100) NOT NULL, -- The username to log into this character's account
   `gender` varchar(11) NOT NULL,
   `birth_date` varchar(100) NOT NULL,
@@ -192,6 +225,7 @@ CREATE TABLE IF NOT EXISTS `character_records` (
   `first_shift_day` bigint UNSIGNED NOT NULL DEFAULT '0',
   `last_shift_day` bigint UNSIGNED NOT NULL DEFAULT '0',
   FOREIGN KEY (`acc_id`) REFERENCES accounts(`id`),
+  FOREIGN KEY (`char_id`) REFERENCES characters(`id`),
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 ;
 
@@ -215,8 +249,8 @@ CREATE TABLE IF NOT EXISTS `paperwork_records` (
   `author_ckey` varchar(32) NOT NULL,
   `author_name` varchar(32) NOT NULL,
   `author_ip` varchar(18) NOT NULL,
-  `author_id` bigint NOT NULL,
-  `recipient_id` bigint NOT NULL, -- ID of the account that this record belongs to
+  `author_id` bigint,
+  `recipient_id` bigint, -- ID of the account that this record belongs to
   `clearence` varchar(32) NOT NULL DEFAULT  "Unclassified",
   `category` varchar(255) NOT NULL DEFAULT "Uncategorized",
   `date_time` datetime NOT NULL,
@@ -235,40 +269,6 @@ CREATE TABLE IF NOT EXISTS `universe` (
 	`name` varchar(255) NOT NULL,
 	`ic_date` varchar(20) NOT NULL,
 	PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 ;
-
--- -----------------------------------------------------
--- Player Characters
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `characters` (
-  `id` bigint NOT NULL AUTO_INCREMENT,
-  `acc_id` bigint NOT NULL,
-  `ckey` varchar(32) NOT NULL,
-  `name` varchar(100) NOT NULL,
-  `gender` varchar(11) NOT NULL,
-  `birth_date` varchar(100) NOT NULL,
-  `underwear` tinyint UNSIGNED NOT NULL DEFAULT '1',
-  `undershirt` tinyint UNSIGNED NOT NULL DEFAULT '1',
-  `backpack` tinyint UNSIGNED NOT NULL DEFAULT '2', -- Different
-  `hair_style` varchar(50) NOT NULL DEFAULT "Bald",
-  `hair_face_style` varchar(50) NOT NULL DEFAULT "Shaved",
-  `hair_color` varchar(7) NOT NULL DEFAULT "#FFFFFF",
-  `hair_face_color` varchar(7) NOT NULL DEFAULT "#FFFFFF",
-  `skin_tone` smallint NOT NULL DEFAULT '35',
-  `skin_color` varchar(7) NOT NULL DEFAULT "#FFFFFF",
-  `eye_color` varchar(7) NOT NULL DEFAULT "#FFFFFF",
-  `species` varchar(100) NOT NULL DEFAULT "Human",
-  `additional_language` varchar(100),
-  `gear` text,
-  `organ_data` text,
-  `flavor_texts_human` text,
-  `flavor_texts_robot` text, -- Different
-  `disabilities` int UNSIGNED NOT NULL DEFAULT '0',
-  `DNA` varchar(32) NOT NULL,
-  `fingerprints` varchar(32) NOT NULL,
-  `blood_type` varchar(10) NOT NULL,
-  FOREIGN KEY (`acc_id`) REFERENCES character_records(`id`),
-  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 ;
 
 -- -----------------------------------------------------

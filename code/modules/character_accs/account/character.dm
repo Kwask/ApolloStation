@@ -64,6 +64,8 @@
 	var/first_shift_day = 0 // When was this character first played?
 	var/last_shift_day = 0 // When was this character last played?
 
+	var/char_id = 0
+
 	var/datum/browser/menu
 
 	// Mob preview

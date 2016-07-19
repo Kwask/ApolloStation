@@ -1,4 +1,4 @@
-/datum/character/New( var/key, var/new_char = 1, var/temp = 1 )
+/datum/character/New( key = "", new_char = 1, temp = 1, acc = null )
 	ckey = ckey( key )
 
 	blood_type = pick(4;"O-", 36;"O+", 3;"A-", 28;"A+", 1;"B-", 20;"B+", 1;"AB-", 5;"AB+")
@@ -16,12 +16,10 @@
 
 	change_age( 30 )
 
-	account = new( key, src )
+	account = acc
 
-	if( !account.department )
+	if( account && !account.department )
 		account.LoadDepartment( CIVILIAN )
-
-	account.generateUsername( 1 )
 
 	menu = new( null, "creator", "Character Creator", 710, 610 )
 	menu.window_options = "focus=0;can_close=0;"
@@ -130,7 +128,27 @@
 
 	return sql_id
 
-/datum/character/proc/saveCharacter( var/prompt = 0, var/save_acc = 1 )
+/datum/character/proc/getCharID()
+	establish_db_connection()
+	if( !dbcon.IsConnected() )
+		return 0
+
+	var/DBQuery/query = dbcon.NewQuery("SELECT id FROM characters WHERE name = '[html_encode( sql_sanitize_text( name ))]' AND ckey = '[ckey( ckey )]'")
+	query.Execute()
+	var/sql_id = 0
+	while(query.NextRow())
+		sql_id = query.item[1]
+		break
+
+	if(sql_id)
+		if(istext(sql_id))
+			sql_id = text2num(sql_id)
+		if(!isnum(sql_id))
+			return 0
+
+	return sql_id
+
+/datum/character/proc/saveCharacter( var/prompt = 0 )
 	if( istype( char_mob ))
 		char_mob.fully_replace_character_name( char_mob.real_name, name )
 		copy_to( char_mob )
@@ -163,12 +181,6 @@
 
 		if( response == "No" )
 			return 1
-
-	if( new_character || prompt )
-		account.copyFrom( src )
-
-	if( save_acc )
-		acc_id = account.saveAccount()
 
 	var/list/variables = list()
 
@@ -227,7 +239,6 @@
 	variables["DNA"] = html_encode( sql_sanitize_text( DNA ))
 	variables["fingerprints"] = html_encode( sql_sanitize_text( fingerprints ))
 	variables["blood_type"] = html_encode( sql_sanitize_text( blood_type ))
-	variables["acc_id"] = "[acc_id]"
 
 	var/list/names = list()
 	var/list/values = list()
@@ -235,22 +246,9 @@
 		names += sql_sanitize_text( name )
 		values += variables[name]
 
-	var/DBQuery/query = dbcon.NewQuery("SELECT id FROM characters WHERE acc_id = '[acc_id]'")
-	query.Execute()
-	var/sql_id = 0
-	while(query.NextRow())
-		sql_id = query.item[1]
-		break
+	id = getCharID()
 
-	//Just the standard check to see if it's actually a number
-	if(sql_id)
-		if(istext(sql_id))
-			sql_id = text2num(sql_id)
-		if(!isnum(sql_id))
-			log_debug( "SAVE CHARACTER: Didn't save [name] / ([ckey]) because of an invalid sql ID" )
-			return 0
-
-	if(sql_id)
+	if(id)
 		if( names.len != values.len )
 			log_debug( "SAVE CHARACTER: Didn't save [name] / ([ckey]) because the variables length did not match the values" )
 			return 0
@@ -261,7 +259,7 @@
 			if( i != names.len )
 				query_params += ","
 
-		var/DBQuery/query_update = dbcon.NewQuery("UPDATE characters SET [query_params] WHERE id = '[sql_id]'")
+		var/DBQuery/query_update = dbcon.NewQuery("UPDATE characters SET [query_params] WHERE id = '[id]'")
 		if( !query_update.Execute())
 			log_debug( "SAVE CHARACTER: Didn't save [name] / ([ckey]) because the SQL update failed" )
 			return 0
@@ -277,6 +275,11 @@
 		if( !query_insert.Execute() )
 			log_debug( "SAVE CHARACTER: Didn't save [name] / ([ckey]) because the SQL insert failed" )
 			return 0
+
+		id = getCharID()
+
+	if( new_character || prompt )
+		account.copyFrom( src )
 
 	new_character = 0
 
@@ -342,7 +345,6 @@
 	variables["DNA"] = "text"
 	variables["fingerprints"] = "text"
 	variables["blood_type"] = "text"
-	variables["acc_id"] = "number"
 
 	var/query_names = list2text( variables, "," )
 
@@ -396,7 +398,6 @@
 
 		vars[variables[i]] = value
 
-	account.loadAccount( acc_id )
 	account.copyFrom( src )
 
 	update_preview_icon()
@@ -712,26 +713,6 @@
 	qdel(undershirt_s)
 	qdel(clothes_s)
 
-/datum/character/proc/useCharacterToken( var/type, var/mob/user )
-	var/num = user.client.character_tokens[type]
-	if( !num || num <= 0 )
-		return
-
-	switch( type )
-		if( "Command" )
-			if( !istype( account.department ))
-				account.LoadDepartment( CIVILIAN )
-
-			account.roles |= account.getAllPromotablePositions()
-
-		if( "Antagonist" )
-			account.antag_data["persistant"] = 1
-
-	num--
-
-	user.client.character_tokens[type] = num
-	user.client.saveTokens()
-
 /datum/character/proc/setHairColor( var/r, var/g, var/b )
 	hair_color = rgb( r, g, b )
 
@@ -747,36 +728,7 @@
 /datum/character/proc/setEyeColor( var/r, var/g, var/b )
 	eye_color = rgb( r, g, b )
 
-/datum/character/proc/isPersistantAntag()
-	if( !account.antag_data )
-		return 0
-
-	if( !account.antag_data["persistant"] )
-		return 0
-
-	return 1
-
-/datum/character/proc/getAntagFaction()
-	if( !isPersistantAntag() )
-		return 0
-
-	return faction_controller.get_faction( account.antag_data["faction"] )
-
-/datum/character/proc/canJoin()
-	if( account.employment_status != "Active" )
-		return 0
-
-	if( account.prison_date && account.prison_date.len )
-		var/days = daysTilDate( universe.date, account.prison_date )
-		if( days > 0 )
-			return 0
-
-	return 1
-
 /datum/character/proc/enterMob()
 	temporary = new_character // If we're a new character, then we're also temporary
-	account.last_shift_day = universe.round_number
-	account.crew = 1
 
-	if( !account.first_shift_day )
-		account.first_shift_day = universe.round_number
+	account.enterMob()

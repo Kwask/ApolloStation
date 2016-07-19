@@ -216,6 +216,9 @@
 	. += "<h3>Character Selection Menu</h3><hr>"
 	. += "<table border='1' width='100%'>"
 
+
+	// MAKE THIS NOT DISPLAY ALL CHARACTERS
+
 	var/sql_ckey = ckey( user.client.ckey )
 
 	establish_db_connection()

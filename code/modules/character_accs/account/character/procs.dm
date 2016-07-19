@@ -16,23 +16,18 @@
 		if(istext(sql_id))
 			sql_id = text2num(sql_id)
 		if(!isnum(sql_id))
-			log_debug( "Could not load sql_id [sql_id]!" )
 			return 0
 
 	if( sql_id )
-		log_debug( "Returning sql_id [sql_id]" )
 		return sql_id
 
-	log_debug( "No sql_id found!" )
-
-/datum/account/character/New( var/key, var/datum/character/char )
-	if( istype( char ))
-		owner = char
-
+/datum/account/character/New( var/key )
 	ckey = ckey( key )
 
 	if( !department )
 		LoadDepartment( CIVILIAN )
+
+	owner = new( acc = src )
 
 	..()
 
@@ -46,6 +41,7 @@
 
 	birth_date = owner.birth_date
 
+	updateVar( "char_id", "id" )
 	updateVar( "name" )
 	updateVar( "gender" )
 	updateVar( "species" )
@@ -85,23 +81,26 @@
 
 	return 1
 
-/datum/account/character/proc/updateVar( var/var_name )
+/datum/account/character/proc/updateVar( var/copy_to, var/copy_from )
+	if( !copy_to )
+		return 0
+
+	if( !copy_from )
+		copy_from = copy_to // Using the same value for both if the second one isnt given
+
 	if( !istype( owner ))
 		return 0
 
-	if( !var_name )
+	if( !owner.vars[copy_from] )
 		return 0
 
-	if( !owner.vars[var_name] )
+	if( !src.vars[copy_to] )
 		return 0
 
-	if( !src.vars[var_name] )
+	if( src.vars[copy_to] == owner.vars[copy_from] )
 		return 0
 
-	if( src.vars[var_name] == owner.vars[var_name] )
-		return 0
-
-	src.vars[var_name] = owner.vars[var_name]
+	src.vars[copy_to] = owner.vars[copy_from]
 	temporary = 0
 
 	return 1
@@ -413,26 +412,82 @@
 		src.vars[variables[i]] = value
 
 	new_account = 0
+
+	owner.loadCharacter( char_id )
 	owner.update_preview_icon()
 
 	// Src vars dont update quick enough to use immediately
 	if( !username || username == "username" )
-		log_debug( "Username was [username], regen'ing" )
 		username = generateUsername()
 
 	if( !password || password == "password" )
-		log_debug( "Password was [password], regen'ing" )
 		password = generatePassword()
 
 	if( !pin || pin == "0000" )
-		log_debug( "Pin was [pin], regen'ing" )
 		pin = generatePin()
 
 	return character_ident
 
 // Primarily for copying role data to antags
 /datum/account/character/proc/copy_metadata_to( var/datum/account/character/A )
+	if( !istype( A ))
+		return
+
 	A.roles = src.roles
 	A.department = src.department
 	A.antag_data = src.antag_data.Copy()
 	A.uplink_location = src.uplink_location
+
+/datum/account/character/proc/useCharacterToken( var/type, var/mob/user )
+	var/num = user.client.character_tokens[type]
+	if( !num || num <= 0 )
+		return
+
+	switch( type )
+		if( "Command" )
+			if( !istype( department ))
+				LoadDepartment( CIVILIAN )
+
+			roles |= getAllPromotablePositions()
+
+		if( "Antagonist" )
+			antag_data["persistant"] = 1
+
+	num--
+
+	user.client.character_tokens[type] = num
+	user.client.saveTokens()
+
+/datum/account/character/proc/isPersistantAntag()
+	if( !antag_data )
+		return 0
+
+	if( !antag_data["persistant"] )
+		return 0
+
+	return 1
+
+/datum/account/character/proc/getAntagFaction()
+	if( !isPersistantAntag() )
+		return 0
+
+	return faction_controller.get_faction( antag_data["faction"] )
+
+/datum/account/character/proc/canJoin()
+	if( employment_status != "Active" )
+		return 0
+
+	if( prison_date && prison_date.len )
+		var/days = daysTilDate( universe.date, prison_date )
+		if( days > 0 )
+			return 0
+
+	return 1
+
+/datum/account/character/proc/enterMob()
+	crew = 1
+
+	last_shift_day = universe.round_number
+
+	if( !first_shift_day )
+		first_shift_day = universe.round_number

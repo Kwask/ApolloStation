@@ -30,6 +30,10 @@
 /datum/account/New( var/key )
 	ckey = ckey( key )
 
+	generateUsername( 1 )
+	generatePassword( 1 )
+	generatePin( 1 )
+
 	..()
 
 	temporary = 1
