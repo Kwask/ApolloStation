@@ -109,6 +109,8 @@
 		if( "change_faction" )
 			var/list/choices = list()
 			for( var/datum/faction/syndicate/S in faction_controller.factions )
+				if( S.gamemode_faction )	continue
+
 				if( S.name != account.antag_data["faction"] )
 					// going to a rival faction requires a lot of notoriety
 					if( account.antag_data["faction"] != "" &&  !( account.antag_data["faction"] in S.alliances ) && account.antag_data["notoriety"] < 6 )	continue

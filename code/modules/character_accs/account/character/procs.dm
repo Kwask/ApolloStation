@@ -440,12 +440,12 @@
 
 /datum/account/character/proc/useCharacterToken( var/type, var/mob/user )
 	var/num = user.client.character_tokens[type]
-	if( !num || num <= 0 )
+	if( !num || num < 1 )
 		return
 
 	switch( type )
 		if( "Command" )
-			if( !istype( department ))
+			if( !department || !istype( department ))
 				LoadDepartment( CIVILIAN )
 
 			roles |= getAllPromotablePositions()
@@ -457,6 +457,7 @@
 
 	user.client.character_tokens[type] = num
 	user.client.saveTokens()
+	saveCharacter()
 
 /datum/account/character/proc/isPersistantAntag()
 	if( !antag_data )
