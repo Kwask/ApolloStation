@@ -133,7 +133,7 @@
 			if(alert("Are you sure you want to use an antagonist token on this character? This will make the character a persistant antagonist, but will consume the token.",,"Yes","No")=="No")
 				return
 
-			useCharacterToken( href_list["type"], user )
+			account.useCharacterToken( href_list["type"], user )
 
 		if( "exploitable_record" )
 			var/expmsg = sanitize(input(usr,"Set your exploitable information here. This information is used by antags.","Exploitable Information",html_decode(account.exploit_record)) as message, MAX_PAPER_MESSAGE_LEN, extra = 0)

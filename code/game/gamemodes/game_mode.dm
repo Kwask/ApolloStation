@@ -128,7 +128,7 @@
 
 	// Get a list of all the people who want to be the antagonist for this round
 	for(var/mob/new_player/player in players)
-		if( player.client.prefs.selected_character && player.client.prefs.selected_character.isPersistantAntag() )
+		if( player.client.prefs.selected_character && player.client.prefs.selected_character.account.isPersistantAntag() )
 			log_debug("[player.key] is a persistant antag.")
 			candidates += player.mind
 			players -= player
@@ -146,7 +146,7 @@
 
 		log_debug("Picked [traitor.name] for persistant antag.")
 		persistant_traitors += traitor
-		var/faction = traitor.current.client.prefs.selected_character.getAntagFaction() // please dont break
+		var/faction = traitor.current.client.prefs.selected_character.account.getAntagFaction() // please dont break
 
 		traitor.antagonist = new /datum/antagonist/traitor/persistant( traitor, faction )
 		candidates.Remove(traitor)
@@ -279,9 +279,7 @@
 /datum/game_mode/proc/persistant_antag_game_end()
 	for( var/datum/mind/traitor in persistant_traitors )
 		var/datum/antagonist/antag = traitor.antagonist
-		if( antag )	continue // admin removed them or something, idk
-
-		// antag got caught check goes here
+		if( !antag )	continue // admin removed them or something, idk
 
 		var/notoriety = traitor.original_character.account.antag_data["notoriety"]
 		var/contract_requirement = round( ( notoriety + 1 ) / 2 )
@@ -477,6 +475,7 @@
 	if(!num_antags)	return null
 
 	var/list/possible_antags = get_players_for_role(role)
+	log_debug("(pick_antagonists) Amount of possible antags: [possible_antags.len]")
 	var/list/chosen_antags = list()
 	var/list/clients = list()
 

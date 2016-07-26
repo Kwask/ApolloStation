@@ -199,7 +199,7 @@
 			if(alert("Are you sure you want to use a command token on this character? This will unlock all roles in your selected department, but will consume the token.",,"Yes","No")=="No")
 				return
 
-			useCharacterToken( href_list["type"], user )
+			account.useCharacterToken( href_list["type"], user )
 		if("random")
 			var/option = user.client.prefs.alternate_spawn_option
 			if(option == GET_RANDOM_JOB || option == BE_ASSISTANT)

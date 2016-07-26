@@ -108,7 +108,7 @@
 				client << "<span class='notice'>You have no character selected!</span>"
 				return
 
-			if( !client.prefs.selected_character.canJoin() )
+			if( !client.prefs.selected_character.account.canJoin() )
 				client << "<span class='notice'>You're not allowed to join the game as that character!</span>"
 				return
 
@@ -341,7 +341,10 @@
 		if( !client.prefs.selected_character )
 			usr << "<span class='notice'>You have no character selected!</span>"
 			return
-		if( !client.prefs.selected_character.canJoin() )
+		if( !client.prefs.selected_character.account )
+			usr << "<span class='notice'>The selected character has no account! Contact an admin.</span>"
+			return 0
+		if( !client.prefs.selected_character.account.canJoin() )
 			usr << "<span class='notice'>You're not allowed to join the game as that character!</span>"
 			return 0
 		if(!IsJobAvailable(rank))

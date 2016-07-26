@@ -372,13 +372,21 @@
 						L[V] = text2num( L[V] )
 				value = L
 			if( "prison_date" )
-				prison_date = list()
+				prison_date = params2list( html_decode( value ))
 
-				for( var/num in params2list( html_decode( value )))
-					if( istext( num ))
-						num = text2num( num )
-						if( num )
-							prison_date.Add( num )
+				var/clear = 0
+
+				for( var/j in prison_date )
+					if( prison_date[j] )
+						prison_date[j] = text2num( prison_date[j] )
+					else
+						clear = 1
+
+				if( !prison_date || !prison_date.len == 3 )
+					clear = 1
+
+				if( clear )
+					prison_date = list()
 
 				value = prison_date
 			if( "roles" )
@@ -457,7 +465,7 @@
 
 	user.client.character_tokens[type] = num
 	user.client.saveTokens()
-	saveCharacter()
+	owner.saveCharacter()
 
 /datum/account/character/proc/isPersistantAntag()
 	if( !antag_data )

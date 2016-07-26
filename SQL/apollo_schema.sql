@@ -219,7 +219,7 @@ CREATE TABLE IF NOT EXISTS `character_records` (
   `blood_type` varchar(10) NOT NULL,
   `employment_status` varchar(100) NOT NULL DEFAULT "Active",
   `felon` tinyint UNSIGNED NOT NULL DEFAULT '0', 
-  `prison_date` text,
+  `prison_date` varchar(100),
   `antag_data` text,
   `uplink_location` varchar(100) NOT NULL DEFAULT "PDA",
   `first_shift_day` bigint UNSIGNED NOT NULL DEFAULT '0',
@@ -232,6 +232,7 @@ CREATE TABLE IF NOT EXISTS `character_records` (
 -- -----------------------------------------------------
 -- Library Books
 -- -----------------------------------------------------
+
 CREATE TABLE IF NOT EXISTS `library` (
   `id` bigint NOT NULL AUTO_INCREMENT,
   `author` TEXT NOT NULL ,
@@ -267,7 +268,7 @@ CREATE TABLE IF NOT EXISTS `paperwork_records` (
 CREATE TABLE IF NOT EXISTS `universe` (
 	`id` int(11) NOT NULL AUTO_INCREMENT,
 	`name` varchar(255) NOT NULL,
-	`ic_date` varchar(20) NOT NULL,
+	`ic_date` varchar(100) NOT NULL,
 	PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 ;
 
