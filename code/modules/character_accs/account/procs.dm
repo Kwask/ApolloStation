@@ -144,15 +144,16 @@
 
 	return sql_id
 
-/datum/account/proc/loadAccount( var/character_ident )
-	if( istext( character_ident ))
-		character_ident = text2num( character_ident )
+/datum/account/proc/loadAccount( var/ident )
+	if( istext( ident ))
+		ident = text2num( ident )
+		log_debug( "Given value [ident] is text!" )
 
-	if( !character_ident )
-		log_debug( "No character identity!" )
+	if( !ident )
+		log_debug( "No account identity!" )
 		return 0
 
-	if( ckey && !checkCharacter( character_ident, ckey ))
+	if( ckey && !checkCharacter( ident, ckey ))
 		log_debug( "Character's account does not belong to the given ckey!" )
 		return 0
 
@@ -184,7 +185,7 @@
 
 	temporary = 1 // All characters are temporary until they enter the game
 
-	var/DBQuery/query = dbcon.NewQuery("SELECT [query_names] FROM accounts WHERE id = '[character_ident]'")
+	var/DBQuery/query = dbcon.NewQuery("SELECT [query_names] FROM accounts WHERE id = '[ident]'")
 	if( !query.Execute() )
 		log_debug( "Could not execute query!" )
 		return 0
@@ -219,4 +220,4 @@
 		log_debug( "Pin was [pin], regen'ing" )
 		pin = generatePin()
 
-	return character_ident
+	return ident

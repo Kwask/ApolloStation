@@ -269,15 +269,16 @@
 
 	return sql_id
 
-/datum/account/character/loadAccount( var/character_ident )
-	if( istext( character_ident ))
-		character_ident = text2num( character_ident )
+/datum/account/character/loadAccount( var/ident )
+	if( istext( ident ))
+		ident = text2num( ident )
+		log_debug( "Given value [ident] is text!" )
 
-	if( !character_ident )
-		log_debug( "No character identity!" )
+	if( !ident )
+		log_debug( "No character account identity!" )
 		return 0
 
-	if( ckey && !checkCharacter( character_ident, ckey ))
+	if( ckey && !checkCharacter( ident, ckey ))
 		log_debug( "Character's account does not belong to the given ckey!" )
 		return 0
 
@@ -290,6 +291,8 @@
 		return 0
 
 	var/list/variables = list()
+
+	variables["char_id"] = "number"
 
 	variables["name"] = "text"
 	variables["gender"] = "text"
@@ -349,7 +352,7 @@
 
 	temporary = 1 // All characters are temporary until they enter the game
 
-	var/DBQuery/query = dbcon.NewQuery("SELECT [query_names] FROM character_records WHERE id = '[character_ident]'")
+	var/DBQuery/query = dbcon.NewQuery("SELECT [query_names] FROM character_records WHERE id = '[ident]'")
 	if( !query.Execute() )
 		log_debug( "Could not execute query!" )
 		return 0
@@ -464,7 +467,7 @@
 	if( !pin || pin == "0000" )
 		pin = generatePin()
 
-	return character_ident
+	return ident
 
 // Primarily for copying role data to antags
 /datum/account/character/proc/copy_metadata_to( var/datum/account/character/A )
