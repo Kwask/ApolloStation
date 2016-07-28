@@ -353,8 +353,8 @@ client/proc/one_click_antag()
 
 	new_character.gender = pick(MALE,FEMALE)
 
-	var/datum/character/C = new()
-	C.randomize_appearance_for(new_character)
+	randomize_appearance_for(new_character)
+
 	if(new_character.gender == MALE)
 		new_character.real_name = "[pick(first_names_male)] [pick(last_names)]"
 	else
@@ -375,8 +375,7 @@ client/proc/one_click_antag()
 
 	new_syndicate_commando.gender = pick(MALE, FEMALE)
 
-	var/datum/character/C = new()//Randomize appearance for the commando.
-	C.randomize_appearance_for(new_syndicate_commando)
+	randomize_appearance_for(new_syndicate_commando)
 
 	new_syndicate_commando.real_name = "[!syndicate_leader_selected ? syndicate_commando_rank : syndicate_commando_leader_rank] [syndicate_commando_name]"
 	new_syndicate_commando.name = new_syndicate_commando.real_name

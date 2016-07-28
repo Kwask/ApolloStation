@@ -106,8 +106,7 @@ var/global/sent_strike_team = 0
 
 	new_commando.gender = pick(MALE, FEMALE)
 
-	var/datum/character/C = new()//Randomize appearance for the commando.
-	C.randomize_appearance_for(new_commando)
+	randomize_appearance_for(new_commando)
 
 	new_commando.real_name = "[!leader_selected ? commando_rank : commando_leader_rank] [commando_name]"
 	new_commando.character.age = !leader_selected ? rand(23,35) : rand(35,45)

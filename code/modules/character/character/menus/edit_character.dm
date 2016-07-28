@@ -5,7 +5,7 @@
 
 	var/menu_name = "edit_character"
 
-	update_preview_icon()
+	account.update_preview_icon()
 	user << browse_rsc(account.preview_icon_front, "previewicon.png")
 	user << browse_rsc(account.preview_icon_side, "previewicon2.png")
 
@@ -288,11 +288,11 @@
 /datum/character/proc/EditCharacterMenuProcess( mob/user, list/href_list )
 	switch( href_list["task"] )
 		if( "save" )
-			if( !saveCharacter( 1 ))
+			if( !saveAll( prompt = 1, force = 1 ))
 				alert( user, "Character could not be saved to the database, please contact an admin." )
 
 		if( "reset" )
-			if( !loadCharacter( name ))
+			if( !loadCharacter( id ))
 				alert( user, "No savepoint to reset from. You need to save your character first before you can reset." )
 
 		if("name")

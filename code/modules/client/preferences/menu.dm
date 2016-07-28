@@ -9,13 +9,13 @@
 
 	. = "<h2>Client Menu</h2><hr>"
 	. += "<table border='1' width='320'>"
-	if( selected_character )
-		selected_character.update_preview_icon()
-		user << browse_rsc(selected_character.account.preview_icon_front, "previewicon.png")
-		user << browse_rsc(selected_character.account.preview_icon_side, "previewicon2.png")
+	if( character )
+		character.update_preview_icon()
+		user << browse_rsc(character.preview_icon_front, "previewicon.png")
+		user << browse_rsc(character.preview_icon_side, "previewicon2.png")
 		. += "<tr>"
 		. += "<td><b><a href='byond://?src=\ref[user];preference=[menu_name];task=select_character'>Selected:</a></b></td>"
-		. += "<td colspan='2'>[selected_character.name]</td>"
+		. += "<td colspan='2'>[character.name]</td>"
 		. += "</tr>"
 
 		. += "<tr>"
@@ -44,7 +44,6 @@
 
 	. += "<hr><a href='byond://?src=\ref[user];preference=[menu_name];task=close'>\[Done\]</a>"
 
-
 	var/datum/browser/popup = new(user, "[menu_name]", "Client Menu", 360, 300)
 	popup.set_content(.)
 	popup.open()
@@ -58,32 +57,32 @@
 			SelectCharacterMenu( user )
 			ClientMenuDisable( user )
 		if( "edit_character" )
-			if( !selected_character )
-				selected_character = new( client.ckey, 1, 0 )
-				data_core.employee_pool.Add( selected_character )
+			if( !character )
+				character = new( client.ckey )
+				data_core.employee_pool.Add( character )
 			ClientMenuDisable( user )
-			selected_character.EditCharacterMenu( user )
+			character.owner.EditCharacterMenu( user )
 		if( "delete_character" )
-			if( alert( user, "Are you sure you want to permanently delete [selected_character.name]?", "Delete Character","Yes","No" ) == "No" )
+			if( alert( user, "Are you sure you want to permanently delete [character.name]?", "Delete Character","Yes","No" ) == "No" )
 				return
 
-			if( deleteCharacter( client.ckey, selected_character.name ))
-				client << "[selected_character.name] deleted from your account."
+			if( deleteCharacter( client.ckey, character.name ))
+				client << "[character.name] deleted from your account."
 
-				qdel( selected_character )
-				selected_character = null
+				qdel( character )
+				character = null
 				savePreferences()
 			else
-				client << "[selected_character.name] could not be deleted from your account."
+				client << "[character.name] could not be deleted from your account."
 
 			ClientMenu( user )
 		if( "new_character" )
-			selected_character = new( client.ckey, 1, 0 )
-			data_core.employee_pool.Add( selected_character )
+			character = new( client.ckey )
+			data_core.employee_pool.Add( character )
 			savePreferences()
 
 			ClientMenuDisable( user )
-			selected_character.EditCharacterMenu( user )
+			character.owner.EditCharacterMenu( user )
 		if( "client_prefs" )
 			ClientMenuDisable( user )
 			PreferencesMenu( user )
@@ -252,7 +251,7 @@
 			. += "<tr>"
 			var/name = query.item[3]
 			var/ident = text2num( query.item[4] )
-			if( selected_character && selected_character.name == name )
+			if( character && character.name == name )
 				. += "<td><b>[name]</b> - Selected</td>"
 			else
 				if( employment != "Active" )
@@ -283,21 +282,21 @@
 /datum/preferences/proc/SelectCharacterMenuProcess( mob/user, list/href_list )
 	switch( href_list["task"] )
 		if( "choose" )
-			var/chosen_ident = href_list["ident"]
+			var/chosen_ident = text2num( href_list["ident"] )
 
 			var/datum/character/C = data_core.getCharacter( chosen_ident )
 
 			if( C )
-				selected_character = C
+				character = C
 				SelectCharacterMenu( user )
 				winshow( user, "select_character_menu", 0)
 				ClientMenu( user )
 				return
 
-			selected_character = new( client.ckey )
-			data_core.employee_pool.Add( selected_character )
-			if( !selected_character.loadCharacter( chosen_ident ))
-				qdel( selected_character )
+			character = new( client.ckey )
+			data_core.employee_pool.Add( character )
+			if( !character.loadAccount( chosen_ident ))
+				qdel( character )
 
 			savePreferences()
 			winshow( user, "select_character_menu", 0)

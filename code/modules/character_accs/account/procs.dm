@@ -145,6 +145,9 @@
 	return sql_id
 
 /datum/account/proc/loadAccount( var/character_ident )
+	if( istext( character_ident ))
+		character_ident = text2num( character_ident )
+
 	if( !character_ident )
 		log_debug( "No character identity!" )
 		return 0

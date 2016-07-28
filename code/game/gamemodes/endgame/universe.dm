@@ -79,7 +79,7 @@
 
 // Returns the universe datetime in format "YYYY-MM-DD HH:MM:SS"
 /datum/universal_state/proc/getDateTime()
-	var/timestamp = "[date[1]]-[ date[2] < 10 ? date[2] : add_zero( date[2] )]-[ date[3] < 10 ? date[3] : add_zero( date[3] )]"
+	var/timestamp = "[date["year"]]-[ date["month"] < 10 ? date["month"] : add_zero( date["month"] )]-[ date["day"] < 10 ? date["day"] : add_zero( date["day"] )]"
 
 	var/seconds = world.time / 10 % 60
 	timestamp += " [worldtime2text()]:[ seconds < 10 ? seconds : add_zero( seconds )]"

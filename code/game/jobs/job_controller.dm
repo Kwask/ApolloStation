@@ -179,7 +179,7 @@ var/global/datum/controller/occupations/job_master
 				for(var/mob/V in candidates)
 					// Log-out during round-start? What a bad boy, no head position for you!
 					if(!V.client) continue
-					var/age = V.client.prefs.selected_character.age
+					var/age = V.client.prefs.character.owner.age
 					switch(age)
 						if(good_age_minimal - 10 to good_age_minimal)
 							weightedCandidates[V] = 3 // Still a bit young.
@@ -397,9 +397,9 @@ var/global/datum/controller/occupations/job_master
 			//Equip custom gear loadout.
 			var/list/custom_equip_slots = list() //If more than one item takes the same slot, all after the first one spawn in storage.
 			var/list/custom_equip_leftovers = list()
-			if(H.client.prefs.selected_character.gear && H.client.prefs.selected_character.gear.len && job.title != "Cyborg" && job.title != "AI")
+			if(H.client.prefs.character.owner.gear && H.client.prefs.character.owner.gear.len && job.title != "Cyborg" && job.title != "AI")
 
-				for(var/thing in H.client.prefs.selected_character.gear)
+				for(var/thing in H.client.prefs.character.owner.gear)
 					var/datum/gear/G = gear_datums[thing]
 					if(G)
 						var/permitted

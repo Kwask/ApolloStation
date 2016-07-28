@@ -6,25 +6,25 @@
 				return
 
 /datum/preferences/proc/GetJobLevel( var/role )
-	if( !selected_character )
+	if( !character )
 		return
 
-	return selected_character.account.GetJobLevel( role )
+	return character.GetJobLevel( role )
 
 /datum/preferences/proc/GetJobLevelNum( var/role )
-	if( !selected_character )
+	if( !character )
 		return
 
-	return selected_character.account.GetJobLevelNum( role )
+	return character.GetJobLevelNum( role )
 
 /datum/preferences/proc/GetPlayerAltTitle(datum/job/job)
-	if( !selected_character )
+	if( !character )
 		return
 
-	return selected_character.account.GetPlayerAltTitle( job )
+	return character.GetPlayerAltTitle( job )
 
 /datum/preferences/proc/beSpecial()
-	if( !selected_character )
+	if( !character )
 		return
 
 	return job_antag
@@ -76,8 +76,8 @@
 
 	// Saved characters
 	var/sql_select_ident = "None"
-	if( selected_character )
-		sql_select_ident = html_encode( sql_sanitize_text( num2text( selected_character.id )))
+	if( character )
+		sql_select_ident = html_encode( sql_sanitize_text( num2text( character.id )))
 
 	if(sql_id)
 		//Player already identified previously, we need to just update the 'lastseen', 'ip' and 'computer_id' variables
@@ -114,20 +114,20 @@
 		UI_style_color = query.item[4]
 		UI_style_alpha = text2num( query.item[5] )
 		toggles = text2num( query.item[6] )
-		var/selected_char_name =  html_decode( query.item[7] )
+		var/selected_char_id =  text2num( query.item[7] )
 
-		if( checkCharacter( selected_char_name, client.ckey ))
-			selected_character = new( client.ckey, 0, 0 )
-			data_core.employee_pool.Add( selected_character )
-			selected_character.loadCharacter( selected_char_name )
+		if( checkCharacter( selected_char_id, client.ckey ))
+			character = new( client.ckey )
+			data_core.employee_pool.Add( character )
+			character.loadAccount( selected_char_id )
 
 	return 1
 
 /datum/preferences/proc/saveCharacter()
-	if( !selected_character )
+	if( !character )
 		return
 
-	return selected_character.saveCharacter()
+	return character.saveAccount()
 
 /proc/deleteCharacter( var/ckey, var/character_name )
 	if( IsGuestKey( ckey ))

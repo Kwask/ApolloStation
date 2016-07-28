@@ -1,3 +1,4 @@
+// Gets the character record id from a given account id
 /proc/getCharRecordID( var/id )
 	establish_db_connection()
 	if( !dbcon.IsConnected() )
@@ -21,13 +22,13 @@
 	if( sql_id )
 		return sql_id
 
-/datum/account/character/New( var/key )
+/datum/account/character/New( key = "", new_char = 1, temp = 1 )
 	ckey = ckey( key )
 
 	if( !department )
 		LoadDepartment( CIVILIAN )
 
-	owner = new( acc = src )
+	owner = new( acc = src, key = key, new_char = new_char, temp = temp )
 
 	..()
 
@@ -132,11 +133,25 @@
 			username = usern
 			return usern
 
+/datum/account/character/proc/saveAll( prompt = 0, force = 0 )
+	if( prompt && usr )
+		var/response
+		if( owner.new_character )
+			response = alert(usr, "Are you sure you're finished with character setup? You will no longer be able to change your character name, age, gender, or species after this.", "Save Character","Yes","No")
+		else
+			response = alert(usr, "Are you sure you want to save?", "Save Character","Yes","No")
+
+		if( response == "No" )
+			return 1
+
+	owner.saveCharacter( force )
+	saveAccount( force )
+
 /datum/account/character/saveAccount( var/force = 0 )
 	if( temporary && !force ) // If we're just a temporary character and we're not forcing a save, dont save to database
 		return 0
 
-	id = ..()
+	id = ..( force )
 
 	if( !id )
 		log_debug( "SAVE CHARACTER: Didn't save [username]'s account / ([ckey]) because they didnt have a valid acc_id" )
@@ -202,6 +217,17 @@
 	variables["first_shift_day"] = sanitize_integer( first_shift_day, 0, 1.8446744e+19, 0 )
 	variables["last_shift_day"] = sanitize_integer( last_shift_day, 0, 1.8446744e+19, 0 )
 
+
+	if( owner.id )
+		char_id = owner.id
+	else
+		char_id = owner.getCharID()
+
+	if( !char_id )
+		char_id = "null"
+
+	variables["char_id"] = sanitize_integer( char_id, 0, 1.8446744e+19, 0 )
+
 	var/list/names = list()
 	var/list/values = list()
 	for( var/name in variables )
@@ -244,6 +270,9 @@
 	return sql_id
 
 /datum/account/character/loadAccount( var/character_ident )
+	if( istext( character_ident ))
+		character_ident = text2num( character_ident )
+
 	if( !character_ident )
 		log_debug( "No character identity!" )
 		return 0
@@ -421,8 +450,9 @@
 
 	new_account = 0
 
-	owner.loadCharacter( char_id )
-	owner.update_preview_icon()
+	owner.loadCharacter( char_id ) // Loading the mob character
+	copyFrom( owner ) // Copying relevant record data such as birth date
+	update_preview_icon() // Updates their mugshot for records
 
 	// Src vars dont update quick enough to use immediately
 	if( !username || username == "username" )
@@ -500,3 +530,14 @@
 
 	if( !first_shift_day )
 		first_shift_day = universe.round_number
+
+/datum/account/character/proc/update_preview_icon()
+	qdel(preview_icon_front)
+	qdel(preview_icon_side)
+
+	var/datum/job/job = job_master.GetJob( GetHighestLevelJob() )
+	var/icon/preview_icon = owner.update_preview_icon( job, GetPlayerAltTitle(job) )
+
+	preview_icon_front = new( preview_icon, dir = SOUTH )
+	preview_icon_side = new( preview_icon, dir = WEST )
+	qdel( preview_icon )

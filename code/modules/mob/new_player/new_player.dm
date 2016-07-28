@@ -104,11 +104,11 @@
 			return 1
 
 		if(href_list["ready"])
-			if( !client.prefs.selected_character )
+			if( !client.prefs.character )
 				client << "<span class='notice'>You have no character selected!</span>"
 				return
 
-			if( !client.prefs.selected_character.account.canJoin() )
+			if( !client.prefs.character.canJoin() )
 				client << "<span class='notice'>You're not allowed to join the game as that character!</span>"
 				return
 
@@ -132,12 +132,12 @@
 						continue
 					if( !C.prefs )
 						continue
-					if( !C.prefs.selected_character )
+					if( !C.prefs.character )
 						continue
 
 					totalPlayersReady++
 
-					var/datum/account/character/A = C.prefs.selected_character.account
+					var/datum/account/character/A = C.prefs.character
 					var/datum/job/J = job_master.GetJob( A.GetHighestLevelJob() )
 
 					var/datum/department/D = job_master.GetDepartment( J.department_id )
@@ -174,10 +174,10 @@
 				observer.timeofdeath = world.time // Set the time of death so that the respawn timer works correctly.
 
 				announce_ghost_joinleave(src)
-				if( client && client.prefs && client.prefs.selected_character )
-					client.prefs.selected_character.update_preview_icon()
-					observer.icon = client.prefs.selected_character.account.preview_icon
-					observer.real_name = client.prefs.selected_character.name
+				if( client && client.prefs && client.prefs.character )
+					client.prefs.character.update_preview_icon()
+					observer.icon = client.prefs.character.preview_icon
+					observer.real_name = client.prefs.character.name
 					observer.name = observer.real_name
 
 				observer.alpha = 127
@@ -194,11 +194,11 @@
 				usr << alert( "The round is either not ready, or has already finished..." )
 				return 0
 
-			if( !client || !client.prefs || !client.prefs.selected_character )
+			if( !client || !client.prefs || !client.prefs.character )
 				usr << alert( "You have not selected a character!" )
 				return 0
 
-			var/species = client.prefs.selected_character.species
+			var/species = client.prefs.character.species
 
 			if( !is_alien_whitelisted(src, species ))
 				src << alert("You are currently not whitelisted to play [species].")
@@ -239,11 +239,11 @@
 				usr << alert("The station is currently exploding. Joining would go poorly.")
 				return
 
-			if( !client.prefs.selected_character )
+			if( !client.prefs.character )
 				usr << alert("You have not selected a character to join as!")
 				return
 
-			var/species = client.prefs.selected_character.species
+			var/species = client.prefs.character.species
 
 			if( !is_alien_whitelisted( src, species ))
 				src << alert("You are currently not whitelisted to play [species]!")
@@ -259,7 +259,7 @@
 				src << alert("Your current species, [S], is not available for play on the station.")
 				return 0
 
-			AttemptLateSpawn(href_list["SelectedJob"],client.prefs.selected_character.account.spawnpoint)
+			AttemptLateSpawn(href_list["SelectedJob"],client.prefs.character.spawnpoint)
 			return
 
 		if(!ready && href_list["preference"])
@@ -338,13 +338,10 @@
 		if(!config.enter_allowed)
 			usr << "<span class='notice'>There is an administrative lock on entering the game!</span>"
 			return 0
-		if( !client.prefs.selected_character )
+		if( !client.prefs.character )
 			usr << "<span class='notice'>You have no character selected!</span>"
 			return
-		if( !client.prefs.selected_character.account )
-			usr << "<span class='notice'>The selected character has no account! Contact an admin.</span>"
-			return 0
-		if( !client.prefs.selected_character.account.canJoin() )
+		if( !client.prefs.character.canJoin() )
 			usr << "<span class='notice'>You're not allowed to join the game as that character!</span>"
 			return 0
 		if(!IsJobAvailable(rank))
@@ -423,7 +420,7 @@
 		var/mins = (mills % 36000) / 600
 		var/hours = mills / 36000
 
-		var/name = client.prefs.selected_character.name
+		var/name = client.prefs.character.name
 
 		var/dat = "<html><body><center>"
 		dat += "<b>Welcome, [name].<br></b>"
@@ -439,7 +436,7 @@
 					dat += "<font color='red'>The station is currently undergoing crew transfer procedures.</font><br>"
 
 		dat += "Choose from the following open positions:<br>"
-		for(var/role in client.prefs.selected_character.account.roles)
+		for(var/role in client.prefs.character.roles)
 			var/datum/job/job = job_master.GetJob( role )
 
 			if( !istype( job ))
@@ -466,12 +463,12 @@
 		var/mob/living/carbon/human/new_character
 
 		var/datum/species/chosen_species
-		if(client.prefs.selected_character.species)
-			chosen_species = all_species[client.prefs.selected_character.species]
+		if(client.prefs.character.species)
+			chosen_species = all_species[client.prefs.character.species]
 		if(chosen_species)
 			// Have to recheck admin due to no usr at roundstart. Latejoins are fine though.
 			if(is_species_whitelisted(chosen_species) || has_admin_rights())
-				new_character = new(loc, client.prefs.selected_character.species)
+				new_character = new(loc, client.prefs.character.species)
 
 		if(!new_character)
 			new_character = new(loc)
@@ -479,11 +476,11 @@
 		new_character.lastarea = get_area(loc)
 
 		var/datum/language/chosen_language
-		if(client.prefs.selected_character.additional_language)
-			chosen_language = all_languages["[client.prefs.selected_character.additional_language]"]
+		if(client.prefs.character.additional_language)
+			chosen_language = all_languages["[client.prefs.character.additional_language]"]
 		if(chosen_language)
-			if(is_alien_whitelisted(src, client.prefs.selected_character.additional_language) || !config.usealienwhitelist || !(chosen_language.flags & WHITELISTED) || (new_character.species && (chosen_language.name in new_character.species.secondary_langs)))
-				new_character.add_language("[client.prefs.selected_character.additional_language]")
+			if(is_alien_whitelisted(src, client.prefs.character.additional_language) || !config.usealienwhitelist || !(chosen_language.flags & WHITELISTED) || (new_character.species && (chosen_language.name in new_character.species.secondary_langs)))
+				new_character.add_language("[client.prefs.character.additional_language]")
 
 		src << sound(null, repeat = 0, wait = 0, volume = 85, channel = 1) // MAD JAMS cant last forever yo
 
@@ -497,16 +494,16 @@
 
 		if(ticker.random_players)
 			new_character.gender = pick(MALE, FEMALE)
-			client.prefs.selected_character.name = random_name(new_character.gender)
-			client.prefs.selected_character.randomize_appearance_for(new_character)
+			client.prefs.character.name = random_name(new_character.gender)
+			randomize_appearance_for(new_character)
 		else
-			client.prefs.selected_character.copy_to(new_character)
+			client.prefs.character.owner.copy_to(new_character)
 
 		new_character.name = real_name
 		new_character.dna.ready_dna(new_character)
-		new_character.dna.b_type = client.prefs.selected_character.blood_type
+		new_character.dna.b_type = client.prefs.character.blood_type
 
-		if(client.prefs.selected_character.disabilities)
+		if(client.prefs.character.owner.disabilities)
 			// Set defer to 1 if you add more crap here so it only recalculates struc_enzymes once. - N3X
 			new_character.dna.SetSEState(GLASSESBLOCK,1,0)
 			new_character.disabilities |= NEARSIGHTED
@@ -550,8 +547,8 @@
 
 /mob/new_player/get_species()
 	var/datum/species/chosen_species
-	if(client.prefs.selected_character.species)
-		chosen_species = all_species[client.prefs.selected_character.species]
+	if(client.prefs.character.species)
+		chosen_species = all_species[client.prefs.character.species]
 
 	if(!chosen_species)
 		return "Human"
@@ -563,7 +560,7 @@
 
 /mob/new_player/get_gender()
 	if(!client || !client.prefs) ..()
-	return client.prefs.selected_character.gender
+	return client.prefs.character.gender
 
 /mob/new_player/is_ready()
 	return ready && ..()

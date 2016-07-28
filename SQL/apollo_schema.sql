@@ -99,7 +99,7 @@ CREATE TABLE IF NOT EXISTS `player` (
   `whitelist_flags` int(16) NOT NULL DEFAULT '0',
   `species_flags` int(16) NOT NULL DEFAULT '0',
   `donator_flags` int(16) NOT NULL DEFAULT '0',
-  `playtime` int UNSIGNED NOT NULL DEFAULT '0',
+  `playtime` bigint UNSIGNED NOT NULL DEFAULT '0',
   `character_tokens` text,
   `antag_weights` text,
   PRIMARY KEY (`id`),
@@ -184,7 +184,8 @@ CREATE TABLE IF NOT EXISTS `accounts` (
   `record_access` int UNSIGNED NOT NULL DEFAULT '0',
   `datetime_login` datetime, -- When the account was last logged in
   `datetime_created` datetime NOT NULL, -- When the account was created
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `username` (`username`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 ;
 
 -- -----------------------------------------------------

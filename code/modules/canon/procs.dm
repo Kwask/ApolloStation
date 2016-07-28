@@ -22,7 +22,7 @@
 		if( C.temporary ) // If they've been saved to the database previously
 			continue
 
-		C.saveCharacter( 0, 0 )
+		C.saveCharacter( 0 )
 
 /proc/saveAllActiveAccounts()
 	for( var/datum/character/C in all_characters )

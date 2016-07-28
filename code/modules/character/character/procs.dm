@@ -1,3 +1,37 @@
+/proc/checkCharacter( var/character_ident, var/ckey )
+	establish_db_connection()
+	if( !dbcon.IsConnected() )
+		return 0
+
+	if( !ckey )
+		return 0
+
+	if( !character_ident )
+		return 0
+
+	var/sql_ckey = ckey( ckey )
+	var/sql_character_ident = html_encode( character_ident )
+
+	var/DBQuery/query = dbcon.NewQuery("SELECT id FROM characters WHERE ckey = '[sql_ckey]' AND id = '[sql_character_ident]'")
+	if( !query.Execute() )
+		return 0
+
+	if( !query.NextRow() )
+		return 0
+
+	var/sql_id = query.item[1]
+
+	if(!sql_id)
+		return 0
+
+	if(istext(sql_id))
+		sql_id = text2num(sql_id)
+
+	if(!isnum(sql_id))
+		return 0
+
+	return sql_id
+
 /datum/character/New( key = "", new_char = 1, temp = 1, acc = null )
 	ckey = ckey( key )
 
@@ -94,40 +128,6 @@
 	account.copyFrom( src )
 	enterMob()
 
-/proc/checkCharacter( var/character_ident, var/ckey )
-	establish_db_connection()
-	if( !dbcon.IsConnected() )
-		return 0
-
-	if( !ckey )
-		return 0
-
-	if( !character_ident )
-		return 0
-
-	var/sql_ckey = ckey( ckey )
-	var/sql_character_ident = html_encode( character_ident )
-
-	var/DBQuery/query = dbcon.NewQuery("SELECT id FROM characters WHERE ckey = '[sql_ckey]' AND id = '[sql_character_ident]'")
-	if( !query.Execute() )
-		return 0
-
-	if( !query.NextRow() )
-		return 0
-
-	var/sql_id = query.item[1]
-
-	if(!sql_id)
-		return 0
-
-	if(istext(sql_id))
-		sql_id = text2num(sql_id)
-
-	if(!isnum(sql_id))
-		return 0
-
-	return sql_id
-
 /datum/character/proc/getCharID()
 	establish_db_connection()
 	if( !dbcon.IsConnected() )
@@ -148,30 +148,7 @@
 
 	return sql_id
 
-/datum/character/proc/saveCharacter( var/prompt = 0 )
-	if( istype( char_mob ))
-		char_mob.fully_replace_character_name( char_mob.real_name, name )
-		copy_to( char_mob )
-		char_mob.update_hair()
-		char_mob.update_body()
-		char_mob.check_dna( char_mob )
-
-	if(( temporary && account.crew ) || ( temporary && !prompt )) // If we're just a temporary character and the user isnt forcing this save, dont save to database
-		return 1
-
-	establish_db_connection()
-	if( !dbcon.IsConnected() )
-		log_debug( "SAVE CHARACTER: Didn't save [name] / ([ckey]) because the database wasn't connected" )
-		return 0
-
-	if( !ckey && prompt )
-		log_debug( "SAVE CHARACTER: Didn't save [name] because they didn't have a ckey" )
-		return 0
-
-	if ( IsGuestKey( ckey ) && prompt )
-		log_debug( "SAVE CHARACTER: Didn't save [name] / ([ckey]) because they were a guest character" )
-		return 0
-
+/datum/character/proc/saveAll( prompt = 0, force = 0 )
 	if( prompt && usr )
 		var/response
 		if( new_character )
@@ -181,6 +158,38 @@
 
 		if( response == "No" )
 			return 1
+
+	if( !saveCharacter( force ))
+		return 0
+
+	if( !account.saveAccount( force ))
+		return 0
+
+	return 1
+
+/datum/character/proc/saveCharacter( var/force = 0 )
+	if( istype( char_mob ))
+		char_mob.fully_replace_character_name( char_mob.real_name, name )
+		copy_to( char_mob )
+		char_mob.update_hair()
+		char_mob.update_body()
+		char_mob.check_dna( char_mob )
+
+	if(( temporary && account.crew ) || ( temporary && !force )) // If we're just a temporary character and the user isnt forcing this save, dont save to database
+		return 1
+
+	establish_db_connection()
+	if( !dbcon.IsConnected() )
+		log_debug( "SAVE CHARACTER: Didn't save [name] / ([ckey]) because the database wasn't connected" )
+		return 0
+
+	if( !ckey && !force )
+		log_debug( "SAVE CHARACTER: Didn't save [name] because they didn't have a ckey" )
+		return 0
+
+	if ( IsGuestKey( ckey ) && !force )
+		log_debug( "SAVE CHARACTER: Didn't save [name] / ([ckey]) because they were a guest character" )
+		return 0
 
 	var/list/variables = list()
 
@@ -278,12 +287,12 @@
 
 		id = getCharID()
 
-	if( new_character || prompt )
+	if( new_character || force )
 		account.copyFrom( src )
 
 	new_character = 0
 
-	return 1
+	return id
 
 /datum/character/proc/loadCharacter( var/character_ident )
 	if( !character_ident )
@@ -403,10 +412,6 @@
 
 		vars[variables[i]] = value
 
-	account.copyFrom( src )
-
-	update_preview_icon()
-
 	return 1
 
 /datum/character/proc/randomize_appearance( var/random_age = 0 )
@@ -424,10 +429,12 @@
 	if( random_age )
 		age = rand(AGE_MIN,AGE_MAX)
 
-/datum/character/proc/randomize_appearance_for(var/mob/living/carbon/human/H)
-	randomize_appearance(1)
-	if(H)
-		copy_to(H,1)
+/proc/randomize_appearance_for(var/mob/living/carbon/human/H)
+	if( !istype( H ))
+		return
+
+	H.character.randomize_appearance(1)
+	H.character.copy_to(H,1)
 
 /datum/character/proc/randomize_hair_color(var/target = "hair")
 	if(prob (75) && target == "facial") // Chance to inherit hair color
@@ -623,10 +630,7 @@
 
 	skin_color = rgb( red, green, blue )
 
-/datum/character/proc/update_preview_icon()		//seriously. This is horrendous.
-	qdel(account.preview_icon_front)
-	qdel(account.preview_icon_side)
-
+/datum/character/proc/update_preview_icon( var/datum/job/job, var/title )		//seriously. This is horrendous.
 	var/icon/preview_icon = null
 
 	var/g = "m"
@@ -694,10 +698,9 @@
 		undershirt_s = new/icon("icon" = 'icons/mob/human.dmi', "icon_state" = "undershirt[undershirt]_s")
 
 	var/icon/clothes_s = null
-	var/datum/job/job = job_master.GetJob( account.GetHighestLevelJob() )
 
 	if( job )
-		clothes_s = job.make_preview_icon( backpack, account.GetPlayerAltTitle(job) , g)
+		clothes_s = job.make_preview_icon( backpack, title, g)
 
 	if(disabilities & NEARSIGHTED)
 		preview_icon.Blend(new /icon('icons/mob/eyes.dmi', "glasses"), ICON_OVERLAY)
@@ -710,13 +713,12 @@
 	if(clothes_s)
 		preview_icon.Blend(clothes_s, ICON_OVERLAY)
 
-	account.preview_icon_front = new(preview_icon, dir = SOUTH)
-	account.preview_icon_side = new(preview_icon, dir = WEST)
-
 	qdel(eyes_s)
 	qdel(underwear_s)
 	qdel(undershirt_s)
 	qdel(clothes_s)
+
+	return preview_icon
 
 /datum/character/proc/setHairColor( var/r, var/g, var/b )
 	hair_color = rgb( r, g, b )
