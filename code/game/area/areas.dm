@@ -1114,6 +1114,17 @@ area/space/atmosalert()
 	icon_state = "bridge"
 	environment = STONEROOM
 
+/area/bridge/bridgedorm
+	name = "\improper Bridge Dormitory"
+	icon_state = "bridge"
+	environment = STONEROOM
+
+/area/bridge/bridgelocker
+	name = "\improper Bridge Locker Room"
+	icon_state = "bridge"
+	environment = STONEROOM
+
+
 /area/bridge/bridgemed
 	name = "\improper Bridge Medical"
 	icon_state = "bridge"
@@ -1205,6 +1216,10 @@ area/space/atmosalert()
 
 /area/crew_quarters/maintrooms/secroom1
 	name = "\improper Fore Starboard Private Quarter One"
+	icon_state = "Sleep"
+
+/area/crew_quarters/maintrooms/arrivalroom1
+	name = "\improper Port Private Quarter One"
 	icon_state = "Sleep"
 
 /area/crew_quarters/maintrooms/secroom2
