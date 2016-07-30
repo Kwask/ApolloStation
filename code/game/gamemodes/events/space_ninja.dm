@@ -496,8 +496,7 @@ As such, it's hard-coded for now. No reason for it not to be, really.
 	var/ninja_name = pick(ninja_names)
 	new_ninja.gender = pick(MALE, FEMALE)
 
-	var/datum/character/C = new()//Randomize appearance for the ninja.
-	C.randomize_appearance_for(new_ninja)
+	randomize_appearance_for(new_ninja)
 	new_ninja.real_name = "[ninja_title] [ninja_name]"
 	new_ninja.dna.ready_dna(new_ninja)
 	new_ninja.create_mind_space_ninja()

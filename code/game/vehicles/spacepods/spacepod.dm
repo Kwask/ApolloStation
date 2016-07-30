@@ -329,7 +329,7 @@
 
 	// Removing the equipment
 	var/obj/item/SPE = input(user, "Remove which equipment?", null, null) as null|anything in equipment_system.spacepod_equipment
-	if( SPE )
+	if( SPE && in_range(src, user) )
 		equipment_system.dequip( SPE, user )
 		update_HUD( pilot )
 
@@ -894,6 +894,7 @@
 /obj/effect/landmark/spacepod/random/New()
 	..()
 
+/*
 /obj/spacepod/verb/fly_up()
 	if( src.pilot == usr )
 		set category = "Spacepod"
@@ -943,6 +944,7 @@
 			else
 				pilot << "<span class='warning'>There's nothing of interest below you!!</span>"
 		return
+*/
 
 /obj/spacepod/verb/move_inside()
 	set category = "Object"

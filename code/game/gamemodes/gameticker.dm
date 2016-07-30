@@ -335,6 +335,7 @@ var/global/datum/controller/gameticker/ticker
 			current_state = GAME_STATE_FINISHED
 
 			spawn
+				mode.persistant_antag_game_end() // After-the-game persistant antag stuff
 				declare_completion()
 
 			spawn(50)
@@ -444,8 +445,6 @@ var/global/datum/controller/gameticker/ticker
 
 	//Ask the event manager to print round end information
 	event_manager.RoundEnd()
-
-	mode.persistant_antag_game_end() // After-the-game persistant antag stuff
 
 	//Print a list of antagonists to the server log
 	var/list/total_antagonists = list()

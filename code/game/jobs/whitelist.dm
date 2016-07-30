@@ -89,8 +89,7 @@
 	if( !query.NextRow() )
 		return 0
 
-	var/sql = "UPDATE player SET whitelist_flags = '[flags]' WHERE ckey = '[ckey]'"
-	var/DBQuery/query_insert = dbcon.NewQuery(sql)
+	var/DBQuery/query_insert = dbcon.NewQuery("UPDATE player SET whitelist_flags = '[flags]' WHERE ckey = '[ckey]'")
 	query_insert.Execute()
 
 	return 1
@@ -199,8 +198,7 @@
 
 	existing_flags |= flags
 
-	var/sql = "UPDATE player SET species_flags = '[existing_flags]' WHERE ckey = '[ckey]'"
-	var/DBQuery/query_insert = dbcon.NewQuery(sql)
+	var/DBQuery/query_insert = dbcon.NewQuery("UPDATE player SET species_flags = '[existing_flags]' WHERE ckey = '[ckey]'")
 	query_insert.Execute()
 
 	return 1

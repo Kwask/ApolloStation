@@ -136,8 +136,8 @@
 	item_state = "card-id"
 	var/access = list()
 	var/registered_name = "Unknown" // The name registered_name on the card
-	var/mob/living/carbon/human/mob
-	var/datum/account/account
+
+	var/datum/account/character/account
 	slot_flags = SLOT_ID
 
 	var/blood_type = "\[UNSET\]"
@@ -157,8 +157,8 @@
 
 	spawn(30)
 		if(istype(loc, /mob/living/carbon/human))
-			mob = loc
-			account = mob.character.account
+			var/mob/living/carbon/human/H = loc
+			account = H.character.account
 
 			blood_type = loc:dna:b_type
 			dna_hash = loc:dna:unique_enzymes

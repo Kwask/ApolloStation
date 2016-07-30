@@ -30,16 +30,16 @@
 
 	var/obj/item/I = locate(/obj/item/device/pda) in antag.current.contents
 
-	if(antag.character && M.client.prefs.selected_character.account.uplink_location == "Headset" && locate(/obj/item/device/radio) in antag.current.contents)
+	if(antag.character && M.client.prefs.character.uplink_location == "Headset" && locate(/obj/item/device/radio) in antag.current.contents)
 		I = locate(/obj/item/device/radio) in antag.current.contents
 
 	if(!I)
 		return 0
 	if(istype(I, /obj/item/device/radio))
 		var/obj/item/device/radio/R = I
-		var/freq = rand(COMM_FREQ + 2, PUB_FREQ + 2)
+		var/freq = rand(1441, 1489)
 		while(freq in radiochannels)
-			freq = rand(COMM_FREQ + 2, PUB_FREQ + 2)
+			freq = rand(1441, 1489)
 
 		var/obj/item/device/uplink/hidden/T = new(I)
 		T.uplink_owner = antag

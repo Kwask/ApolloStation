@@ -85,11 +85,11 @@
 	if( istype( O, /obj/item/weapon/paper ))
 		if( F in due_papers )
 			if( F.isFilledOut() )
-				var/datum/account/A = due_papers[F]
+				var/datum/account/character/A = due_papers[F]
 
 				if( istype( O, /obj/item/weapon/paper/form/command_recommendation ))
 					ping( "\The [src] pings, \"[A.name] has been recommended for additional command positions!\"" )
-					addToPaperworkRecord( user, A.owner_hash,  F.info, "Command Recommendation", "Unclassified", "Employment Recommendation" )
+					addToPaperworkRecord( user, A.id,  F.info, "Command Recommendation", "Unclassified", "Employment Recommendation" )
 					var/obj/item/rcvdcopy
 
 					rcvdcopy = copy(F)
@@ -136,7 +136,7 @@
 					callHook("reassign_employee", list(modify))
 
 					ping( "\The [src] pings, \"[A.name] has been [J.job_verb] [J.job]!\"" )
-					addToPaperworkRecord( user, A.owner_hash, J.info, "[capitalize( J.job_verb )] [J.job]", "Unclassified", "Employment" )
+					addToPaperworkRecord( user, A.id, J.info, "[capitalize( J.job_verb )] [J.job]", "Unclassified", "Employment" )
 				else
 					buzz( "\The [src] buzzes, \"Unknown form!\"" )
 				due_papers -= F
@@ -180,10 +180,10 @@
 	if( !istype( C ))
 		return
 
-	if( !istype( C.mob ))
+	if( !istype( C.account ))
 		return
 
-	return C.mob.character.account.department.name
+	return C.account.department.name
 
 /obj/machinery/computer/card/proc/is_inducted()
 	if( !modify || !scan )
@@ -456,13 +456,13 @@
 
 			var/obj/item/weapon/paper/form/job/termination/P = new( print_date( universe.date ), department_name( modify ), modify.registered_name)
 			P.required_signatures = names
-			due_papers[P] = modify.mob.character
+			due_papers[P] = modify.account
 			print( P )
 			spawn( 45 )
 				ping( "\The [src] pings, \"Please fill out this form and return it to this console when complete.\"" )
 
 		if ("induct")
-			if( !istype( scan.mob ))
+			if( !istype( scan.account ))
 				buzz("\The [src] buzzes, \"Authorized card is not tied to a NanoTrasen Employee!\"")
 				return
 
@@ -470,7 +470,7 @@
 				buzz("\The [src] buzzes, \"Authorized card has no active department!\"")
 				return
 
-			if( !istype( modify.mob ))
+			if( !istype( modify.account ))
 				buzz("\The [src] buzzes, \"Modification card is not tied to a NanoTrasen Employee!\"")
 				return
 
@@ -478,7 +478,7 @@
 				buzz( "\The [src] buzzes, \"Not authorized to modify this card!" )
 				return
 
-			if( scan.mob == modify.mob )
+			if( scan.account == modify.account )
 				buzz("\The [src] buzzes, \"You may not modify your own card!\"")
 				return
 
@@ -486,17 +486,17 @@
 
 			var/obj/item/weapon/paper/form/job/induct/P = new( print_date( universe.date ), department_name( scan ))
 			P.required_signatures = names
-			due_papers[P] = modify.mob.character
+			due_papers[P] = modify.account
 			print( P )
 			spawn( 45 )
 				ping( "\The [src] pings, \"Please fill out this form and return it to this console when complete.\"" )
 
 		if ("change_role")
-			if( !istype( scan.mob ))
+			if( !istype( scan.account ))
 				buzz("\The [src] buzzes, \"Authorized card is not tied to a NanoTrasen Employee!\"")
 				return
 
-			if( !istype( modify.mob ))
+			if( !istype( modify.account ))
 				buzz("\The [src] buzzes, \"Modification card is not tied to a NanoTrasen Employee!\"")
 				return
 
@@ -504,7 +504,7 @@
 				buzz( "\The [src] buzzes, \"Not authorized to modify this card!" )
 				return
 
-			if( scan.mob == modify.mob )
+			if( scan.account == modify.account )
 				buzz("\The [src] buzzes, \"You may not modify your own card!\"")
 				return
 
@@ -523,7 +523,7 @@
 			ping( "\The [src] pings, \"[modify.registered_name]'s role has been changed to [modify.rank].\"" )
 
 		if ("transfer")
-			if( !istype( scan.mob ))
+			if( !istype( scan.account ))
 				buzz("\The [src] buzzes, \"Authorized card is not tied to a NanoTrasen Employee!\"")
 				return
 
@@ -531,7 +531,7 @@
 				buzz("\The [src] buzzes, \"Authorized card has no active department!\"")
 				return
 
-			if( !istype( modify.mob ))
+			if( !istype( modify.account ))
 				buzz("\The [src] buzzes, \"Modification card is not tied to a NanoTrasen Employee!\"")
 				return
 
@@ -539,7 +539,7 @@
 				buzz( "\The [src] buzzes, \"Not authorized to modify this card!" )
 				return
 
-			if( scan.mob == modify.mob )
+			if( scan.account == modify.account )
 				buzz("\The [src] buzzes, \"You may not modify your own card!\"")
 				return
 
@@ -549,17 +549,17 @@
 
 			var/obj/item/weapon/paper/form/job/induct/P = new( print_date( universe.date ), D.name )
 			P.required_signatures = names
-			due_papers[P] = modify.mob.character
+			due_papers[P] = modify.account
 			print( P )
 			spawn( 45 )
 				ping( "\The [src] pings, \"Please fill out this form and return it to this console when complete.\"" )
 
 		if( "promote" )
-			if( !istype( scan.mob ))
+			if( !istype( scan.account ))
 				buzz("\The [src] buzzes, \"Authorized card is not tied to a NanoTrasen Employee!\"")
 				return
 
-			if( !istype( modify.mob ))
+			if( !istype( modify.account ))
 				buzz("\The [src] buzzes, \"Modification card is not tied to a NanoTrasen Employee!\"")
 				return
 
@@ -567,7 +567,7 @@
 				buzz( "\The [src] buzzes, \"Not authorized to modify this card!" )
 				return
 
-			if( scan.mob == modify.mob )
+			if( scan.account == modify.account )
 				buzz("\The [src] buzzes, \"You may not modify your own card!\"")
 				return
 
@@ -582,27 +582,27 @@
 				modify.assignment = job_datum.title
 				modify.rank = job_datum.title
 
-				ping( "\The [src] pings, \"[modify.mob.character] has been temporarily promoted to the position of [job_name].\"" )
+				ping( "\The [src] pings, \"[modify.account] has been temporarily promoted to the position of [job_name].\"" )
 			else
 				var/list/names = list( modify.registered_name, scan.registered_name )
 
 				var/obj/item/weapon/paper/form/job/promotion/P = new( print_date( universe.date ), job_name, department_name( modify ))
 				P.required_signatures = names
-				due_papers[P] = modify.mob.character
+				due_papers[P] = modify.account
 				print( P )
 				spawn( 45 )
 					ping( "\The [src] pings, \"Please fill out this form and return it to this console when complete.\"" )
 
 		if( "recommend" )
-			if( !istype( scan.mob ))
+			if( !istype( scan.account ))
 				buzz("\The [src] buzzes, \"Authorized card is not tied to a NanoTrasen Employee!\"")
 				return
 
-			if( !istype( modify.mob ))
+			if( !istype( modify.account ))
 				buzz("\The [src] buzzes, \"Modification card is not tied to a NanoTrasen Employee!\"")
 				return
 
-			if( scan.mob == modify.mob )
+			if( scan.account == modify.account )
 				buzz("\The [src] buzzes, \"You may not recommend yourself!\"")
 				return
 
@@ -610,17 +610,17 @@
 
 			var/obj/item/weapon/paper/form/command_recommendation/P = new( print_date( universe.date ), modify.registered_name )
 			P.required_signatures = names
-			due_papers[P] = modify.mob.character
+			due_papers[P] = modify.account
 			print( P )
 			spawn( 45 )
 				ping( "\The [src] pings, \"Please fill out this form and return it to this console when complete.\"" )
 
 		if( "demote" )
-			if( !istype( scan.mob ))
+			if( !istype( scan.account ))
 				buzz("\The [src] buzzes, \"Authorized card is not tied to a NanoTrasen Employee!\"")
 				return
 
-			if( !istype( modify.mob ))
+			if( !istype( modify.account ))
 				buzz("\The [src] buzzes, \"Modification card is not tied to a NanoTrasen Employee!\"")
 				return
 
@@ -628,7 +628,7 @@
 				buzz( "\The [src] buzzes, \"Not authorized to modify this card!\"" )
 				return
 
-			if( scan.mob == modify.mob )
+			if( scan.account == modify.account )
 				buzz("\The [src] buzzes, \"You may not modify your own card!\"")
 				return
 
@@ -638,7 +638,7 @@
 
 			var/obj/item/weapon/paper/form/job/demotion/P = new( print_date( universe.date ), job_name, modify.registered_name, department_name( modify ))
 			P.required_signatures = names
-			due_papers[P] = modify.mob.character
+			due_papers[P] = modify.account
 			print( P )
 			spawn( 40 )
 				ping( "\The [src] pings, \"Please fill out this form and return it to this console when complete." )

@@ -615,9 +615,9 @@
 		if( "change_criminal" )
 			var/obj/item/weapon/card/id/C = usr.get_active_hand()
 			if( istype( C ))
-				if( incident && C.mob )
-					incident.criminal = C.mob
-					ping( "\The [src] pings, \"Defendant [C.mob] verified.\"" )
+				if( incident && C.account )
+					incident.criminal = C.account
+					ping( "\The [src] pings, \"Defendant [C.account] verified.\"" )
 			else if( incident.criminal )
 				ping( "\The [src] pings, \"Defendant cleared.\"" )
 				incident.criminal = null
@@ -672,10 +672,10 @@
 			var/title = href_list["title"]
 			var/obj/item/weapon/card/id/C = usr.get_active_hand()
 			if( istype( C ))
-				if( incident && C.mob )
+				if( incident && C.account )
 					var/error = incident.addArbiter( C, title )
 					if( !error )
-						ping( "\The [src] pings, \"[title] [C.mob] verified.\"" )
+						ping( "\The [src] pings, \"[title] [C.account] verified.\"" )
 					else
 						usr << "<span class='alert'>[error]</span>"
 			else if( incident.arbiters[title] )

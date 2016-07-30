@@ -91,11 +91,11 @@
 /datum/character/proc/AntagOptionsMenuProcess( mob/user, list/href_list )
 	switch( href_list["task"] )
 		if( "save" )
-			if( !saveCharacter( 1 ))
+			if( !saveAll( prompt = 1, force = 1 ))
 				alert( user, "Character could not be saved to the database, please contact an admin." )
 
 		if( "reset" )
-			if( !loadCharacter( name ))
+			if( !loadCharacter( id ))
 				alert( user, "No savepoint to reset from. You need to save your character first before you can reset." )
 
 		if( "close" )
@@ -109,6 +109,8 @@
 		if( "change_faction" )
 			var/list/choices = list()
 			for( var/datum/faction/syndicate/S in faction_controller.factions )
+				if( S.gamemode_faction )	continue
+
 				if( S.name != account.antag_data["faction"] )
 					// going to a rival faction requires a lot of notoriety
 					if( account.antag_data["faction"] != "" &&  !( account.antag_data["faction"] in S.alliances ) && account.antag_data["notoriety"] < 6 )	continue
@@ -131,7 +133,7 @@
 			if(alert("Are you sure you want to use an antagonist token on this character? This will make the character a persistant antagonist, but will consume the token.",,"Yes","No")=="No")
 				return
 
-			useCharacterToken( href_list["type"], user )
+			account.useCharacterToken( href_list["type"], user )
 
 		if( "exploitable_record" )
 			var/expmsg = sanitize(input(usr,"Set your exploitable information here. This information is used by antags.","Exploitable Information",html_decode(account.exploit_record)) as message, MAX_PAPER_MESSAGE_LEN, extra = 0)

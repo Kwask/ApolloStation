@@ -205,6 +205,7 @@
 /obj/item/clothing/suit/storage/toggle/labcoat/ominousbrainworm
 	name = "Eriziki Sidier's labcoat"
 	desc = "A labcoat that has a nametag noting that it belongs to Eriziki Sidier."
+	icon = 'icons/obj/clothing/suits.dmi'
 	icon_state = "labcoat_sidier"
 	item_state = "labcoat_sidier"
 	icon_open = "labcoat_sidier"
@@ -258,3 +259,12 @@
 	icon = 'icons/obj/custom_items.dmi'
 	icon_state = "garm"
 	item_state = "garm"
+
+/obj/item/clothing/suit/storage/toggle/labcoat/fluff/callmanfok
+	name = "red labcoat"
+	desc = "A labcoat tagged with the name \"Phoebe Weisgarber\". Underneath it has a embroidered badge that says, \"From your friends aboard the NOS Apollo.\""
+	icon = 'icons/obj/custom_items.dmi'
+	icon_state = "callmanfok"
+	item_state = "callmanfok"
+	icon_open = "callmanfok_open"
+	icon_closed = "callmanfok"

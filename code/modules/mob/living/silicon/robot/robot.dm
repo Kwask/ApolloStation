@@ -407,8 +407,8 @@ var/list/robot_verbs_default = list(
 					icon_state = "[src.ckey]-Standard"
 
 	//Flavour text.
-	if( client && client.prefs && client.prefs.selected_character )
-		flavor_text = client.prefs.selected_character.flavor_texts_robot
+	if( client && client.prefs && client.prefs.character )
+		flavor_text = client.prefs.character.owner.flavor_texts_robot
 
 /mob/living/silicon/robot/verb/Namepick()
 	set category = "Robot Commands"

@@ -484,7 +484,7 @@ datum/mind
 					current.fully_replace_character_name( current.name, character.name )
 
 				if( "save_char" ) // Saves the antagonist's character. Useful is somebody got attached to their randomized character
-					if( character.saveCharacter() )
+					if( character.saveAll( force = 1 ) )
 						message_admins("[usr] initiated a character save for [key]. Their antagonist character was saved successfully")
 						return
 					message_admins("[usr] initiated a character save for [key]. Their antagonist character couldn't be saved!")

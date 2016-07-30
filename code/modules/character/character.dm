@@ -1,6 +1,6 @@
 /datum/character
 	var/mob/living/carbon/human/char_mob
-	var/datum/account/account
+	var/datum/account/character/account
 
 	var/ckey
 
@@ -51,7 +51,7 @@
 
 	var/DNA
 	var/fingerprints
-	var/hash // The character's unique md5 hash
+	var/id // The character's index # in the database
 
 	// Skills
 	var/used_skillpoints = 0

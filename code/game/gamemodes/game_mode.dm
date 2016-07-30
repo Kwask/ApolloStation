@@ -128,7 +128,7 @@
 
 	// Get a list of all the people who want to be the antagonist for this round
 	for(var/mob/new_player/player in players)
-		if( player.client.prefs.selected_character && player.client.prefs.selected_character.isPersistantAntag() )
+		if( player.client.prefs.character && player.client.prefs.character.isPersistantAntag() )
 			log_debug("[player.key] is a persistant antag.")
 			candidates += player.mind
 			players -= player
@@ -146,7 +146,7 @@
 
 		log_debug("Picked [traitor.name] for persistant antag.")
 		persistant_traitors += traitor
-		var/faction = traitor.current.client.prefs.selected_character.getAntagFaction() // please dont break
+		var/faction = traitor.current.client.prefs.character.getAntagFaction() // please dont break
 
 		traitor.antagonist = new /datum/antagonist/traitor/persistant( traitor, faction )
 		candidates.Remove(traitor)
@@ -279,9 +279,7 @@
 /datum/game_mode/proc/persistant_antag_game_end()
 	for( var/datum/mind/traitor in persistant_traitors )
 		var/datum/antagonist/antag = traitor.antagonist
-		if( antag )	continue // admin removed them or something, idk
-
-		// antag got caught check goes here
+		if( !antag )	continue // admin removed them or something, idk
 
 		var/notoriety = traitor.original_character.account.antag_data["notoriety"]
 		var/contract_requirement = round( ( notoriety + 1 ) / 2 )
@@ -308,15 +306,14 @@
 	var/intercepttext = "<FONT size = 3><B>Cent. Com. Update</B> Requested status information:</FONT><HR>"
 	intercepttext += "<B> In case you have misplaced your copy, attached is a list of personnel whom reliable sources&trade; suspect may be affiliated with subversive elements:</B><br>"
 
-
 	var/list/suspects = list()
 	for(var/mob/living/carbon/human/man in player_list) if(man.client && man.mind)
 		// NT relation option
 		var/special_role = man.mind.special_role
 		if (special_role == "Wizard" || special_role == "Ninja" || special_role == "Mercenary" || special_role == "Vox Raider")
 			continue	//NT intelligence ruled out possiblity that those are too classy to pretend to be a crew.
-		if(man.client.prefs.selected_character.account.nanotrasen_relation == "Opposed" && prob(50) || \
-			man.client.prefs.selected_character.account.nanotrasen_relation == "Skeptical" && prob(20))
+		if(man.client.prefs.character.nanotrasen_relation == "Opposed" && prob(50) || \
+			man.client.prefs.character.nanotrasen_relation == "Skeptical" && prob(20))
 			suspects += man
 		// Antags
 		else if(special_role == "traitor" && prob(40) || \
@@ -477,6 +474,7 @@
 	if(!num_antags)	return null
 
 	var/list/possible_antags = get_players_for_role(role)
+	log_debug("(pick_antagonists) Amount of possible antags: [possible_antags.len]")
 	var/list/chosen_antags = list()
 	var/list/clients = list()
 
@@ -628,9 +626,9 @@ proc/get_nt_opposed()
 	var/list/dudes = list()
 	for(var/mob/living/carbon/human/man in player_list)
 		if(man.client)
-			if(man.client.prefs.selected_character.account.nanotrasen_relation == "Opposed")
+			if(man.client.prefs.character.nanotrasen_relation == "Opposed")
 				dudes += man
-			else if(man.client.prefs.selected_character.account.nanotrasen_relation == "Skeptical" && prob(50))
+			else if(man.client.prefs.character.nanotrasen_relation == "Skeptical" && prob(50))
 				dudes += man
 	if(dudes.len == 0) return null
 	return pick(dudes)

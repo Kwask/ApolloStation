@@ -34,7 +34,7 @@ var/list/preferences_datums = list()
 	var/alternate_spawn_option = RETURN_TO_LOBBY
 
 	// Saved characters
-	var/datum/character/selected_character
+	var/datum/account/character/character
 
 	// Items tied to the account
 	var/list/account_items = list()

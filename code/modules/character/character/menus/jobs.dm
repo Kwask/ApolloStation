@@ -168,11 +168,11 @@
 /datum/character/proc/JobChoicesMenuProcess( mob/user, list/href_list )
 	switch(href_list["task"])
 		if( "save" )
-			if( !saveCharacter( 1 ))
+			if( !saveAll( prompt = 1, force = 1 ))
 				alert( user, "Character could not be saved to the database, please contact an admin." )
 
 		if( "reset" )
-			if( !loadCharacter( name ))
+			if( !loadCharacter( id ))
 				alert( user, "No savepoint to reset from. You need to save your character first before you can reset." )
 
 		if("close")
@@ -199,7 +199,7 @@
 			if(alert("Are you sure you want to use a command token on this character? This will unlock all roles in your selected department, but will consume the token.",,"Yes","No")=="No")
 				return
 
-			useCharacterToken( href_list["type"], user )
+			account.useCharacterToken( href_list["type"], user )
 		if("random")
 			var/option = user.client.prefs.alternate_spawn_option
 			if(option == GET_RANDOM_JOB || option == BE_ASSISTANT)

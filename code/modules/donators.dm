@@ -70,8 +70,7 @@ proc/get_donator(client/C)
 	if( !query.NextRow() )
 		return 0
 
-	var/sql = "UPDATE player SET donator_flags = '[flags]' WHERE ckey = '[ckey]'"
-	var/DBQuery/query_insert = dbcon.NewQuery(sql)
+	var/DBQuery/query_insert = dbcon.NewQuery("UPDATE player SET donator_flags = '[flags]' WHERE ckey = '[ckey]'")
 	query_insert.Execute()
 
 	return 1

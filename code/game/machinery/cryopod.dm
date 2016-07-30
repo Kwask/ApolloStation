@@ -319,7 +319,7 @@
 		var/mob/living/carbon/human/H = occupant
 		if( H.character )
 			if( !H.character.new_character ) // If they've been saved to the database previously
-				H.character.saveCharacter()
+				H.character.saveAll()
 
 	//Drop all items into the pod.
 	for(var/obj/item/W in occupant)

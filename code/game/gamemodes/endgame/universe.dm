@@ -17,7 +17,7 @@
 	if( !day || day < 1 )
 		day = 1
 
-	universe.date = list( year, month, day )
+	universe.date = list( "year" = year, "month" = month, "day" = day )
 
  // Default shit.
 /datum/universal_state
@@ -61,7 +61,7 @@
 			log_debug( "Loaded date was [date.len] in length!" )
 			continue
 
-		var/days = daysTilDate( list( START_YEAR, 1, 1 ), date )
+		var/days = daysTilDate( list( "year" = START_YEAR, "month" = 1, "day" = 1 ), date )
 
 		if( days <= 0 )
 			log_debug( "Loaded date was [days] days behind the default date!" )
@@ -73,13 +73,13 @@
 		log_debug( "Date progressed: [print_date( date )]!" )
 		return
 
-	date = list( START_YEAR, 1, 1 )
+	date = list( "year" = START_YEAR, "month" = 1, "day" = 1 )
 
 	log_debug( "Failed to load the universe date after [max_attempts] attempts!" )
 
 // Returns the universe datetime in format "YYYY-MM-DD HH:MM:SS"
 /datum/universal_state/proc/getDateTime()
-	var/timestamp = "[date[1]]-[ date[2] < 10 ? date[2] : add_zero( date[2] )]-[ date[3] < 10 ? date[3] : add_zero( date[3] )]"
+	var/timestamp = "[date["year"]]-[ date["month"] < 10 ? date["month"] : add_zero( date["month"] )]-[ date["day"] < 10 ? date["day"] : add_zero( date["day"] )]"
 
 	var/seconds = world.time / 10 % 60
 	timestamp += " [worldtime2text()]:[ seconds < 10 ? seconds : add_zero( seconds )]"
@@ -122,7 +122,7 @@
 	var/message = "Saved date: "
 
 	for( var/i in date )
-		message += "[i] "
+		message += "[date[i]] "
 
 	log_debug( "[message]" )
 
@@ -143,7 +143,7 @@
 		log_debug( "Database is not connected yet!" )
 		return
 
-	var/list/D = list( START_YEAR, 1, 1 )
+	var/list/D = list( "year" = START_YEAR, "month" = 1, "day" = 1 )
 
 	var/sql_name = sql_sanitize_text( univ_name )
 
@@ -155,7 +155,7 @@
 		return D
 
 	var/list/date_text = params2list( html_decode( query.item[1] ))
-	for( var/i = 1, i <= date_text.len, i++ )
+	for( var/i in date_text )
 		D[i] = text2num( date_text[i] )
 
 	return D

@@ -40,17 +40,17 @@
 // This randomizes the antag character, used for any non-persistant antags
 /datum/antagonist/proc/randomize_character()
 	if( !antag.original_character )
-		antag.original_character = antag.current.client.prefs.selected_character
+		antag.original_character = antag.current.client.prefs.character
 
 	var/datum/character/C = new( antag.current.client.ckey )
 	C.randomize_appearance( 1 )
 
-	antag.current.client.prefs.selected_character = C
+	antag.current.client.prefs.character = C
 
 	if( istype( antag.current, /mob/living/carbon/human ))
 		C.copy_to( antag.current ) // for latespawns
 
-	antag.current.client.prefs.selected_character.account.copy_metadata_to( C.account )
+	antag.current.client.prefs.character.copy_metadata_to( C.account )
 	C.temporary = 1
 
 	antag.current << "<span class='ooc_notice'>You are a non-persistent antagonist and have received a randomized character!</span>"

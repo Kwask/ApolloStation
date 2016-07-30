@@ -2,12 +2,16 @@
 	set name = "Promote / Demote"
 	set category = "Fun"
 
-	if(!check_rights( R_MOD|R_ADMIN ))
+	if( !holder )
+		return
+
+	if( check_rights( R_MOD ))
+		src << "<span class='warning'>Mods are not allowed to use this verb.</span>"
 		return
 
 	var/mob/user = usr
 
-	var/datum/account/A = M.character.account
+	var/datum/account/character/A = M.character.account
 
 	var/type = input( user, "What type of role modification?", "Set Department" ) as null|anything in list( "Set Department", "Promotion", "Demotion" )
 
