@@ -70,8 +70,8 @@
 	var/sql_author_ckey = "'[ckey( user.client.ckey )]'"
 	var/sql_author_name = "'[sql_sanitize_text( user.character.name )]'"
 	var/sql_author_ip = "'[sql_sanitize_text( user.client.address )]'"
-	var/sql_author_id = "'[sql_sanitize_text( user.character.account.id )]'"
-	var/sql_recipient_id = "'[sql_sanitize_text( recipient_id )]'"
+	var/sql_author_id = "'[user.character.account.id]'"
+	var/sql_recipient_id = "'[recipient_id]'"
 
 	var/sql_clearence = "'[sql_sanitize_text( clearence )]'"
 	var/sql_category = "'[sql_sanitize_text( category )]'"

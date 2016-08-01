@@ -397,7 +397,7 @@ What a mess.*/
 					if( !title )
 						title = "Note"
 
-					var/rec_id = href_list["rec_id"]
+					var/rec_id = text2num( href_list["rec_id"] )
 					if( !addToPaperworkRecord( usr, rec_id, P.info, "[title]", "Unclassified", "Employment Notes" ))
 						buzz( "\The [src] buzzes, \"Could not add note!\"" )
 					else
