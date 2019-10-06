@@ -224,7 +224,7 @@
 	var/sql_ckey = ckey( user.client.ckey )
 
 	establish_db_connection()
-	if( dbcon.IsConnected() )
+	if(dbcon.IsConnected())
 		var/DBQuery/query = dbcon.NewQuery("SELECT employment_status, prison_date, name, id, gender, department FROM character_records ORDER BY name")
 		query.Execute()
 

@@ -9,7 +9,7 @@
 	var/obj/item/scanning
 	var/datum/data/record/forensic/current
 
-	var/list/filters = list()
+	var/list/search_filters = list()
 	var/list/current_list = list()
 
 	var/list/files = list()
@@ -96,50 +96,50 @@
 	for(var/id in files)
 		var/datum/data/record/forensic/cur = files[id]
 		var/add = 1
-		if(filters["name"])
+		if(search_filters["name"])
 			add = 0
-			for(var/filter in filters["name"])
+			for(var/filter in search_filters["name"])
 				if(findtext(cur.fields["name"], filter))
 					add = 1
 					break
 
-		if(filters["area"])
+		if(search_filters["area"])
 			add = 0
-			for(var/filter in filters["area"])
+			for(var/filter in search_filters["area"])
 				if(findtext(cur.fields["area"], filter))
 					add = 1
 					break
 
-		if(filters["fprints"])
+		if(search_filters["fprints"])
 			add = 0
 			var/list/prints = cur.fields["fprints"]
 			for(var/pid in prints)
 				var/print = prints[pid]
 				if (is_complete_print(print))
-					for(var/filter in filters["fprints"])
+					for(var/filter in search_filters["fprints"])
 						if(findtext(print, filter))
 							add = 1
 							break
 
-		if(filters["fibers"])
+		if(search_filters["fibers"])
 			add = 0
 			for(var/fiber in cur.fields["fibers"])
-				for(var/filter in filters["fibers"])
+				for(var/filter in search_filters["fibers"])
 					if(findtext(fiber, filter))
 						add = 1
 						break
 
-		if(filters["blood"])
+		if(search_filters["blood"])
 			add = 0
 			for(var/DNA in cur.fields["blood"])
-				for(var/filter in filters["blood"])
+				for(var/filter in search_filters["blood"])
 					if(findtext(DNA, filter))
 						add = 1
 						break
 
-		if(filters["label"])
+		if(search_filters["label"])
 			add = 0
-			for(var/filter in filters["label"])
+			for(var/filter in search_filters["label"])
 				if(cur.fields["label"] && findtext(cur.fields["label"], filter))
 					add = 1
 					break
